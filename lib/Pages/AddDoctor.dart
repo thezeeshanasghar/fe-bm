@@ -45,8 +45,7 @@ class DoctorForm extends StatefulWidget {
 }
 
 class _DoctorFormState extends State<DoctorForm> {
-  final addDoctorFormKey = GlobalKey<FormState>();
-  final doctorController = TextEditingController();
+  final doctorFormKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
 
   String FirstName;
@@ -73,6 +72,11 @@ class _DoctorFormState extends State<DoctorForm> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.bodyText2,
@@ -86,12 +90,12 @@ class _DoctorFormState extends State<DoctorForm> {
               child: Padding(
                   padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                   child: Form(
-                    key: addDoctorFormKey,
+                    key: doctorFormKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        widgetProfileImage(),
-                        widgetSizedBox(),
+                        // widgetProfileImage(),
+                        // widgetSizedBox(),
                         widgetFirstName(),
                         widgetLastName(),
                         widgetFatherOrHusbandName(),
@@ -114,12 +118,6 @@ class _DoctorFormState extends State<DoctorForm> {
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    doctorController.dispose();
-    super.dispose();
   }
 
   // widget functions
@@ -592,7 +590,7 @@ class _DoctorFormState extends State<DoctorForm> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!addDoctorFormKey.currentState.validate()) {
+                if (!doctorFormKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
                           Text('Error: Some input fields are not filled.')));
@@ -600,7 +598,7 @@ class _DoctorFormState extends State<DoctorForm> {
                 }
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Successfull')));
-                addDoctorFormKey.currentState.save();
+                doctorFormKey.currentState.save();
                 print(JoiningDate.toString());
               },
             ),
@@ -681,10 +679,10 @@ class _DoctorFormState extends State<DoctorForm> {
     });
   }
 
-  // void takePhotoFromWeb() async {
-  //   final pickedFile = await FlutterWebImagePicker.getImage;
-  //   setState(() {
-  //     image = pickedFile;
-  //   });
-  // }
+// void takePhotoFromWeb() async {
+//   final pickedFile = await FlutterWebImagePicker.getImage;
+//   setState(() {
+//     image = pickedFile;
+//   });
+// }
 }
