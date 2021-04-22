@@ -59,6 +59,22 @@ class HomeDrawer extends StatelessWidget {
                 Navigator.pushNamed(context, '/AddProcedures');
               },
             ),
+            ListTile(
+              leading: Icon(Icons.list_alt),
+              title: Text('Services'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/AddService');
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.list_alt),
+              title: Text('Room'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/AddRoom');
+              },
+            ),
           ],
         ),
       ),
