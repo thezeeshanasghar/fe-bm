@@ -61,6 +61,8 @@ class _DoctorFormState extends State<DoctorForm> {
   int EmergencyConsultationFee;
   int FeeShare;
   DateTime JoiningDate;
+  List<String> qualificationList = [''];
+  List<String> diplomaList = [''];
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
@@ -105,6 +107,9 @@ class _DoctorFormState extends State<DoctorForm> {
                         widgetEmail(),
                         widgetAddress(),
                         widgetSpeciality(),
+                        ...widgetQualification(),
+                        widgetExperience(),
+                        ...widgetDiplomas(),
                         widgetConsultationFee(),
                         widgetEmergencyConsultationFee(),
                         widgetFeeShare(),
@@ -121,6 +126,220 @@ class _DoctorFormState extends State<DoctorForm> {
   }
 
   // widget functions
+
+  List<Widget> widgetQualification() {
+    List<Widget> qualificationWidgetList = [];
+
+    for (int i = 0; i < qualificationList.length; i++) {
+      qualificationWidgetList.add(Column(
+        children: [
+          Card(
+            color: Colors.grey[100],
+            shadowColor: Colors.grey,
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Column(
+                          children: [
+                            Stack(
+                              children: <Widget>[
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: _imageFile != null
+                                      ? FileImage(File(_imageFile.path))
+                                      : AssetImage('assets/certificate.png'),
+                                ),
+                                Positioned(
+                                    bottom: 10.0,
+                                    right: 10.0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: ((builder) =>
+                                                bottomSheet()));
+                                      },
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.teal,
+                                        size: 22,
+                                      ),
+                                    ))
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            autofocus: false,
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Qualification'),
+                            validator: (String value) {
+                              if (value == null || value.isEmpty) {
+                                return 'This field cannot be empty';
+                              }
+                              return null;
+                            },
+                            onSaved: (String value) {
+                              FirstName = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        _addRemoveButton(i == qualificationList.length - 1, i, qualificationList)
+                      ],
+                    ),
+                  ],
+                )),
+          ),
+        ],
+      ));
+    }
+    return qualificationWidgetList;
+  }
+
+  Widget _addRemoveButton(bool add, int index, List<String> list) {
+    return InkWell(
+      onTap: () {
+        if (add) {
+          list.insert(0, null);
+        } else {
+          list.removeAt(index);
+        }
+        setState(() {});
+      },
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: (add) ? Colors.green : Colors.red,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(
+          (add) ? Icons.add : Icons.remove,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  List<Widget> widgetDiplomas() {
+    List<Widget> diplomaWidgetList = [];
+
+    for (int i = 0; i < diplomaList.length; i++) {
+      diplomaWidgetList.add(Column(
+        children: [
+          Card(
+            color: Colors.grey[100],
+            shadowColor: Colors.grey,
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Column(
+                          children: [
+                            Stack(
+                              children: <Widget>[
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: _imageFile != null
+                                      ? FileImage(File(_imageFile.path))
+                                      : AssetImage('assets/diplomas.png'),
+                                ),
+                                Positioned(
+                                    bottom: 10.0,
+                                    right: 10.0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: ((builder) =>
+                                                bottomSheet()));
+                                      },
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.teal,
+                                        size: 22,
+                                      ),
+                                    ))
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            autofocus: false,
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Diplomas'),
+                            validator: (String value) {
+                              if (value == null || value.isEmpty) {
+                                return 'This field cannot be empty';
+                              }
+                              return null;
+                            },
+                            onSaved: (String value) {
+                              FirstName = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        _addRemoveButton(i == diplomaList.length - 1, i, diplomaList)
+                      ],
+                    ),
+                  ],
+                )),
+          ),
+        ],
+      ));
+    }
+    return diplomaWidgetList;
+  }
+
+  Widget widgetExperience() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            decoration: InputDecoration(
+                icon: Icon(Icons.date_range_sharp),
+                border: OutlineInputBorder(),
+                labelText: 'Experience'),
+            // validator: (String value) {
+            //   if (value == null || value.isEmpty) {
+            //     return 'This field cannot be empty';
+            //   }
+            //   return null;
+            // },
+            // onSaved: (String value) {
+            //   FirstName = value;
+            // },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget widgetProfileImage() {
     return Column(
       children: [

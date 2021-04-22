@@ -52,10 +52,10 @@ class _NurseFormState extends State<NurseForm> {
   int ProceduresShare;
   int Salary;
   DateTime JoiningDate;
+  List<String> qualificationList = [''];
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
-  Image image;
 
   @override
   void initState() {
@@ -104,6 +104,7 @@ class _NurseFormState extends State<NurseForm> {
                         widgetJoiningDate(),
                         widgetProcedureShare(),
                         widgetSalary(),
+                        ...widgetQualification(),
                         widgetSubmit()
                       ],
                     ),
@@ -115,7 +116,135 @@ class _NurseFormState extends State<NurseForm> {
     );
   }
 
+  // functions required for working
+  pickDate() async {
+    DateTime date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        JoiningDate = date;
+        joinDateController.text = JoiningDate.toString();
+      });
+    }
+  }
+
+  void takePhotoFromPhone(ImageSource source) async {
+    final pickedFile = await _imagePicker.getImage(source: source);
+    setState(() {
+      _imageFile = pickedFile;
+    });
+  }
+
   // widget functions
+  List<Widget> widgetQualification() {
+    List<Widget> qualificationWidgetList = [];
+
+    for (int i = 0; i < qualificationList.length; i++) {
+      qualificationWidgetList.add(Column(
+        children: [
+          Card(
+            color: Colors.grey[100],
+            shadowColor: Colors.grey,
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Column(
+                          children: [
+                            Stack(
+                              children: <Widget>[
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: _imageFile != null
+                                      ? FileImage(File(_imageFile.path))
+                                      : AssetImage('assets/certificate.png'),
+                                ),
+                                Positioned(
+                                    bottom: 10.0,
+                                    right: 10.0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: ((builder) =>
+                                                bottomSheet()));
+                                      },
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.teal,
+                                        size: 22,
+                                      ),
+                                    ))
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            autofocus: false,
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Qualification'),
+                            validator: (String value) {
+                              if (value == null || value.isEmpty) {
+                                return 'This field cannot be empty';
+                              }
+                              return null;
+                            },
+                            onSaved: (String value) {
+                              FirstName = value;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        _addRemoveButton(i == qualificationList.length - 1, i)
+                      ],
+                    ),
+                  ],
+                )),
+          ),
+        ],
+      ));
+    }
+    return qualificationWidgetList;
+  }
+
+  Widget _addRemoveButton(bool add, int index) {
+    return InkWell(
+      onTap: () {
+        if (add) {
+          qualificationList.insert(0, null);
+        } else {
+          qualificationList.removeAt(index);
+        }
+        setState(() {});
+      },
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: (add) ? Colors.green : Colors.red,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(
+          (add) ? Icons.add : Icons.remove,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
   Widget widgetProfileImage() {
     return Column(
       children: [
@@ -595,8 +724,6 @@ class _NurseFormState extends State<NurseForm> {
     );
   }
 
-
-
   Widget widgetJoiningDate() {
     return Column(
       children: [
@@ -685,7 +812,6 @@ class _NurseFormState extends State<NurseForm> {
               TextButton.icon(
                   onPressed: () {
                     if (kIsWeb) {
-                      // takePhotoFromWeb();
                       takePhotoFromPhone(ImageSource.gallery);
                     } else {
                       takePhotoFromPhone(ImageSource.camera);
@@ -699,7 +825,6 @@ class _NurseFormState extends State<NurseForm> {
               TextButton.icon(
                   onPressed: () {
                     if (kIsWeb) {
-                      // takePhotoFromWeb();
                       takePhotoFromPhone(ImageSource.gallery);
                     } else {
                       takePhotoFromPhone(ImageSource.gallery);
@@ -712,27 +837,5 @@ class _NurseFormState extends State<NurseForm> {
         ],
       ),
     );
-  }
-
-  // functions required for working
-  pickDate() async {
-    DateTime date = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(DateTime.now().year + 1));
-    if (date != null) {
-      setState(() {
-        JoiningDate = date;
-        joinDateController.text = JoiningDate.toString();
-      });
-    }
-  }
-
-  void takePhotoFromPhone(ImageSource source) async {
-    final pickedFile = await _imagePicker.getImage(source: source);
-    setState(() {
-      _imageFile = pickedFile;
-    });
   }
 }
