@@ -16,8 +16,10 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('Hi Doctor,'),
+        backgroundColor: Colors.grey,
       ),
       drawer: Drawer(
         child: ListView(
@@ -25,7 +27,7 @@ class HomeDrawer extends StatelessWidget {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.teal,
+                color: Colors.grey,
               ),
               child: Text(
                 'Hi Doctor!',
