@@ -1,38 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:dropdown_formfield/dropdown_formfield.dart';
 
-class AddProcedures extends StatefulWidget {
+class AddRoom extends StatefulWidget {
   @override
-  _AddProcedureState createState() => _AddProcedureState();
+  _AddRoomState createState() => _AddRoomState();
 }
 
-class _AddProcedureState extends State<AddProcedures> {
+class _AddRoomState extends State<AddRoom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text("Add Procedure"),
+        title: Text("Add Room"),
         centerTitle: false,
         backgroundColor: Colors.grey,
         elevation: 0.0,
       ),
-      body: ProcedureForm(),
+      body: ServiceForm(),
     );
   }
 }
 
-class ProcedureForm extends StatefulWidget {
+class ServiceForm extends StatefulWidget {
   @override
-  _ProcedureFormState createState() => _ProcedureFormState();
+  _ServiceFormState createState() => _ServiceFormState();
 }
 
-class _ProcedureFormState extends State<ProcedureForm> {
+class _ServiceFormState extends State<ServiceForm> {
   @override
-  final addProcedureFormKey = GlobalKey<FormState>();
-  String ProcedureName;
-  String PerformedBy;
-  double Charges;
-  double Share;
+  final addRoomFormKey = GlobalKey<FormState>();
+  String RoomNo;
+  String RoomType;
+  String RoomCapacity;
+  String Charges;
+
   Widget build(BuildContext context) {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.bodyText2,
@@ -43,43 +45,43 @@ class _ProcedureFormState extends State<ProcedureForm> {
               constraints: BoxConstraints(
                 minHeight: viewportConstraints.minHeight,
               ),
-          child: Form(
-          key: addProcedureFormKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
+              child: Form(
+                key: addRoomFormKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
 
-                  Column(
-                    children: [
-                      widgetProcedureName(),
-                      widgetPerformedBy(),
-                      widgetCharges(),
-                      widgetShare(),
-                      widgetSubmit()
-                    ],
+                    Column(
+                      children: [
+                        widgetroomNo(),
+                        widgetRoomType(),
+                        widgetCapacity(),
+                        widgetCharges(),
+                        widgetSubmit()
+                      ],
 
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-          ),
             ),
           );
         },
       ),
     );
   }
-  Widget widgetProcedureName() {
+  Widget widgetroomNo() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
             autofocus: false,
-            maxLength: 30,
+            maxLength: 6,
             decoration: InputDecoration(
                 icon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
-                labelText: 'Procedure Name'),
+                labelText: 'Room No'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -87,25 +89,74 @@ class _ProcedureFormState extends State<ProcedureForm> {
               return null;
             },
             onSaved: (String value) {
-              ProcedureName = value;
+              RoomNo = value;
             },
           ),
         ),
       ],
     );
   }
-  Widget widgetPerformedBy() {
+  Widget widgetRoomType() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: DropDownFormField(
+            value: RoomType,
+            titleText: 'Speciality',
+            hintText: 'Please choose one',
+
+            onSaved: (value) {
+              setState(() {
+                RoomType = value;
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onChanged: (value) {
+              setState(() {
+                RoomType = value;
+              });
+            },
+            dataSource: [
+              {
+                "display": "Typ-1",
+                "value": "1",
+              },
+              {
+                "display": "Typ-2",
+                "value": "2",
+              },
+              {
+                "display": "Typ-3",
+                "value": "3",
+              },
+            ],
+            textField: 'display',
+            valueField: 'value',
+          ),
+        ),
+      ],
+    );
+  }
+  Widget widgetCapacity() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
             autofocus: false,
-            maxLength: 15,
+            maxLength: 2,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
-                labelText: 'Performed By'),
+                labelText: 'Room Capacity'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -113,7 +164,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
               return null;
             },
             onSaved: (String value) {
-              PerformedBy = value;
+              RoomNo = value;
             },
           ),
         ),
@@ -127,58 +178,25 @@ class _ProcedureFormState extends State<ProcedureForm> {
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
             autofocus: false,
-            maxLength: 5,
+            maxLength: 4,
             decoration: InputDecoration(
                 icon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
-                labelText: 'Charges'),
+                labelText: 'Room Charges(Per Hour)'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              if(double.tryParse(value)<=0){
-                return 'Input Error: cannot enter negative digits';
-              }
               return null;
             },
             onSaved: (String value) {
-              Charges = double.parse(value);
+              Charges = value;
             },
           ),
         ),
       ],
     );
   }
-  Widget widgetShare() {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: TextFormField(
-            autofocus: false,
-            maxLength: 3,
-            decoration: InputDecoration(
-                icon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-                labelText: 'Performer Share'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              //if(value>=0 || value<=100){
-               // return 'This field cannot be empty';
-              //}
-              return null;
-            },
-            onSaved: (String value) {
-              Share =double.tryParse(value);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget widgetSubmit() {
     return Column(
       children: [
@@ -194,7 +212,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!addProcedureFormKey.currentState.validate()) {
+                if (!addRoomFormKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
                       Text('Error: Some input fields are not filled.')));
@@ -202,7 +220,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
                 }
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Successfull')));
-                addProcedureFormKey.currentState.save();
+                addRoomFormKey.currentState.save();
               },
             ),
           ),
@@ -212,4 +230,3 @@ class _ProcedureFormState extends State<ProcedureForm> {
   }
 
 }
-
