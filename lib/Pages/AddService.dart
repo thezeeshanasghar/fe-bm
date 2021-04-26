@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
 
-class AddProcedures extends StatefulWidget {
+class AddService extends StatefulWidget {
   @override
-  _AddProcedureState createState() => _AddProcedureState();
+  _AddServiceState createState() => _AddServiceState();
 }
 
-class _AddProcedureState extends State<AddProcedures> {
+class _AddServiceState extends State<AddService> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text("Add Procedure"),
+        title: Text("Add Service"),
         centerTitle: false,
         backgroundColor: Colors.grey,
         elevation: 0.0,
       ),
-      body: ProcedureForm(),
+      body: ServiceForm(),
     );
   }
 }
 
-class ProcedureForm extends StatefulWidget {
+class ServiceForm extends StatefulWidget {
   @override
-  _ProcedureFormState createState() => _ProcedureFormState();
+  _ServiceFormState createState() => _ServiceFormState();
 }
 
-class _ProcedureFormState extends State<ProcedureForm> {
+class _ServiceFormState extends State<ServiceForm> {
   @override
   final addProcedureFormKey = GlobalKey<FormState>();
-  String ProcedureName;
-  String PerformedBy;
-  double Charges;
-  double Share;
+  String ServiceName;
+  String ServiceDescription;
+
   Widget build(BuildContext context) {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.bodyText2,
@@ -43,32 +42,30 @@ class _ProcedureFormState extends State<ProcedureForm> {
               constraints: BoxConstraints(
                 minHeight: viewportConstraints.minHeight,
               ),
-          child: Form(
-          key: addProcedureFormKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
+              child: Form(
+                key: addProcedureFormKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
 
-                  Column(
-                    children: [
-                      widgetProcedureName(),
-                      widgetPerformedBy(),
-                      widgetCharges(),
-                      widgetShare(),
-                      widgetSubmit()
-                    ],
+                    Column(
+                      children: [
+                        widgetServiceName(),
+                        widgetDescription(),
+                        widgetSubmit()
+                      ],
 
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-          ),
             ),
           );
         },
       ),
     );
   }
-  Widget widgetProcedureName() {
+  Widget widgetServiceName() {
     return Column(
       children: [
         Padding(
@@ -79,7 +76,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
             decoration: InputDecoration(
                 icon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
-                labelText: 'Procedure Name'),
+                labelText: 'Service Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -87,25 +84,26 @@ class _ProcedureFormState extends State<ProcedureForm> {
               return null;
             },
             onSaved: (String value) {
-              ProcedureName = value;
+              ServiceName = value;
             },
           ),
         ),
       ],
     );
   }
-  Widget widgetPerformedBy() {
+  Widget widgetDescription() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextFormField(
             autofocus: false,
-            maxLength: 15,
+            maxLength: 300,
+            maxLines: 5,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.description),
                 border: OutlineInputBorder(),
-                labelText: 'Performed By'),
+                labelText: 'Service Description'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -113,72 +111,13 @@ class _ProcedureFormState extends State<ProcedureForm> {
               return null;
             },
             onSaved: (String value) {
-              PerformedBy = value;
+              ServiceDescription = value;
             },
           ),
         ),
       ],
     );
   }
-  Widget widgetCharges() {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: TextFormField(
-            autofocus: false,
-            maxLength: 5,
-            decoration: InputDecoration(
-                icon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-                labelText: 'Charges'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              if(double.tryParse(value)<=0){
-                return 'Input Error: cannot enter negative digits';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              Charges = double.parse(value);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-  Widget widgetShare() {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: TextFormField(
-            autofocus: false,
-            maxLength: 3,
-            decoration: InputDecoration(
-                icon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-                labelText: 'Performer Share'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              //if(value>=0 || value<=100){
-               // return 'This field cannot be empty';
-              //}
-              return null;
-            },
-            onSaved: (String value) {
-              Share =double.tryParse(value);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget widgetSubmit() {
     return Column(
       children: [
@@ -212,4 +151,3 @@ class _ProcedureFormState extends State<ProcedureForm> {
   }
 
 }
-

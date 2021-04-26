@@ -16,8 +16,10 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Hi Doctor,'),
+        title: Text('Hi Admin,'),
+        backgroundColor: Colors.grey,
       ),
       drawer: Drawer(
         child: ListView(
@@ -25,7 +27,7 @@ class HomeDrawer extends StatelessWidget {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.teal,
+                color: Colors.grey,
               ),
               child: Text(
                 'Hi Doctor!',
@@ -57,6 +59,45 @@ class HomeDrawer extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/AddProcedures');
+              },
+            ),
+            ListTile(
+
+              leading: Icon(Icons.list_alt),
+              title: Text('Receptionist'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/AddReceptionist');
+
+
+              leading: Icon(Icons.timer),
+              title: Text('Nurse Appointment'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/NurseAppointment');
+
+              leading: Icon(Icons.list_alt),
+              title: Text('Services'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/AddService');
+
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.list_alt),
+
+              title: Text('PatientList'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/PatientList');
+
+              title: Text('Room'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/AddRoom');
+
+
               },
             ),
           ],
