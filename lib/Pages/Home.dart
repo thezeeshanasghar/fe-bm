@@ -63,6 +63,13 @@ class HomeDrawer extends StatelessWidget {
             ),
             ListTile(
 
+              leading: Icon(Icons.list_alt),
+              title: Text('Receptionist'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/AddReceptionist');
+
+
               leading: Icon(Icons.timer),
               title: Text('Nurse Appointment'),
               onTap: () {
@@ -74,14 +81,22 @@ class HomeDrawer extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/AddService');
+
               },
             ),
             ListTile(
               leading: Icon(Icons.list_alt),
+
+              title: Text('PatientList'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/PatientList');
+
               title: Text('Room'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/AddRoom');
+
 
               },
             ),
