@@ -18,7 +18,7 @@ class HomeDrawer extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Hi Doctor,'),
+        title: Text('Hi Admin,'),
         backgroundColor: Colors.grey,
       ),
       drawer: Drawer(
@@ -62,6 +62,13 @@ class HomeDrawer extends StatelessWidget {
               },
             ),
             ListTile(
+
+              leading: Icon(Icons.timer),
+              title: Text('Nurse Appointment'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/NurseAppointment');
+
               leading: Icon(Icons.list_alt),
               title: Text('Services'),
               onTap: () {
@@ -75,6 +82,7 @@ class HomeDrawer extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/AddRoom');
+
               },
             ),
           ],
