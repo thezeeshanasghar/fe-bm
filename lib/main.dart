@@ -1,10 +1,11 @@
-
 import 'package:baby_doctor/Pages/AddDoctor.dart';
 import 'package:baby_doctor/Pages/AddNurse.dart';
 import 'package:baby_doctor/Pages/AddProcedures.dart';
+import 'package:baby_doctor/Pages/BedTime.dart';
 import 'package:baby_doctor/Pages/Home.dart';
 
 import 'package:baby_doctor/Pages/AddReceptionist.dart';
+import 'package:baby_doctor/Pages/NurseMedication.dart';
 import 'package:baby_doctor/Pages/PatientList.dart';
 
 import 'package:baby_doctor/Pages/NurseAppointment.dart';
@@ -15,19 +16,18 @@ import 'package:baby_doctor/Pages/AddRoom.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: '/',
+    initialRoute: '/NurseMedication',
     routes: {
       '/AddRoom': (context) => AddRoom(),
       '/AddService': (context) => AddService(),
       '/AddDoctor': (context) => AddDoctor(),
       '/AddNurse': (context) => AddNurse(),
       '/AddProcedures': (context) => AddProcedures(),
-
       '/AddReceptionist': (context) => AddReceptionist(),
       '/PatientList': (context) => PatientList(),
-
-      '/NurseAppointment': (context)=> NurseAppointment(),
-
+      '/NurseAppointment': (context) => NurseAppointment(),
+      '/NurseMedication': (context) => NurseMedication(),
+      '/BedTime': (context) => BedTime(),
       '/': (context) => Home(),
     },
   ));

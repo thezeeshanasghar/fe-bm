@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class PatientList extends StatefulWidget {
   @override
   _PatientListState createState() => _PatientListState();
@@ -25,6 +26,7 @@ class _PatientListState extends State<PatientList> {
       body: PatientListForm(),
     );
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -32,19 +34,15 @@ class _PatientListState extends State<PatientList> {
 }
 
 class PatientListForm extends StatefulWidget {
-@override
-_PatientListFormState createState() => _PatientListFormState();
+  @override
+  _PatientListFormState createState() => _PatientListFormState();
 }
-
 
 class _PatientListFormState extends State<PatientListForm> {
   final PatientListFormKey = GlobalKey<FormState>();
   final doctorController = TextEditingController();
   String ValueChoose;
-  List listitem=[
-    "Admitted",
-    "Non Admitted"
-  ];
+  List listitem = ["Admitted", "Non Admitted"];
 
   @override
   void initState() {
@@ -54,10 +52,7 @@ class _PatientListFormState extends State<PatientListForm> {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: Theme
-          .of(context)
-          .textTheme
-          .bodyText2,
+      style: Theme.of(context).textTheme.bodyText2,
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints viewportConstraints) {
           return SingleChildScrollView(
@@ -74,7 +69,9 @@ class _PatientListFormState extends State<PatientListForm> {
                       children: <Widget>[
                         widgetPatientType(),
                         widgetCard(),
-
+                        // widgetCard(),
+                        // widgetCard(),
+                        // widgetCard()
                       ],
                     ),
                   )),
@@ -91,45 +88,47 @@ class _PatientListFormState extends State<PatientListForm> {
     super.dispose();
   }
 
-
   Widget widgetSizedBox() {
     return SizedBox(
       height: 30,
     );
   }
-Widget widgetCard(){
-  return Center(
-      child: Container(
-        width: 380,
-        height: 250,
-        padding: new EdgeInsets.all(1.0),
 
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5.0),
-
-          ),
-          color: Colors.grey[300],
-          elevation: 10,
-
-          child: Column(
+  Widget widgetCard() {
+    return Center(
+        child: Container(
+      padding: new EdgeInsets.all(1.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        color: Colors.grey[100],
+        elevation: 10,
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  radius: 40.0,
-                  child: ClipRRect(
-                    child: Image.asset('doctordp.jpg'),
-                    borderRadius: BorderRadius.circular(100.0),
-                  ),
-                ),
-                SizedBox(width: 20),
-                Text(
-                  'Anees Ahmad',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 24.0,
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 40.0,
+                        child: ClipRRect(
+                          child: Image.asset('doctordp.jpg'),
+                          borderRadius: BorderRadius.circular(100.0),
+                        ),
+                      ),
+                      SizedBox(width: 20),
+                      Text(
+                        'Anees Ahmad',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 24.0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -143,7 +142,8 @@ Widget widgetCard(){
                     vertical: 16.0,
                     horizontal: 0,
                   ),
-                  child: Text('Zahoor Ahmad',
+                  child: Text(
+                    'Zahoor Ahmad',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 20.0,
@@ -161,91 +161,80 @@ Widget widgetCard(){
               ],
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                ButtonBar(
-                  children: <Widget>[
-                    RaisedButton(
-                      child: Column( // Replace with a Row for horizontal icon + text
-                        children: <Widget>[
-                          Icon(Icons.add),
-                          Text("Monitor",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.0,
-                            ),
+                Expanded(
+                  child: ButtonBar(
+                    children: <Widget>[
+                      ElevatedButton(
+                        child: Text(
+                          "Monitor",
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
-                        ],
+                        ),
+                        onPressed: () {
+                          /* ... */
+                        },
                       ),
-                      onPressed: () {/* ... */},
-                    ),
-                    RaisedButton(
-                      child: Column( // Replace with a Row for horizontal icon + text
-                        children: <Widget>[
-                          Icon(Icons.add),
-                          Text("Medication",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.0,
-                            ),
+                      ElevatedButton(
+                        child: Text(
+                          "Medication",
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
-                        ],
+                        ),
+                        onPressed: () {
+                          /* ... */
+                        },
                       ),
-                      onPressed: () {/* ... */},
-                    ),
-                    RaisedButton(
-                      child: Column( // Replace with a Row for horizontal icon + text
-                        children: <Widget>[
-                          Icon(Icons.add),
-                          Text("Admit",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.0,
-                            ),
+                      ElevatedButton(
+                        child: Text(
+                          "Admit",
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
-                        ],
+                        ),
+                        onPressed: () {
+                          /* ... */
+                        },
                       ),
-                      onPressed: () {/* ... */},
-                    ),
-                    RaisedButton(
-                      child: Column( // Replace with a Row for horizontal icon + text
-                        children: <Widget>[
-                          Icon(Icons.add),
-                          Text("Other",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                      onPressed: () {/* ... */},
-                    ),
-                  ],
+                      // ElevatedButton(
+                      //   child: Text(
+                      //     "Other",
+                      //     style: TextStyle(
+                      //       color: Colors.white,
+                      //     ),
+                      //   ),
+                      //   onPressed: () {
+                      //     /* ... */
+                      //   },
+                      // ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ],
-          ),
-
         ),
-      )
-  );
-}
+      ),
+    ));
+  }
 
   Widget widgetPatientType() {
     return Column(
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child:  DropdownButton(
+          child: DropdownButton(
             hint: Text("Select Patient"),
             isExpanded: true,
             dropdownColor: Colors.grey[100],
             value: ValueChoose,
-            onChanged: (newValue)
-            {
+            onChanged: (newValue) {
               setState(() {
-                ValueChoose=newValue;
+                ValueChoose = newValue;
               });
             },
             items: listitem.map((valueItem) {
@@ -259,7 +248,4 @@ Widget widgetCard(){
       ],
     );
   }
-
-
-
 }
