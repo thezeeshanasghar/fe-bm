@@ -13,7 +13,7 @@ class _NurseMedicationState extends State<NurseMedication> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text("Patient Name"),
+        title: Text("Basit Ali"),
         centerTitle: false,
         backgroundColor: Colors.grey,
         elevation: 0.0,
@@ -43,6 +43,671 @@ class _MedicationFormState extends State<MedicationForm> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: <Widget>[
+            DataTable(
+              columns: [
+                DataColumn(
+                    label: Text('Service',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Name',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Status',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Action',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold))),
+              ],
+              rows: [
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+                DataRow(cells: [
+                  DataCell(Text("IV Injection"), onTap: () {}),
+                  DataCell(
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                        child: TextFormField(
+                          initialValue: '(optional)',
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: (val) {},
+                        ),
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: Status,
+                              hint: Text("Status"),
+                              // icon: const Icon(Icons.arrow_circle_down_sharp),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.grey),
+                              underline: Container(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  Status = newValue;
+                                });
+                              },
+                              items: <String>[
+                                'Given',
+                                'Pending',
+                                'Status'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                  DataCell(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text("Save"),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green),
+                              onPressed: () {},
+                              child: Text(
+                                "Duplicate",
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: ElevatedButton(
+                              style:
+                                  ElevatedButton.styleFrom(primary: Colors.red),
+                              onPressed: () {},
+                              child: Text(
+                                "Remove",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {}),
+                ]),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _addRemoveButton(bool add, int index, List<String> list) {
@@ -188,34 +853,5 @@ class _MedicationFormState extends State<MedicationForm> {
       ));
     }
     return medicationWidgetList;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        ...widgetMedicationList(),
-                      ],
-                    ),
-                  )),
-            ),
-          );
-        },
-      ),
-    );
   }
 }
