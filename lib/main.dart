@@ -14,7 +14,7 @@ import 'package:baby_doctor/Pages/NurseAppointment.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Pages/AddService.dart';
 import 'package:baby_doctor/Pages/AddRoom.dart';
-
+import 'package:baby_doctor/Pages/Invoice.dart';
 import 'Pages/MonthlyShare.dart';
 
 void main() {
@@ -33,6 +33,7 @@ void main() {
       '/BedTime': (context) => BedTime(),
       '/NurseShare': (context) => NurseShare(),
       '/MonthlyShare': (context) => MonthlyShare(),
+      '/Invoice': (context) => Invoice(),
       '/': (context) => Home(),
     },
   ));

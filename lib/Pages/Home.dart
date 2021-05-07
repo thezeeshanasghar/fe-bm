@@ -97,6 +97,13 @@ class HomeDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/AddRoom');
+                }),
+            ListTile(
+                leading: Icon(Icons.list_alt),
+                title: Text('Invoice'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/Invoice');
                 })
           ],
         ),

@@ -31,6 +31,7 @@ class _ServiceFormState extends State<ServiceForm> {
   @override
   final addRoomFormKey = GlobalKey<FormState>();
   String RoomNo;
+  String Floor;
   String RoomType;
   String RoomCapacity;
   String Charges;
@@ -54,6 +55,7 @@ class _ServiceFormState extends State<ServiceForm> {
                     Column(
                       children: [
                         widgetroomNo(),
+                        widgetFloor(),
                         widgetRoomType(),
                         widgetCapacity(),
                         widgetCharges(),
@@ -90,6 +92,32 @@ class _ServiceFormState extends State<ServiceForm> {
             },
             onSaved: (String value) {
               RoomNo = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+  Widget widgetFloor() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 6,
+            decoration: InputDecoration(
+                icon: Icon(Icons.fact_check),
+                border: OutlineInputBorder(),
+                labelText: 'Floor No'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              Floor = value;
             },
           ),
         ),

@@ -28,10 +28,10 @@ class ServiceForm extends StatefulWidget {
 
 class _ServiceFormState extends State<ServiceForm> {
   @override
-  final addProcedureFormKey = GlobalKey<FormState>();
+  final addServiceFormKey = GlobalKey<FormState>();
   String ServiceName;
   String ServiceDescription;
-
+  String ServiceCharges;
   Widget build(BuildContext context) {
     return DefaultTextStyle(
       style: Theme.of(context).textTheme.bodyText2,
@@ -43,7 +43,7 @@ class _ServiceFormState extends State<ServiceForm> {
                 minHeight: viewportConstraints.minHeight,
               ),
               child: Form(
-                key: addProcedureFormKey,
+                key: addServiceFormKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
@@ -52,6 +52,7 @@ class _ServiceFormState extends State<ServiceForm> {
                       children: [
                         widgetServiceName(),
                         widgetDescription(),
+                        widgetCharges(),
                         widgetSubmit()
                       ],
 
@@ -118,6 +119,32 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
+  Widget widgetCharges() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 4,
+            decoration: InputDecoration(
+                icon: Icon(Icons.description),
+                border: OutlineInputBorder(),
+                labelText: 'Service Charges'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              ServiceCharges = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
   Widget widgetSubmit() {
     return Column(
       children: [
@@ -133,7 +160,7 @@ class _ServiceFormState extends State<ServiceForm> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!addProcedureFormKey.currentState.validate()) {
+                if (!addServiceFormKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
                       Text('Error: Some input fields are not filled.')));
@@ -141,7 +168,7 @@ class _ServiceFormState extends State<ServiceForm> {
                 }
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Successfull')));
-                addProcedureFormKey.currentState.save();
+                addServiceFormKey.currentState.save();
               },
             ),
           ),
