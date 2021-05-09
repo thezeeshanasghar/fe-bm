@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
-import 'package:image_picker/image_picker.dart';
 
 class Invoice extends StatefulWidget {
   @override
@@ -10,6 +8,10 @@ class Invoice extends StatefulWidget {
 class _InvoiceState extends State<Invoice> {
   @override
   Widget build(BuildContext context) {
+    final double shortestSide = MediaQuery.of(context).size.shortestSide; // get the shortest side of device
+    final bool useMobileLayout = shortestSide < 650.0; // check for tablet
+    final Orientation orientation = MediaQuery.of(context).orientation; // get the orientation
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -18,10 +20,26 @@ class _InvoiceState extends State<Invoice> {
         backgroundColor: Colors.grey,
         elevation: 0.0,
       ),
-      body: ServiceForm(),
+      body:gridviewForPhone()
     );
   }
 }
+
+gridviewForPhone() {
+  return Padding(
+    padding: EdgeInsets.all(5.0),
+    child: GridView.count(
+      crossAxisCount: 1,
+      childAspectRatio: 1.0,
+      mainAxisSpacing: 4.0,
+      crossAxisSpacing: 4.0,
+      children: [
+        ServiceForm()
+      ],
+    ),
+  );
+}
+
 
 class ServiceForm extends StatefulWidget {
   @override
@@ -34,6 +52,7 @@ class _ServiceFormState extends State<ServiceForm> {
   final InvoiceFormKey = GlobalKey<FormState>();
   final DateFromController = TextEditingController();
   final DateToController = TextEditingController();
+  final DateController = TextEditingController();
   DateTime DateFrom;
   DateTime DateTo;
   String InvoiceType;
@@ -44,46 +63,63 @@ class _ServiceFormState extends State<ServiceForm> {
   String LastName;
   String Doctor;
   String AppointmentType;
-
+  DateTime Date;
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Form(
-                key: InvoiceFormKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
+    return
+      Container(
+          child: LayoutBuilder(
+             builder: (BuildContext context, BoxConstraints viewportConstraints)
+    {
+     return Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetDateFrom()),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetDateTo()),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetInvoiceType()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(width: MediaQuery.of(context).size.width * 0.47, child: widgetUserId()),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.47, child: widgetAmount()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(width: MediaQuery.of(context).size.width * 0.47, child: widgetFirstName()),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.47, child: widgetLastName()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(width: MediaQuery.of(context).size.width * 0.97, child: widgetDate()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(width: MediaQuery.of(context).size.width * 0.47, child: widgetDoctor()),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.47, child: widgetAppointmentType()),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(width: MediaQuery.of(context).size.width * 0.97, child: widgetSubmit()),
+            ],
+          )
+        ],
 
-                    Column(
-                      children: [
-                        widgetDateFrom(),
-                        widgetDateTo(),
-                        widgetInvoiceType(),
-                        widgetUserId(),
-                        widgetAmount(),
-                        widgetFirstName(),
-                        widgetLastName(),
-                        widgetDoctor(),
-                        widgetAppointmentType(),
-                        widgetSubmit()
-                      ],
 
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
+      );
+    }
+    ));
   }
 
   Widget widgetDateFrom() {
@@ -128,43 +164,53 @@ class _ServiceFormState extends State<ServiceForm> {
     }
   }
   Widget widgetInvoiceType(){
-    return Column(
-        children: [
-    Padding(
-    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-    child:DropdownButton<String>(
-      focusColor:Colors.white,
-      icon: Icon(Icons.list_alt_outlined),
-      value: InvoiceType,
-      //elevation: 5,
-      style: TextStyle(color: Colors.white),
-      iconEnabledColor:Colors.black,
-    isExpanded:true,
-
-      items: <String>[
-        'Payment',
-        'Refund'
-      ].map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value,style:TextStyle(color:Colors.black)),
-        );
-      }).toList(),
-      hint:Text(
-        "Please choose a Invoice Type",
-        style: TextStyle(
-            color: Colors.black,
-            fontSize: 14,
-            fontWeight: FontWeight.w500),
-      ),
-      onChanged: (String value) {
-        setState(() {
-          InvoiceType = value;
-        });
-      },
-    )
-    )]
-    );
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.grey[300])),
+                  child: Padding(
+                    padding:
+                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: InvoiceType,
+                      elevation: 16,
+                      underline: Container(
+                        height: 0,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          InvoiceType = newValue;
+                        });
+                      },
+                      items: <String>[
+                        'Select Type',
+                        'Payment',
+                        'Return'
+                      ].map<DropdownMenuItem<String>>(
+                              (String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
   }
   Widget widgetDateTo() {
     return Column(
@@ -202,8 +248,49 @@ class _ServiceFormState extends State<ServiceForm> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        DateFrom = date;
+        DateTo = date;
         DateToController.text = DateFrom.toString();
+      });
+    }
+  }
+  Widget widgetDate(){
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: TextFormField(
+            controller: DateController,
+            decoration: InputDecoration(
+              icon: Icon(Icons.date_range),
+              border: OutlineInputBorder(),
+              labelText: 'Date',
+            ),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+            },
+            onSaved: (String value) {
+              Date = DateTime.parse(value);
+            },
+            onTap: () {
+              pickDate();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+  pickDate() async {
+    DateTime date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        Date = date;
+        DateController.text = DateFrom.toString();
       });
     }
   }
@@ -312,81 +399,120 @@ class _ServiceFormState extends State<ServiceForm> {
     );
   }
   Widget widgetDoctor(){
-    return Column(
-        children: [
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child:DropdownButton<String>(
-                focusColor:Colors.white,
-                icon: Icon(Icons.list_alt_outlined),
-                value: Doctor,
-                //elevation: 5,
-                style: TextStyle(color: Colors.white),
-                iconEnabledColor:Colors.black,
-                isExpanded:true,
-
-                items: <String>[
-                  'Abdul Basit',
-                  'Anees'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,style:TextStyle(color:Colors.black)),
-                  );
-                }).toList(),
-                hint:Text(
-                  "Please choose a Doctor",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                children: [
+                  Text(
+                    'Doctor',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.grey[300])),
+                  child: Padding(
+                    padding:
+                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: Doctor,
+                      elevation: 16,
+                      underline: Container(
+                        height: 0,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          Doctor = newValue;
+                        });
+                      },
+                      items: <String>[
+                        'Select Doctor',
+                        'Dr. Salman',
+                        'Dr. Faisal',
+                        'Dr. Nawaz',
+                        'Dr. Sadia'
+                      ].map<DropdownMenuItem<String>>(
+                              (String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                    ),
+                  ),
                 ),
-                onChanged: (String value) {
-                  setState(() {
-                    Doctor = value;
-                  });
-                },
-              )
-          )]
-    );
+              ),
+            ],
+          ),
+        ));
   }
   Widget widgetAppointmentType(){
-    return Column(
-        children: [
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child:DropdownButton<String>(
-                focusColor:Colors.white,
-                icon: Icon(Icons.list_alt_outlined),
-                value: AppointmentType,
-                //elevation: 5,
-                style: TextStyle(color: Colors.white),
-                iconEnabledColor:Colors.black,
-                isExpanded:true,
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                children: [
+                  Text(
+                    'Appintment Type',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.grey[300])),
+                  child: Padding(
+                    padding:
+                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: AppointmentType,
+                      elevation: 16,
+                      underline: Container(
+                        height: 0,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          AppointmentType = newValue;
+                        });
+                      },
+                      items: <String>[
+                        'Select Appointment',
+                        'Consultation',
 
-                items: <String>[
-                  'Consultation'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value,style:TextStyle(color:Colors.black)),
-                  );
-                }).toList(),
-                hint:Text(
-                  "Please choose a Appointment Type",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
+                      ].map<DropdownMenuItem<String>>(
+                              (String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                    ),
+                  ),
                 ),
-                onChanged: (String value) {
-                  setState(() {
-                    AppointmentType = value;
-                  });
-                },
-              )
-          )]
-    );
+              ),
+            ],
+          ),
+        ));
   }
   Widget widgetSubmit() {
     return Column(
