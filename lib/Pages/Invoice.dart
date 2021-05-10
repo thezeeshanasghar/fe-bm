@@ -78,7 +78,7 @@ class _ServiceFormState extends State<ServiceForm> {
             children: [
               SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetDateFrom()),
               SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetDateTo()),
-              SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetInvoiceType()),
+               SizedBox(width: MediaQuery.of(context).size.width * 0.30, child: widgetInvoiceType()),
             ],
           ),
           Row(
@@ -164,7 +164,10 @@ class _ServiceFormState extends State<ServiceForm> {
     }
   }
   Widget widgetInvoiceType(){
-    return Expanded(
+    return
+      Row(
+          children: [
+      Expanded(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -210,7 +213,8 @@ class _ServiceFormState extends State<ServiceForm> {
               ),
             ],
           ),
-        ));
+        ))
+    ]);
   }
   Widget widgetDateTo() {
     return Column(
@@ -399,7 +403,9 @@ class _ServiceFormState extends State<ServiceForm> {
     );
   }
   Widget widgetDoctor(){
-    return Expanded(
+    return Row(
+          children: [
+      Expanded(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -455,10 +461,14 @@ class _ServiceFormState extends State<ServiceForm> {
               ),
             ],
           ),
-        ));
+        ))
+    ]);
   }
   Widget widgetAppointmentType(){
-    return Expanded(
+    return
+      Row(
+          children: [
+      Expanded(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -512,7 +522,10 @@ class _ServiceFormState extends State<ServiceForm> {
               ),
             ],
           ),
-        ));
+        )
+    )
+    ]);
+
   }
   Widget widgetSubmit() {
     return Column(
