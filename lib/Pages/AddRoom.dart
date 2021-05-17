@@ -226,7 +226,7 @@ class _AddRoomState extends State<AddRoom> {
                 if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
-                          Text('Error: Some input fields are not filled.')));
+                      Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
