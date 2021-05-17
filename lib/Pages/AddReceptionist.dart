@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:baby_doctor/Design/Dimens.dart';
+import 'package:baby_doctor/Design/Shade.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -11,40 +13,7 @@ class AddReceptionist extends StatefulWidget {
 }
 
 class _AddReceptionistState extends State<AddReceptionist> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final appTitle = 'Add Receptionist';
-
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(appTitle),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: ReceptionistForm(),
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-}
-
-class ReceptionistForm extends StatefulWidget {
-  @override
-  _ReceptionistFormState createState() => _ReceptionistFormState();
-}
-
-class _ReceptionistFormState extends State<ReceptionistForm> {
-  final addReceptionistFormKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final ReceptionistController = TextEditingController();
   final joinDateController = TextEditingController();
 
@@ -55,7 +24,7 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Gender;
+  String Gender='Choose Gender';
   int FlourNo;
   DateTime JoiningDate;
   DateTime DOB;
@@ -66,62 +35,77 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Form(
-                    key: addReceptionistFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        widgetSizedBox(),
-                        widgetFirstName(),
-                        widgetLastName(),
-                        widgetGender(),
-                        widgetDob(),
-                        widgetCnicNumber(),
-                        widgetContactNumber(),
-                        widgetEmail(),
-                        widgetAddress(),
-                        widgetFlourNo(),
-                        widgetJoiningDate(),
-                        widgetSubmit()
-                      ],
-                    ),
-                  )),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  @override
   void dispose() {
     ReceptionistController.dispose();
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text("Add Receptionist"),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        Dimens.globalPaddingLeft,
+                        Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight,
+                        Dimens.globalPaddingBottom),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          widgetFirstName(),
+                          widgetLastName(),
+                          widgetGender(),
+                          widgetDob(),
+                          widgetCnicNumber(),
+                          widgetContactNumber(),
+                          widgetEmail(),
+                          widgetAddress(),
+                          widgetFlourNo(),
+                          widgetJoiningDate(),
+                          widgetSubmit()
+                        ],
+                      ),
+                    )),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
   Widget widgetFirstName() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'First Name'),
             validator: (String value) {
@@ -143,12 +127,16 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  icon: Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                   labelText: 'Last Name'),
               validator: (String value) {
@@ -167,42 +155,45 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
 
   Widget widgetGender() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
+      children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
-            value: Gender,
-            titleText: 'Gender',
-            hintText: 'Select your Gender',
-            onSaved: (value) {
-              setState(() {
-                Gender = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                Gender = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Male",
-                "value": "Male",
-              },
-              {
-                "display": "Female",
-                "value": "Female",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: Gender,
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    Gender = newValue;
+                  });
+                },
+                items: <String>[
+                  'Choose Gender',
+                  'Male',
+                  'Female',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ],
@@ -213,12 +204,16 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                icon: Icon(Icons.credit_card),
+                prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
                 labelText: 'CNIC Number'),
             validator: (String value) {
@@ -245,12 +240,16 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.phone),
+                  prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
                   labelText: 'Contact Number'),
               validator: (String value) {
@@ -278,17 +277,21 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
               decoration: InputDecoration(
-                  icon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                   labelText: 'Email'),
               validator: (String value) {
                 bool emailValid = RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -310,12 +313,16 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.home),
+                  prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
                   labelText: 'Address'),
               validator: (String value) {
@@ -336,11 +343,15 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
-              icon: Icon(Icons.date_range),
+              prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
               labelText: 'Joining Date',
             ),
@@ -365,11 +376,15 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
-              icon: Icon(Icons.date_range),
+              prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
               labelText: 'Date Of Birth',
             ),
@@ -389,16 +404,21 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
       ],
     );
   }
+
   Widget widgetFlourNo() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.home),
+                  prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
                   labelText: 'FlourNo'),
               validator: (String value) {
@@ -415,7 +435,6 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     );
   }
 
-
   Widget widgetSizedBox() {
     return SizedBox(
       height: 30,
@@ -426,27 +445,31 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!addReceptionistFormKey.currentState.validate()) {
+                if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
-                      Text('Error: Some input fields are not filled.')));
+                          Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Successfull')));
-                addReceptionistFormKey.currentState.save();
-                print(JoiningDate.toString());
+                    .showSnackBar(SnackBar(content: Text('Doctor added')));
+                formKey.currentState.save();
               },
             ),
           ),
@@ -483,7 +506,6 @@ class _ReceptionistFormState extends State<ReceptionistForm> {
       });
     }
   }
-
 
 // void takePhotoFromWeb() async {
 //   final pickedFile = await FlutterWebImagePicker.getImage;

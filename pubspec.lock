@@ -49,7 +49,7 @@ packages:
       name: cupertino_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   date_range_picker:
     dependency: transitive
     description:
@@ -162,7 +162,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.4"
+    version: "0.7.5"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -226,6 +226,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  responsive_context:
+    dependency: transitive
+    description:
+      name: responsive_context
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
+  responsive_table:
+    dependency: "direct main"
+    description:
+      name: responsive_table
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1+8"
   rxdart:
     dependency: transitive
     description:

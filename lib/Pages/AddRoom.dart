@@ -1,3 +1,5 @@
+import 'package:baby_doctor/Design/Dimens.dart';
+import 'package:baby_doctor/Design/Shade.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 
@@ -8,80 +10,72 @@ class AddRoom extends StatefulWidget {
 
 class _AddRoomState extends State<AddRoom> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text("Add Room"),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: ServiceForm(),
-    );
-  }
-}
-
-class ServiceForm extends StatefulWidget {
-  @override
-  _ServiceFormState createState() => _ServiceFormState();
-}
-
-class _ServiceFormState extends State<ServiceForm> {
-  @override
-  final addRoomFormKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   String RoomNo;
-  String Floor;
-  String RoomType;
+  String RoomType='Choose Room Type';
   String RoomCapacity;
   String Charges;
 
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Form(
-                key: addRoomFormKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-
-                    Column(
-                      children: [
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text("Add Room"),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      Dimens.globalPaddingLeft,
+                      Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight,
+                      Dimens.globalPaddingBottom),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
                         widgetroomNo(),
-                        widgetFloor(),
                         widgetRoomType(),
                         widgetCapacity(),
                         widgetCharges(),
                         widgetSubmit()
                       ],
-
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
+
   Widget widgetroomNo() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 6,
             decoration: InputDecoration(
-                icon: Icon(Icons.fact_check),
+                prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
                 labelText: 'Room No'),
             validator: (String value) {
@@ -98,91 +92,69 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
-  Widget widgetFloor() {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: TextFormField(
-            autofocus: false,
-            maxLength: 6,
-            decoration: InputDecoration(
-                icon: Icon(Icons.fact_check),
-                border: OutlineInputBorder(),
-                labelText: 'Floor No'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              Floor = value;
-            },
-          ),
-        ),
-      ],
-    );
-  }
+
   Widget widgetRoomType() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
-
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
-            value: RoomType,
-            titleText: 'Speciality',
-            hintText: 'Please choose one',
-
-            onSaved: (value) {
-              setState(() {
-                RoomType = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                RoomType = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Typ-1",
-                "value": "1",
-              },
-              {
-                "display": "Typ-2",
-                "value": "2",
-              },
-              {
-                "display": "Typ-3",
-                "value": "3",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: RoomType,
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    RoomType = newValue;
+                  });
+                },
+                items: <String>[
+                  'Choose Room Type',
+                  'Room Type 1',
+                  'Room Type 2',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
+
   Widget widgetCapacity() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 2,
             decoration: InputDecoration(
-                icon: Icon(Icons.fact_check),
+                prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
                 labelText: 'Room Capacity'),
             validator: (String value) {
@@ -199,16 +171,21 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
+
   Widget widgetCharges() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 4,
             decoration: InputDecoration(
-                icon: Icon(Icons.monetization_on),
+                prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
                 labelText: 'Room Charges(Per Hour)'),
             validator: (String value) {
@@ -225,30 +202,36 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
+
   Widget widgetSubmit() {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!addRoomFormKey.currentState.validate()) {
+                if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
                       Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Successfull')));
-                addRoomFormKey.currentState.save();
+                    .showSnackBar(SnackBar(content: Text('Doctor added')));
+                formKey.currentState.save();
               },
             ),
           ),
@@ -256,5 +239,4 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
-
 }

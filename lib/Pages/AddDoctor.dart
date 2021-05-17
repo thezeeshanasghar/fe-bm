@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:baby_doctor/Design/Dimens.dart';
+import 'package:baby_doctor/Design/Shade.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -12,40 +14,7 @@ class AddDoctor extends StatefulWidget {
 }
 
 class _AddDoctorState extends State<AddDoctor> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final appTitle = 'Add Doctor';
-
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(appTitle),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: DoctorForm(),
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-}
-
-class DoctorForm extends StatefulWidget {
-  @override
-  _DoctorFormState createState() => _DoctorFormState();
-}
-
-class _DoctorFormState extends State<DoctorForm> {
-  final doctorFormKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
 
   String FirstName;
@@ -56,7 +25,7 @@ class _DoctorFormState extends State<DoctorForm> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Speciality;
+  String Speciality = 'Select Speciality';
   int ConsultationFee;
   int EmergencyConsultationFee;
   int FeeShare;
@@ -80,47 +49,62 @@ class _DoctorFormState extends State<DoctorForm> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text("Add Doctor"),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        Dimens.globalPaddingLeft,
+                        Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight,
+                        Dimens.globalPaddingBottom),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          // widgetProfileImage(),
+                          // widgetSizedBox(),
+                          widgetFirstName(),
+                          widgetLastName(),
+                          widgetFatherOrHusbandName(),
+                          widgetCnicNumber(),
+                          widgetContactNumber(),
+                          widgetEmergencyContactNumber(),
+                          widgetEmail(),
+                          widgetAddress(),
+                          widgetSpeciality(),
+                          widgetExperience(),
+                          widgetConsultationFee(),
+                          widgetEmergencyConsultationFee(),
+                          widgetFeeShare(),
+                          widgetJoiningDate(),
+                          widgetSizedBox(),
+                          ...widgetQualification(),
+                          widgetSizedBox(),
+                          ...widgetDiplomas(),
+                          widgetSubmit()
+                        ],
+                      ),
+                    )),
               ),
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Form(
-                    key: doctorFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        // widgetProfileImage(),
-                        // widgetSizedBox(),
-                        widgetFirstName(),
-                        widgetLastName(),
-                        widgetFatherOrHusbandName(),
-                        widgetCnicNumber(),
-                        widgetContactNumber(),
-                        widgetEmergencyContactNumber(),
-                        widgetEmail(),
-                        widgetAddress(),
-                        widgetSpeciality(),
-                        ...widgetQualification(),
-                        widgetExperience(),
-                        ...widgetDiplomas(),
-                        widgetConsultationFee(),
-                        widgetEmergencyConsultationFee(),
-                        widgetFeeShare(),
-                        widgetJoiningDate(),
-                        widgetSubmit()
-                      ],
-                    ),
-                  )),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -196,7 +180,8 @@ class _DoctorFormState extends State<DoctorForm> {
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(i == qualificationList.length - 1, i, qualificationList)
+                        _addRemoveButton(i == qualificationList.length - 1, i,
+                            qualificationList)
                       ],
                     ),
                   ],
@@ -302,7 +287,8 @@ class _DoctorFormState extends State<DoctorForm> {
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(i == diplomaList.length - 1, i, diplomaList)
+                        _addRemoveButton(
+                            i == diplomaList.length - 1, i, diplomaList)
                       ],
                     ),
                   ],
@@ -318,11 +304,15 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             autofocus: false,
             decoration: InputDecoration(
-                icon: Icon(Icons.date_range_sharp),
+                prefixIcon: Icon(Icons.date_range_sharp),
                 border: OutlineInputBorder(),
                 labelText: 'Experience'),
             // validator: (String value) {
@@ -378,12 +368,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'First Name'),
             validator: (String value) {
@@ -405,12 +399,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  icon: Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                   labelText: 'Last Name'),
               validator: (String value) {
@@ -431,12 +429,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
               decoration: InputDecoration(
-                  icon: Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                   labelText: 'Father Name OR Husband Name'),
               validator: (String value) {
@@ -457,12 +459,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                icon: Icon(Icons.credit_card),
+                prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
                 labelText: 'CNIC Number'),
             validator: (String value) {
@@ -489,12 +495,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.phone),
+                  prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
                   labelText: 'Contact Number'),
               validator: (String value) {
@@ -522,12 +532,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
               decoration: InputDecoration(
-                  icon: Icon(Icons.phone),
+                  prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
                   labelText: 'Emergency Contact Number'),
               validator: (String value) {
@@ -555,12 +569,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
               decoration: InputDecoration(
-                  icon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                   labelText: 'Email'),
               validator: (String value) {
@@ -587,12 +605,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.home),
+                  prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
                   labelText: 'Address'),
               validator: (String value) {
@@ -614,43 +636,43 @@ class _DoctorFormState extends State<DoctorForm> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
-            value: Speciality,
-            titleText: 'Speciality',
-            hintText: 'Please choose one',
-            onSaved: (value) {
-              setState(() {
-                Speciality = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                Speciality = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Speciality 1",
-                "value": "Speciality 1",
-              },
-              {
-                "display": "Speciality 2",
-                "value": "Speciality 2",
-              },
-              {
-                "display": "Speciality 3",
-                "value": "Speciality 3",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: Speciality,
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    Speciality = newValue;
+                  });
+                },
+                items: <String>[
+                  'Select Speciality',
+                  'Speciality 1',
+                  'Speciality 2',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ],
@@ -661,12 +683,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
               decoration: InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                   labelText: 'Consultation Fee'),
               validator: (String value) {
@@ -694,12 +720,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
               decoration: InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                   labelText: 'Emergency Consultation Fee'),
               validator: (String value) {
@@ -727,12 +757,16 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
               decoration: InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                   labelText: 'Fee Share (in percentage %)'),
               validator: (String value) {
@@ -763,11 +797,15 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
-              icon: Icon(Icons.date_range),
+              prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
               labelText: 'Joining Date',
             ),
@@ -790,7 +828,7 @@ class _DoctorFormState extends State<DoctorForm> {
 
   Widget widgetSizedBox() {
     return SizedBox(
-      height: 30,
+      height: 10,
     );
   }
 
@@ -798,27 +836,31 @@ class _DoctorFormState extends State<DoctorForm> {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!doctorFormKey.currentState.validate()) {
+                if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
                           Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Successfull')));
-                doctorFormKey.currentState.save();
-                print(JoiningDate.toString());
+                    .showSnackBar(SnackBar(content: Text('Doctor added')));
+                formKey.currentState.save();
               },
             ),
           ),
