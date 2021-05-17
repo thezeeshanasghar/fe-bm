@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:baby_doctor/Design/Dimens.dart';
+import 'package:baby_doctor/Design/Shade.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 
 class AddNurse extends StatefulWidget {
   @override
@@ -11,35 +14,13 @@ class AddNurse extends StatefulWidget {
 }
 
 class _AddNurseState extends State<AddNurse> {
-  @override
-  Widget build(BuildContext context) {
-    final appTitle = 'Add Nurse';
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(appTitle),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: NurseForm(),
-    );
-  }
-}
-
-class NurseForm extends StatefulWidget {
-  @override
-  _NurseFormState createState() => _NurseFormState();
-}
-
-class _NurseFormState extends State<NurseForm> {
-  final nurseFormKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
 
   String FirstName;
   String LastName;
   String FatherHusbandName;
-  String Gender;
+  String Gender = 'Choose Gender';
   String CNIC;
   String ContactNumber;
   String EmergencyContactNumber;
@@ -60,7 +41,6 @@ class _NurseFormState extends State<NurseForm> {
   @override
   void initState() {
     super.initState();
-    Gender = "Male";
   }
 
   @override
@@ -70,48 +50,58 @@ class _NurseFormState extends State<NurseForm> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text("Add Nurse"),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        Dimens.globalPaddingLeft,
+                        Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight,
+                        Dimens.globalPaddingBottom),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          // widgetProfileImage(),
+                          // widgetSizedBox(),
+                          widgetFirstName(),
+                          widgetLastName(),
+                          widgetFatherOrHusbandName(),
+                          widgetGender(),
+                          widgetCnicNumber(),
+                          widgetContactNumber(),
+                          widgetEmergencyContactNumber(),
+                          // widgetEmail(),
+                          widgetAddress(),
+                          widgetDuration(),
+                          widgetJoiningDate(),
+                          widgetProcedureShare(),
+                          widgetSalary(),
+                          ...widgetQualification(),
+                          widgetSubmit()
+                        ],
+                      ),
+                    )),
               ),
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  child: Form(
-                    key: nurseFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        // widgetProfileImage(),
-                        // widgetSizedBox(),
-                        widgetFirstName(),
-                        widgetLastName(),
-                        widgetFatherOrHusbandName(),
-                        widgetGender(),
-                        widgetCnicNumber(),
-                        widgetContactNumber(),
-                        widgetEmergencyContactNumber(),
-                        // widgetEmail(),
-                        widgetAddress(),
-                        widgetDuration(),
-                        // widgetSpeciality(),
-                        // widgetConsultationFee(),
-                        // widgetEmergencyConsultationFee(),
-                        widgetJoiningDate(),
-                        widgetProcedureShare(),
-                        widgetSalary(),
-                        ...widgetQualification(),
-                        widgetSubmit()
-                      ],
-                    ),
-                  )),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -283,12 +273,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                icon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'First Name'),
             validator: (String value) {
@@ -310,12 +304,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  icon: Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                   labelText: 'Last Name'),
               validator: (String value) {
@@ -336,12 +334,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
               decoration: InputDecoration(
-                  icon: Icon(Icons.person),
+                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                   labelText: 'Father Name OR Husband Name'),
               validator: (String value) {
@@ -362,55 +364,45 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.fromLTRB(48, 10, 8, 20),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [Text("Select Gender:")],
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: Gender,
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Radio(
-                        value: "Male",
-                        groupValue: Gender,
-                        onChanged: (value) {
-                          setState(() {
-                            print(value);
-                            Gender = value;
-                          });
-                        }),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text("Male"),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Radio(
-                        value: "Female",
-                        groupValue: Gender,
-                        onChanged: (value) {
-                          setState(() {
-                            print(value);
-                            Gender = value;
-                          });
-                        }),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text("Female"),
-                    SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                ),
-              ],
-            )),
+                onChanged: (String newValue) {
+                  setState(() {
+                    Gender = newValue;
+                  });
+                },
+                items: <String>[
+                  'Choose Gender',
+                  'Male',
+                  'Female',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -419,12 +411,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                icon: Icon(Icons.credit_card),
+                prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
                 labelText: 'CNIC Number'),
             validator: (String value) {
@@ -451,12 +447,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.phone),
+                  prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
                   labelText: 'Contact Number'),
               validator: (String value) {
@@ -484,12 +484,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
               decoration: InputDecoration(
-                  icon: Icon(Icons.phone),
+                  prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
                   labelText: 'Emergency Contact Number'),
               validator: (String value) {
@@ -517,12 +521,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
               decoration: InputDecoration(
-                  icon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                   labelText: 'Email'),
               validator: (String value) {
@@ -549,12 +557,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
               decoration: InputDecoration(
-                  icon: Icon(Icons.home),
+                  prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
                   labelText: 'Address'),
               validator: (String value) {
@@ -571,64 +583,21 @@ class _NurseFormState extends State<NurseForm> {
     );
   }
 
-  Widget widgetSpeciality() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: DropDownFormField(
-            value: Speciality,
-            titleText: 'Speciality',
-            hintText: 'Please choose one',
-            onSaved: (value) {
-              setState(() {
-                Speciality = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              setState(() {
-                Speciality = value;
-              });
-            },
-            dataSource: [
-              {
-                "display": "Speciality 1",
-                "value": "Speciality 1",
-              },
-              {
-                "display": "Speciality 2",
-                "value": "Speciality 2",
-              },
-              {
-                "display": "Speciality 3",
-                "value": "Speciality 3",
-              },
-            ],
-            textField: 'display',
-            valueField: 'value',
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget widgetSalary() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 5,
               decoration: InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                   labelText: 'Salary'),
               validator: (String value) {
@@ -656,12 +625,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
               decoration: InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                   labelText: 'Procedures Share (in percentage %)'),
               validator: (String value) {
@@ -692,12 +665,16 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 2,
               decoration: InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
                   labelText: 'Duty Duration (in hrs)'),
               validator: (String value) {
@@ -728,11 +705,15 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
-              icon: Icon(Icons.date_range),
+              prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
               labelText: 'Joining Date',
             ),
@@ -755,7 +736,7 @@ class _NurseFormState extends State<NurseForm> {
 
   Widget widgetSizedBox() {
     return SizedBox(
-      height: 30,
+      height: 10,
     );
   }
 
@@ -763,27 +744,31 @@ class _NurseFormState extends State<NurseForm> {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!nurseFormKey.currentState.validate()) {
+                if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
-                          Text('Error: Some input fields are not filled.')));
+                      Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Successfull')));
-                nurseFormKey.currentState.save();
-                print(JoiningDate.toString());
+                    .showSnackBar(SnackBar(content: Text('Doctor added')));
+                formKey.currentState.save();
               },
             ),
           ),

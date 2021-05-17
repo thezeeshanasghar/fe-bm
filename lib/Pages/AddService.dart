@@ -1,3 +1,5 @@
+import 'package:baby_doctor/Design/Dimens.dart';
+import 'package:baby_doctor/Design/Shade.dart';
 import 'package:flutter/material.dart';
 
 class AddService extends StatefulWidget {
@@ -7,74 +9,68 @@ class AddService extends StatefulWidget {
 
 class _AddServiceState extends State<AddService> {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text("Add Service"),
-        centerTitle: false,
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-      ),
-      body: ServiceForm(),
-    );
-  }
-}
-
-class ServiceForm extends StatefulWidget {
-  @override
-  _ServiceFormState createState() => _ServiceFormState();
-}
-
-class _ServiceFormState extends State<ServiceForm> {
-  @override
-  final addProcedureFormKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   String ServiceName;
   String ServiceDescription;
 
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.minHeight,
-              ),
-              child: Form(
-                key: addProcedureFormKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-
-                    Column(
-                      children: [
+    return Scaffold(
+      backgroundColor: Shade.globalBackgroundColor,
+      appBar: AppBar(
+        title: Text("Add Service"),
+        centerTitle: false,
+        backgroundColor: Shade.globalAppBarColor,
+        elevation: 0.0,
+      ),
+      body: DefaultTextStyle(
+        style: Theme.of(context).textTheme.bodyText2,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.minHeight,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      Dimens.globalPaddingLeft,
+                      Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight,
+                      Dimens.globalPaddingBottom),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
                         widgetServiceName(),
                         widgetDescription(),
                         widgetSubmit()
                       ],
-
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
+
   Widget widgetServiceName() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
             decoration: InputDecoration(
-                icon: Icon(Icons.fact_check),
+                prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
                 labelText: 'Service Name'),
             validator: (String value) {
@@ -91,17 +87,21 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
+
   Widget widgetDescription() {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 300,
-            maxLines: 5,
+            maxLength: 100,
             decoration: InputDecoration(
-                icon: Icon(Icons.description),
+                prefixIcon: Icon(Icons.description),
                 border: OutlineInputBorder(),
                 labelText: 'Service Description'),
             validator: (String value) {
@@ -118,30 +118,36 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
+
   Widget widgetSubmit() {
     return Column(
       children: [
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.center,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                textStyle: TextStyle(fontSize: 20),
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!addProcedureFormKey.currentState.validate()) {
+                if (!formKey.currentState.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content:
-                      Text('Error: Some input fields are not filled.')));
+                          Text('Error: Some input fields are not filled.')));
                   return;
                 }
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Successfull')));
-                addProcedureFormKey.currentState.save();
+                    .showSnackBar(SnackBar(content: Text('Doctor added')));
+                formKey.currentState.save();
               },
             ),
           ),
@@ -149,5 +155,4 @@ class _ServiceFormState extends State<ServiceForm> {
       ],
     );
   }
-
 }
