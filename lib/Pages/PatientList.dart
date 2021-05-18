@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
-import '../http_service.dart';
+import '../Service/ProcedureService.dart';
 
 class PatientList extends StatefulWidget {
   @override
@@ -17,8 +17,7 @@ class _PatientListState extends State<PatientList> {
   @override
   Widget build(BuildContext context) {
     final appTitle = 'Patient List';
-    final HttpService httpService = HttpService();
-     httpService.getProcedures();
+
     // print(resp);
     return Scaffold(
       backgroundColor: Colors.grey[100],

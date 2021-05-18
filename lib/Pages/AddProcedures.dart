@@ -1,7 +1,7 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/http_service.dart' as DAL;
+import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
 import 'package:baby_doctor/model/Procedures.dart';
 
 class AddProcedures extends StatefulWidget {
@@ -238,7 +238,7 @@ class _AddProceduresState extends State<AddProcedures> {
      formKey.currentState.save();
 
      //perform your task after save
-    DAL.HttpService service =  new DAL.HttpService();
+    DAL.ProcedureService service =  new DAL.ProcedureService();
     Procedures obj = new Procedures(
         name: ProcedureName,
         performedBy: PerformedBy,
