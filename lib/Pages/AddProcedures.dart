@@ -1,6 +1,8 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:flutter/material.dart';
+import 'package:baby_doctor/http_service.dart' as DAL;
+import 'package:baby_doctor/model/Procedures.dart';
 
 class AddProcedures extends StatefulWidget {
   @override
@@ -14,7 +16,7 @@ class _AddProceduresState extends State<AddProcedures> {
   String PerformedBy;
   double Charges;
   double Share;
-
+  bool Isloading=false;
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
@@ -48,7 +50,11 @@ class _AddProceduresState extends State<AddProcedures> {
                         widgetPerformedBy(),
                         widgetCharges(),
                         widgetShare(),
-                        widgetSubmit()
+                        Isloading==false?
+                        widgetSubmit():
+                        Center(
+                          child: CircularProgressIndicator(),
+                        )
                       ],
                     ),
                   ),
@@ -135,6 +141,7 @@ class _AddProceduresState extends State<AddProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
@@ -169,6 +176,7 @@ class _AddProceduresState extends State<AddProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 3,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
@@ -191,7 +199,6 @@ class _AddProceduresState extends State<AddProcedures> {
     );
   }
 
-
   Widget widgetSubmit() {
     return Column(
       children: [
@@ -212,20 +219,43 @@ class _AddProceduresState extends State<AddProcedures> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                      Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor added')));
-                formKey.currentState.save();
+                onClickDataPost();
               },
             ),
           ),
         ),
       ],
     );
+  }
+
+  onClickDataPost()  async {
+     if (!formKey.currentState.validate()) {
+       ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text('Error: Some input fields are not filled.')));
+       return;
+     }
+     setState((){Isloading = true;});
+     formKey.currentState.save();
+
+     //perform your task after save
+    DAL.HttpService service =  new DAL.HttpService();
+    Procedures obj = new Procedures(
+        name: ProcedureName,
+        performedBy: PerformedBy,
+        charges: Charges,
+        performerShare: Share);
+   var response= await service.InsertProcedure(obj);
+  print(response);
+  if(response==true)
+    {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Success: Record Added Successfully.')));
+      formKey.currentState.reset();
+      setState((){Isloading = false;});
+    }else{
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: Operation Unsuccessfull.')));
+    setState((){Isloading = false;});
+  }
   }
 }

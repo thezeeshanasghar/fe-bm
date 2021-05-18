@@ -4,7 +4,7 @@ class Procedures {
   final String name;
   final String performedBy;
   final double charges;
-  final int performerShare;
+  final double performerShare;
 
   Procedures({
     this.id,
