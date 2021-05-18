@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
-class Rooms {
+class Room {
   final int id;
   final String RoomNo;
   final String RoomType;
   final String RoomCapacity;
   final double Charges;
 
-  Rooms({
+  Room({
     this.id,
     @required this.RoomNo,
     @required this.RoomType,
@@ -14,8 +14,8 @@ class Rooms {
     @required this.Charges
   });
 
-  factory Rooms.fromJson(Map<String, dynamic> json) {
-    return Rooms(
+  factory Room.fromJson(Map<String, dynamic> json) {
+    return Room(
       id: json['id'],
       RoomNo: json['RoomNo'],
       RoomType: json['RoomType'],
