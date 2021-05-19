@@ -3,18 +3,15 @@ import 'package:baby_doctor/model/Services.dart';
 import 'package:http/http.dart' as http;
 
 class HttpService {
-
-
-
   Future<List<Services>> getServices() async {
     final response =
-    await http.get(Uri.https('babymedics.fernflowers.com', 'api/service'));
+        await http.get(Uri.https('babymedics.fernflowers.com', 'api/service'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Services> services = body
           .map(
             (dynamic item) => Services.fromJson(item),
-      )
+          )
           .toList();
 
       return services;
@@ -33,7 +30,7 @@ class HttpService {
       List<Services> services = body
           .map(
             (dynamic item) => Services.fromJson(item),
-      )
+          )
           .toList();
 
       return services;
@@ -73,6 +70,4 @@ class HttpService {
       body: jsonEncode(services),
     );
   }
-
-
 }

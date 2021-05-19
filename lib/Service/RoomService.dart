@@ -7,16 +7,15 @@ import 'package:http/http.dart' as http;
 import '../model/Room.dart';
 
 class RoomService {
-
   Future<List<Room>> getRooms() async {
     final response =
-    await http.get(Uri.https('babymedics.fernflowers.com', 'api/room'));
+        await http.get(Uri.https('babymedics.fernflowers.com', 'api/room'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Room> posts = body
           .map(
             (dynamic item) => Room.fromJson(item),
-      )
+          )
           .toList();
 
       return posts;
@@ -35,7 +34,7 @@ class RoomService {
       List<Room> posts = body
           .map(
             (dynamic item) => Room.fromJson(item),
-      )
+          )
           .toList();
 
       return posts;
@@ -75,7 +74,4 @@ class RoomService {
       body: jsonEncode(rooms),
     );
   }
-
-
-
 }
