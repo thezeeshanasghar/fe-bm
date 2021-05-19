@@ -2,7 +2,8 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
-
+import 'package:baby_doctor/model/Room.dart';
+import 'package:baby_doctor/Service/RoomService.dart' as DAL;
 class AddRoom extends StatefulWidget {
   @override
   _AddRoomState createState() => _AddRoomState();
@@ -13,8 +14,9 @@ class _AddRoomState extends State<AddRoom> {
   final formKey = GlobalKey<FormState>();
   String RoomNo;
   String RoomType='Choose Room Type';
-  String RoomCapacity;
-  String Charges;
+  double RoomCapacity;
+  double Charges;
+  bool Isloading=false;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,7 +166,7 @@ class _AddRoomState extends State<AddRoom> {
               return null;
             },
             onSaved: (String value) {
-              RoomNo = value;
+              RoomCapacity =double.parse(value);
             },
           ),
         ),
@@ -195,7 +197,7 @@ class _AddRoomState extends State<AddRoom> {
               return null;
             },
             onSaved: (String value) {
-              Charges = value;
+              Charges = double.parse(value);
             },
           ),
         ),
@@ -223,20 +225,45 @@ class _AddRoomState extends State<AddRoom> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                      Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor added')));
-                formKey.currentState.save();
+
+                onClickDataPost();
               },
             ),
           ),
         ),
       ],
     );
+  }
+
+  onClickDataPost()  async {
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Some input fields are not filled.')));
+      return;
+    }
+    setState((){Isloading = true;});
+    formKey.currentState.save();
+
+    //perform your task after save
+    DAL.RoomService service =  new DAL.RoomService();
+    Room obj = new Room(
+        RoomNo: RoomNo,
+        RoomType: RoomType,
+        Charges : Charges,
+        RoomCapacity: RoomCapacity,
+    );
+    var response= await service.InsertRoom(obj);
+    print(response);
+    if(response==true)
+    {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Success: Record Added Successfully.')));
+      formKey.currentState.reset();
+      setState((){Isloading = false;});
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Operation Unsuccessfull.')));
+      setState((){Isloading = false;});
+    }
   }
 }

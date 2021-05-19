@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:baby_doctor/model/Services.dart';
 import 'package:http/http.dart' as http;
 
-class HttpService {
+class Service {
 
 
 

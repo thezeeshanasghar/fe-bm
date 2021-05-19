@@ -46,14 +46,30 @@ class RoomService {
     }
   }
 
-  Future<http.Response> InsertRoom(Room rooms) {
-    return http.post(
-      Uri.https('babymedics.fernflowers.com', 'api/room'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(rooms),
-    );
+  Future<bool> InsertRoom(Room rooms) async {
+    Map<String, dynamic> Obj = {
+      'RoomNo': rooms.RoomNo,
+      'RoomType': rooms.RoomType,
+      'charges': rooms.RoomCapacity,
+      'performerShare': rooms.Charges
+    };
+
+    final response = await http.post(
+        Uri.https('babymedics.fernflowers.com', 'api/room'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(Obj));
+
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      return true;
+    } else {
+      // If the server did not return a 201 CREATED response,
+      // then throw an exception.
+      return false;
+    }
   }
 
   Future<http.Response> UpdateRooms(Room rooms) {

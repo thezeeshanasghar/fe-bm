@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:flutter/material.dart';
+import 'package:baby_doctor/model/Services.dart';
+import 'package:baby_doctor/Service/Service.dart' as DAL;
 
 class AddService extends StatefulWidget {
   @override
@@ -12,6 +16,7 @@ class _AddServiceState extends State<AddService> {
   final formKey = GlobalKey<FormState>();
   String ServiceName;
   String ServiceDescription;
+  bool Isloading=false;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,20 +144,43 @@ class _AddServiceState extends State<AddService> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                      Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor added')));
-                formKey.currentState.save();
+                onClickDataPost();
               },
             ),
           ),
         ),
       ],
     );
+  }
+
+
+  onClickDataPost()  async {
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Some input fields are not filled.')));
+      return;
+    }
+    setState((){Isloading = true;});
+    formKey.currentState.save();
+
+    //perform your task after save
+    DAL.Service service =  new DAL.Service();
+    Services obj = new Services(
+      ServiceName: ServiceName,
+      ServiceDescription: ServiceDescription,
+    );
+    var response= await service.InsertServices(obj);
+    print(response);
+    if(response==true)
+    {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Success: Record Added Successfully.')));
+      formKey.currentState.reset();
+      setState((){Isloading = false;});
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Operation Unsuccessfull.')));
+      setState((){Isloading = false;});
+    }
   }
 }

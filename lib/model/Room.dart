@@ -3,7 +3,7 @@ class Room {
   final int id;
   final String RoomNo;
   final String RoomType;
-  final String RoomCapacity;
+  final double RoomCapacity;
   final double Charges;
 
   Room({

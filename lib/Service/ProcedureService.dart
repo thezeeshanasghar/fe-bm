@@ -31,14 +31,31 @@ class ProcedureService {
     }
   }
 
-  Future<http.Response> InsertProcedure(Procedures procedures) {
-    return http.post(
-      Uri.https('babymedics.fernflowers.com', 'api/procedure'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(procedures),
-    );
+  Future<bool> InsertProcedure(Procedures procedures) async {
+
+    Map<String, dynamic> Obj = {
+      'name': procedures.name,
+      'performedBy': procedures.performedBy,
+      'charges': procedures.charges,
+      'performerShare': procedures.performerShare
+    };
+
+    final response = await http.post(Uri.https('babymedics.fernflowers.com', 'api/procedure'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(Obj));
+
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      return true;
+    } else {
+      // If the server did not return a 201 CREATED response,
+      // then throw an exception.
+      return false;
+    }
+
   }
 
   Future<http.Response> UpdateProcedure(Procedures procedures) {
