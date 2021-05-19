@@ -1,22 +1,22 @@
 import 'package:flutter/foundation.dart';
 class Services {
   final int id;
-  final String ServiceName;
-  final String ServiceDescription;
+  final String name;
+  final String description;
 
 
   Services({
     this.id,
-    @required this.ServiceName,
-    @required this.ServiceDescription,
+    @required this.name,
+    @required this.description,
 
   });
 
   factory Services.fromJson(Map<String, dynamic> json) {
     return Services(
       id: json['id'],
-      ServiceName: json['RoomNo'],
-      ServiceDescription: json['RoomType'],
+      name: json['name'],
+      description: json['description'],
 
     );
   }

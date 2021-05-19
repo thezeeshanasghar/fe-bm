@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/model/Room.dart';
 import 'package:baby_doctor/model/Services.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,7 @@ import '../model/Room.dart';
 class RoomService {
   Future<List<Room>> getRooms() async {
     final response =
-        await http.get(Uri.https('babymedics.fernflowers.com', 'api/room'));
+        await http.get(Uri.https(Strings.pathAPI, 'api/room'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Room> posts = body
@@ -28,7 +29,7 @@ class RoomService {
 
   Future<List<Room>> getRoomsById(int Id) async {
     final response = await http
-        .get(Uri.https('babymedics.fernflowers.com', 'api/room/${Id}'));
+        .get(Uri.https(Strings.pathAPI, 'api/room/${Id}'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Room> posts = body
@@ -54,7 +55,7 @@ class RoomService {
     };
 
     final response =
-        await http.post(Uri.https('babymedics.fernflowers.com', 'api/room'),
+        await http.post(Uri.https(Strings.pathAPI, 'api/room'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -73,7 +74,7 @@ class RoomService {
 
   Future<http.Response> UpdateRooms(Room rooms) {
     return http.put(
-      Uri.https('babymedics.fernflowers.com', 'api/room/${rooms.id}'),
+      Uri.https(Strings.pathAPI, 'api/room/${rooms.id}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -83,7 +84,7 @@ class RoomService {
 
   Future<http.Response> DeleteRoom(Room rooms) {
     return http.delete(
-      Uri.https('babymedics.fernflowers.com', 'api/room/${rooms.id}'),
+      Uri.https(Strings.pathAPI, 'api/room/${rooms.id}'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

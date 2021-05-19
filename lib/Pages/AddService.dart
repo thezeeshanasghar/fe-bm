@@ -14,8 +14,8 @@ class AddService extends StatefulWidget {
 class _AddServiceState extends State<AddService> {
   @override
   final formKey = GlobalKey<FormState>();
-  String ServiceName;
-  String ServiceDescription;
+  String name;
+  String description;
   bool Isloading=false;
 
   Widget build(BuildContext context) {
@@ -85,7 +85,7 @@ class _AddServiceState extends State<AddService> {
               return null;
             },
             onSaved: (String value) {
-              ServiceName = value;
+              name = value;
             },
           ),
         ),
@@ -116,7 +116,7 @@ class _AddServiceState extends State<AddService> {
               return null;
             },
             onSaved: (String value) {
-              ServiceDescription = value;
+              description = value;
             },
           ),
         ),
@@ -165,9 +165,9 @@ class _AddServiceState extends State<AddService> {
 
     //perform your task after save
     DAL.Service service =  new DAL.Service();
-    Services obj = new Services(
-      ServiceName: ServiceName,
-      ServiceDescription: ServiceDescription,
+      Services obj = new Services(
+        name: name,
+        description: description,
     );
     var response= await service.InsertServices(obj);
     print(response);

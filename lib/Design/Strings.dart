@@ -32,4 +32,6 @@ class Strings {
   static const String routeServiceList = '/ServiceList';
   static const String routePatientList = '/PatientList';
 
+  static const String pathAPI = 'babymedics.fernflowers.com';
+
 }
