@@ -1,5 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Pages/AddDoctor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -53,8 +54,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage:
-                      AssetImage('assets/joker.jpg'),
+                      backgroundImage: AssetImage('assets/joker.jpg'),
                       radius: 30,
                     ),
                     Padding(
@@ -160,6 +160,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               widgetRowOne(),
                               widgetRowTwo(),
                               widgetRowThree(),
+                              widgetRowFour(),
+                              widgetRowFive()
                             ],
                           ),
                         )),
@@ -202,11 +204,34 @@ class _HomeDrawerState extends State<HomeDrawer> {
       children: [
         widgetNurseAppointmentsCard(),
         widgetPatientListCard(),
-        widgetDummySpaceCard(),
+        widgetDoctorListCard(),
       ],
     );
   }
 
+  Widget widgetRowFour() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.ltr,
+      children: [
+        widgetNurseListCard(),
+        widgetReceptionistListCard(),
+        widgetProcedureListCard(),
+      ],
+    );
+  }
+
+  Widget widgetRowFive() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.ltr,
+      children: [
+        widgetRoomListCard(),
+        widgetServiceListCard(),
+        widgetDummySpaceCard(),
+      ],
+    );
+  }
 
   Widget widgetDummySpaceCard() {
     return Expanded(
@@ -217,11 +242,323 @@ class _HomeDrawerState extends State<HomeDrawer> {
     );
   }
 
+  Widget widgetServiceListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeServiceList);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleServiceList,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetRoomListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeRoomList);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleRoomList,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetProcedureListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeProcedureList);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleProcedureList,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetReceptionistListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeReceptionistList);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleReceptionistList,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetNurseListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeNurseList);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleNurseList,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetDoctorListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeDoctorList);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleDoctorList,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget widgetAddDoctorCard() {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/AddDoctor');
+          Navigator.pushNamed(context, Strings.routeAddDoctor);
         },
         child: Card(
           child: Column(
@@ -244,7 +581,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Doctor',
+                      Strings.titleAddDoctor,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -273,7 +610,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/AddNurse');
+          Navigator.pushNamed(context, Strings.routeAddNurse);
         },
         child: Card(
           child: Column(
@@ -296,7 +633,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Nurse',
+                      Strings.titleAddNurse,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -325,7 +662,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/AddProcedures');
+          Navigator.pushNamed(context, Strings.routeAddProcedure);
         },
         child: Card(
           child: Column(
@@ -338,7 +675,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 padding: const EdgeInsets.all(10),
                 child: Container(
                     child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
+                        child: Icon(Icons.add_circle_outlined),
                         fit: BoxFit.fill)),
               ),
               Padding(
@@ -348,7 +685,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Procedure',
+                      Strings.titleAddProcedure,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -377,7 +714,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/AddReceptionist');
+          Navigator.pushNamed(context, Strings.routeAddReceptionist);
         },
         child: Card(
           child: Column(
@@ -400,7 +737,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Receptionist',
+                      Strings.titleAddReceptionist,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -429,7 +766,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/AddRoom');
+          Navigator.pushNamed(context, Strings.routeAddRoom);
         },
         child: Card(
           child: Column(
@@ -452,7 +789,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Room',
+                      Strings.titleAddRoom,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -481,7 +818,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/AddService');
+          Navigator.pushNamed(context, Strings.routeAddService);
         },
         child: Card(
           child: Column(
@@ -494,7 +831,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 padding: const EdgeInsets.all(10),
                 child: Container(
                     child: FittedBox(
-                        child: Icon(Icons.cleaning_services),
+                        child: Icon(Icons.add_circle_outlined),
                         fit: BoxFit.fill)),
               ),
               Padding(
@@ -504,7 +841,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Service',
+                      Strings.titleAddService,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -636,7 +973,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/NurseAppointment');
+          Navigator.pushNamed(context, Strings.routeNurseAppointment);
         },
         child: Card(
           child: Column(
@@ -649,7 +986,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 padding: const EdgeInsets.all(10),
                 child: Container(
                     child: FittedBox(
-                        child: Icon(Icons.ac_unit), fit: BoxFit.fill)),
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -658,7 +996,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Nurse Appointments',
+                      Strings.titleNurseAppointment,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -687,7 +1025,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/PatientList');
+          Navigator.pushNamed(context, Strings.routePatientList);
         },
         child: Card(
           child: Column(
@@ -710,7 +1048,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Patient List',
+                      Strings.titlePatientList,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
