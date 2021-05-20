@@ -46,41 +46,49 @@ class _ProcedureListState extends State<ProcedureList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Shade.globalBackgroundColor,
-      appBar: AppBar(
-        title: Text(Strings.titleProcedureList),
-        centerTitle: false,
-        backgroundColor: Shade.globalAppBarColor,
-        elevation: 0.0,
-      ),
-      body: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodyText2,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.minHeight,
-                ),
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[widgetprocedurePatients()],
-                      ),
-                    )),
-              ),
-            );
-          },
+        backgroundColor: Shade.globalBackgroundColor,
+        appBar: AppBar(
+          title: Text(Strings.titleProcedureList),
+          centerTitle: false,
+          backgroundColor: Shade.globalAppBarColor,
+          elevation: 0.0,
         ),
-      ),
-    );
+        body: DefaultTextStyle(
+          style: Theme.of(context).textTheme.bodyText2,
+          child: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.minHeight,
+                  ),
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          Dimens.globalPaddingLeft,
+                          Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight,
+                          Dimens.globalPaddingBottom),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[widgetprocedurePatients()],
+                        ),
+                      )),
+                ),
+              );
+            },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, Strings.routeAddProcedures);
+          },
+          child: const Icon(Icons.add),
+          backgroundColor: Shade.fabGlobalButtonColor,
+        ));
   }
 
   Widget widgetprocedurePatients() {

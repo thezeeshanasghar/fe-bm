@@ -15,27 +15,27 @@ class DoctorList extends StatefulWidget {
 class _DoctorListState extends State<DoctorList> {
   final formKey = GlobalKey<FormState>();
 
-  // onCall Data
-  List<DatatableHeader> onCallHeaders = [];
-  List<int> onCallPerPage = [5, 10, 15, 100];
-  int onCallTotal = 100;
-  int onCallCurrentPerPage;
-  int onCallCurrentPage = 1;
-  bool onCallIsSearch = false;
-  List<Map<String, dynamic>> onCallIsSource = [];
-  List<Map<String, dynamic>> onCallSelecteds = [];
-  String onCallSelectableKey = "Invoice";
-  String onCallSortColumn;
-  bool onCallSortAscending = true;
-  bool onCallIsLoading = true;
-  bool onCallShowSelect = false;
+  // doctorList Data
+  List<DatatableHeader> doctorListHeaders = [];
+  List<int> doctorListPerPage = [5, 10, 15, 100];
+  int doctorListTotal = 100;
+  int doctorListCurrentPerPage;
+  int doctorListCurrentPage = 1;
+  bool doctorListIsSearch = false;
+  List<Map<String, dynamic>> doctorListIsSource = [];
+  List<Map<String, dynamic>> doctorListSelecteds = [];
+  String doctorListSelectableKey = "Invoice";
+  String doctorListSortColumn;
+  bool doctorListSortAscending = true;
+  bool doctorListIsLoading = true;
+  bool doctorListShowSelect = false;
 
   @override
   void initState() {
     super.initState();
-    // onCall
-    initializeonCallHeaders();
-    onCallInitData();
+    // doctorList
+    initializedoctorListHeaders();
+    doctorListInitData();
   }
 
   @override
@@ -46,44 +46,52 @@ class _DoctorListState extends State<DoctorList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Shade.globalBackgroundColor,
-      appBar: AppBar(
-        title: Text(Strings.titleDoctorList),
-        centerTitle: false,
-        backgroundColor: Shade.globalAppBarColor,
-        elevation: 0.0,
-      ),
-      body: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodyText2,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.minHeight,
-                ),
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[widgetonCallPatients()],
-                      ),
-                    )),
-              ),
-            );
-          },
+        backgroundColor: Shade.globalBackgroundColor,
+        appBar: AppBar(
+          title: Text(Strings.titleDoctorList),
+          centerTitle: false,
+          backgroundColor: Shade.globalAppBarColor,
+          elevation: 0.0,
         ),
-      ),
-    );
+        body: DefaultTextStyle(
+          style: Theme.of(context).textTheme.bodyText2,
+          child: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.minHeight,
+                  ),
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          Dimens.globalPaddingLeft,
+                          Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight,
+                          Dimens.globalPaddingBottom),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[widgetdoctorListPatients()],
+                        ),
+                      )),
+                ),
+              );
+            },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, Strings.routeAddDoctor);
+          },
+          child: const Icon(Icons.add),
+          backgroundColor: Shade.fabGlobalButtonColor,
+        ));
   }
 
-  Widget widgetonCallPatients() {
+  Widget widgetdoctorListPatients() {
     return Card(
       elevation: 1,
       shadowColor: Colors.black,
@@ -101,22 +109,22 @@ class _DoctorListState extends State<DoctorList> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ResponsiveDatatable(
-                  title: !onCallIsSearch
+                  title: !doctorListIsSearch
                       ? Row(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.person_outline_outlined),
-                            ),
-                            Text(
-                              Strings.titleDoctorList,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                            // Padding(
+                            //   padding: const EdgeInsets.all(8.0),
+                            //   child: Icon(Icons.person_outline_outlined),
+                            // ),
+                            // Text(
+                            //   'Click on search icon to search',
+                            //   style: TextStyle(fontWeight: FontWeight.normal),
+                            // ),
                           ],
                         )
                       : null,
                   actions: [
-                    if (onCallIsSearch)
+                    if (doctorListIsSearch)
                       Expanded(
                           child: TextField(
                         decoration: InputDecoration(
@@ -124,60 +132,64 @@ class _DoctorListState extends State<DoctorList> {
                                 icon: Icon(Icons.cancel),
                                 onPressed: () {
                                   setState(() {
-                                    onCallIsSearch = false;
+                                    doctorListIsSearch = false;
                                   });
                                 }),
                             suffixIcon: IconButton(
                                 icon: Icon(Icons.search), onPressed: () {})),
                       )),
-                    if (!onCallIsSearch)
+                    if (!doctorListIsSearch)
                       IconButton(
                           icon: Icon(Icons.search),
                           onPressed: () {
                             setState(() {
-                              onCallIsSearch = true;
+                              doctorListIsSearch = true;
                             });
                           })
                   ],
-                  headers: onCallHeaders,
-                  source: onCallIsSource,
-                  selecteds: onCallSelecteds,
-                  showSelect: onCallShowSelect,
+                  headers: doctorListHeaders,
+                  source: doctorListIsSource,
+                  selecteds: doctorListSelecteds,
+                  showSelect: doctorListShowSelect,
                   autoHeight: false,
                   onTabRow: (data) {
-                    // print(data);
+                    print(data);
                   },
                   onSort: (value) {
                     setState(() {
-                      onCallSortColumn = value;
-                      onCallSortAscending = !onCallSortAscending;
-                      if (onCallSortAscending) {
-                        onCallIsSource.sort((a, b) => b["$onCallSortColumn"]
-                            .compareTo(a["$onCallSortColumn"]));
+                      doctorListSortColumn = value;
+                      doctorListSortAscending = !doctorListSortAscending;
+                      if (doctorListSortAscending) {
+                        doctorListIsSource.sort((a, b) =>
+                            b["$doctorListSortColumn"]
+                                .compareTo(a["$doctorListSortColumn"]));
                       } else {
-                        onCallIsSource.sort((a, b) => a["$onCallSortColumn"]
-                            .compareTo(b["$onCallSortColumn"]));
+                        doctorListIsSource.sort((a, b) =>
+                            a["$doctorListSortColumn"]
+                                .compareTo(b["$doctorListSortColumn"]));
                       }
                     });
                   },
-                  sortAscending: onCallSortAscending,
-                  sortColumn: onCallSortColumn,
-                  isLoading: onCallIsLoading,
+                  sortAscending: doctorListSortAscending,
+                  sortColumn: doctorListSortColumn,
+                  isLoading: doctorListIsLoading,
                   onSelect: (value, item) {
                     print("$value  $item ");
                     if (value) {
-                      setState(() => onCallSelecteds.add(item));
+                      setState(() => doctorListSelecteds.add(item));
                     } else {
-                      setState(() => onCallSelecteds
-                          .removeAt(onCallSelecteds.indexOf(item)));
+                      setState(() => doctorListSelecteds
+                          .removeAt(doctorListSelecteds.indexOf(item)));
                     }
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => onCallSelecteds =
-                          onCallIsSource.map((entry) => entry).toList().cast());
+                      setState(() => doctorListSelecteds = doctorListIsSource
+                          .map((entry) => entry)
+                          .toList()
+                          .cast());
                     } else {
-                      setState(() => onCallSelecteds.clear());
+                      setState(() => doctorListSelecteds.clear());
                     }
                   },
                   footers: [
@@ -185,12 +197,12 @@ class _DoctorListState extends State<DoctorList> {
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text("Rows per page:"),
                     ),
-                    if (onCallPerPage != null)
+                    if (doctorListPerPage != null)
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 15),
                         child: DropdownButton(
-                            value: onCallCurrentPerPage,
-                            items: onCallPerPage
+                            value: doctorListCurrentPerPage,
+                            items: doctorListPerPage
                                 .map((e) => DropdownMenuItem(
                                       child: Text("$e"),
                                       value: e,
@@ -198,14 +210,14 @@ class _DoctorListState extends State<DoctorList> {
                                 .toList(),
                             onChanged: (value) {
                               setState(() {
-                                onCallCurrentPerPage = value;
+                                doctorListCurrentPerPage = value;
                               });
                             }),
                       ),
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text(
-                          "$onCallCurrentPage - $onCallCurrentPerPage of $onCallTotal"),
+                          "$doctorListCurrentPage - $doctorListCurrentPerPage of $doctorListTotal"),
                     ),
                     IconButton(
                       icon: Icon(
@@ -214,8 +226,8 @@ class _DoctorListState extends State<DoctorList> {
                       ),
                       onPressed: () {
                         setState(() {
-                          onCallCurrentPage = onCallCurrentPage >= 2
-                              ? onCallCurrentPage - 1
+                          doctorListCurrentPage = doctorListCurrentPage >= 2
+                              ? doctorListCurrentPage - 1
                               : 1;
                         });
                       },
@@ -225,7 +237,7 @@ class _DoctorListState extends State<DoctorList> {
                       icon: Icon(Icons.arrow_forward_ios, size: 16),
                       onPressed: () {
                         setState(() {
-                          onCallCurrentPage++;
+                          doctorListCurrentPage++;
                         });
                       },
                       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -238,39 +250,49 @@ class _DoctorListState extends State<DoctorList> {
     );
   }
 
-  // onCall
-  List<Map<String, dynamic>> onCallGenerateData({int n: 100}) {
-    final List sourceonCall = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsonCall = [];
-    var i = onCallIsSource.length;
+  // doctorList
+  List<Map<String, dynamic>> doctorListGenerateData({int n: 100}) {
+    final List sourcedoctorList = List.filled(n, Random.secure());
+    List<Map<String, dynamic>> tempsdoctorList = [];
+    var i = doctorListIsSource.length;
     print(i);
-    for (var data in sourceonCall) {
-      tempsonCall.add({
-        "Date": "Feb 24, 2021",
-        "PatientName": "Syed Basit Ali Shah $i",
-        "FatherName": "Syed Basit Ali Shah $i",
-        "DOB": "Jan 19, 1994",
-        "CheckupType": "Pediatrician",
-        "BookingNo": "GH-0167$i",
+    for (var data in sourcedoctorList) {
+      tempsdoctorList.add({
+        "FirstName": "FirstName $i",
+        "LastName": "LastName $i",
+        "FatherName": "FatherName $i",
+        "CNIC": "CNIC $i",
+        "ContactNumber": "ContactNumber $i",
+        "EmergencyContactNumber": "EmergencyContactNumber $i",
+        "Email": "Email $i",
+        "Address": "Address $i",
+        "Speciality": "Speciality $i",
+        "Experience": "Experience $i",
+        "ConsultationFee": "500$i",
+        "EmergencyConsultationFee": "1000$i",
+        "FeeShare": "35%",
+        "JoiningDate": "JoiningDate",
+        "Qualification": "Qualification",
+        "Diplomas": "Diplomas",
         "Action": [i, 100],
       });
       i++;
     }
-    return tempsonCall;
+    return tempsdoctorList;
   }
 
-  onCallInitData() async {
-    setState(() => onCallIsLoading = true);
+  doctorListInitData() async {
+    setState(() => doctorListIsLoading = true);
     Future.delayed(Duration(seconds: 0)).then((value) {
-      onCallIsSource.addAll(onCallGenerateData(n: 100));
-      setState(() => onCallIsLoading = false);
+      doctorListIsSource.addAll(doctorListGenerateData(n: 100));
+      setState(() => doctorListIsLoading = false);
     });
   }
 
-  initializeonCallHeaders() {
-    onCallHeaders = [
+  initializedoctorListHeaders() {
+    doctorListHeaders = [
       DatatableHeader(
-          value: "Date",
+          value: "FirstName",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -279,16 +301,15 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Date",
+                  "First Name",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "PatientName",
-          show: true,
-          flex: 2,
+          value: "LastName",
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -296,7 +317,7 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Patient Name",
+                  "Last Name",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -304,7 +325,7 @@ class _DoctorListState extends State<DoctorList> {
           }),
       DatatableHeader(
           value: "FatherName",
-          show: true,
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -319,8 +340,8 @@ class _DoctorListState extends State<DoctorList> {
             );
           }),
       DatatableHeader(
-          value: "DOB",
-          show: true,
+          value: "CNIC",
+          show: false,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -328,14 +349,14 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "DOB",
+                  "CNIC",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "CheckupType",
+          value: "ContactNumber",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -344,14 +365,62 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Checkup Type",
+                  "Contact Number",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "BookingNo",
+          value: "EmergencyContactNumber",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Emergency Contact Number",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Email",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Email",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Address",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Address",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Speciality",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -360,7 +429,119 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Booking No",
+                  "Speciality",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Experience",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Experience",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "ConsultationFee",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Consultation Fee",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "EmergencyConsultationFee",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Emergency Fee",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "FeeShare",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Fee Share",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "JoiningDate",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "JoiningDate",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Qualification",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Qualification",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Diplomas",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Diplomas",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -369,7 +550,7 @@ class _DoctorListState extends State<DoctorList> {
       DatatableHeader(
           value: "Action",
           show: true,
-          flex: 2,
+          flex: 1,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -395,7 +576,7 @@ class _DoctorListState extends State<DoctorList> {
                       //   MaterialPageRoute(builder: (context) => NewInvoice()),
                       // );
                     },
-                    child: Text('New Invoice')),
+                    child: Text('Edit')),
                 SizedBox(
                   width: 10,
                 ),
@@ -407,7 +588,7 @@ class _DoctorListState extends State<DoctorList> {
                       // );
                     },
                     child: Text(
-                      'Refund',
+                      'Delete',
                       style: TextStyle(color: Colors.red),
                     )),
               ],

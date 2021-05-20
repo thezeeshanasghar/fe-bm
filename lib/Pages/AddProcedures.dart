@@ -1,5 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
 import 'package:baby_doctor/model/Procedures.dart';
@@ -21,7 +22,7 @@ class _AddProceduresState extends State<AddProcedures> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text("Add Procedures"),
+        title: Text(Strings.titleAddProcedures),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,

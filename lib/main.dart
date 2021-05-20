@@ -30,7 +30,7 @@ void main() {
       Strings.routeAddService: (context) => AddService(),
       Strings.routeAddDoctor: (context) => AddDoctor(),
       Strings.routeAddNurse: (context) => AddNurse(),
-      Strings.routeAddProcedure: (context) => AddProcedures(),
+      Strings.routeAddProcedures: (context) => AddProcedures(),
       Strings.routeAddReceptionist: (context) => AddReceptionist(),
       Strings.routePatientList: (context) => PatientList(),
       Strings.routeNurseAppointment: (context) => NurseAppointment(),

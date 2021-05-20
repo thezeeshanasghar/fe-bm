@@ -1,5 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:baby_doctor/model/Room.dart';
@@ -22,7 +23,7 @@ class _AddRoomState extends State<AddRoom> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text("Add Room"),
+        title: Text(Strings.titleAddRoom),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
