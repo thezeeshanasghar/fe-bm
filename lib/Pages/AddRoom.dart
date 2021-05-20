@@ -3,7 +3,7 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
-import 'package:baby_doctor/model/Room.dart';
+import 'package:baby_doctor/Models/Room.dart';
 import 'package:baby_doctor/Service/RoomService.dart' as DAL;
 class AddRoom extends StatefulWidget {
   @override

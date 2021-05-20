@@ -3,7 +3,7 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
-import 'package:baby_doctor/model/Procedures.dart';
+import 'package:baby_doctor/Models/Procedures.dart';
 
 class AddProcedures extends StatefulWidget {
   @override

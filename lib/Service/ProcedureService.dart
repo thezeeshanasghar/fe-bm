@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/model/Room.dart';
-import 'package:baby_doctor/model/Services.dart';
+import 'package:baby_doctor/Models/Room.dart';
+import 'package:baby_doctor/Models/Services.dart';
 import 'package:http/http.dart' as http;
-import '../model/Procedures.dart';
+import '../Models/Procedures.dart';
 
 class ProcedureService {
   Future<List<Procedures>> getProcedures() async {
