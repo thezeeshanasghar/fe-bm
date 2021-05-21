@@ -40,7 +40,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Scaffold(
         backgroundColor: Shade.globalBackgroundColor,
         appBar: AppBar(
-          title: Text('Admin'),
+          title: Text(Strings.titleHomePage),
           backgroundColor: Shade.globalAppBarColor,
         ),
         drawer: Drawer(
@@ -72,64 +72,71 @@ class _HomeDrawerState extends State<HomeDrawer> {
               ),
               ListTile(
                 leading: Icon(Icons.add_circle_outlined),
-                title: Text('Add Doctor'),
+                title: Text(Strings.titleAddDoctor),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/AddDoctor');
+                  Navigator.pushNamed(context, Strings.routeAddDoctor);
                 },
               ),
               ListTile(
                 leading: Icon(Icons.add_circle_outlined),
-                title: Text('Add Nurse'),
+                title: Text(Strings.titleAddNurse),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/AddNurse');
+                  Navigator.pushNamed(context, Strings.routeAddNurse);
                 },
               ),
               ListTile(
                 leading: Icon(Icons.add_circle_outlined),
-                title: Text('Receptionist'),
+                title: Text(Strings.titleAddReceptionist),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/AddReceptionist');
+                  Navigator.pushNamed(context, Strings.routeAddReceptionist);
                 },
               ),
               ListTile(
                 leading: Icon(Icons.list_alt),
-                title: Text('Add Procedures'),
+                title: Text(Strings.titleAddProcedures),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/AddProcedures');
+                  Navigator.pushNamed(context, Strings.routeAddProcedures);
                 },
               ),
               ListTile(
                 leading: Icon(Icons.add_circle_outlined),
-                title: Text('Add Room'),
+                title: Text(Strings.titleAddRoom),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/AddRoom');
+                  Navigator.pushNamed(context, Strings.routeAddRoom);
                 },
               ),
               ListTile(
                   leading: Icon(Icons.cleaning_services),
-                  title: Text('Add Service'),
+                  title: Text(Strings.titleAddService),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/AddService');
+                    Navigator.pushNamed(context, Strings.routeAddService);
                   }),
               ListTile(
                   leading: Icon(Icons.list_alt),
-                  title: Text('Nurse Appointments'),
+                  title: Text(Strings.titleNurseAppointment),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/NurseAppointment');
+                    Navigator.pushNamed(context, Strings.routeNurseAppointment);
                   }),
               ListTile(
                   leading: Icon(Icons.list_alt),
-                  title: Text('Patient List'),
+                  title: Text(Strings.titlePatientList),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/PatientList');
+                    Navigator.pushNamed(context, Strings.routePatientList);
+                  }),
+              ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text(Strings.titleLogout),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, Strings.routePatientList);
                   })
             ],
           ),
@@ -157,8 +164,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
+                              widgetRowHeaderOne(),
                               widgetRowOne(),
                               widgetRowTwo(),
+                              widgetRowHeaderTwo(),
                               widgetRowThree(),
                               widgetRowFour(),
                               widgetRowFive()
@@ -171,6 +180,84 @@ class _HomeDrawerState extends State<HomeDrawer> {
             ),
           ),
         ));
+  }
+
+  Widget widgetRowHeaderOne() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.ltr,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                textDirection: TextDirection.ltr,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'For adding data in database',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetRowHeaderTwo() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.ltr,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                textDirection: TextDirection.ltr,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'To view data that is present in database',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget widgetRowOne() {
@@ -662,7 +749,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, Strings.routeAddProcedure);
+          Navigator.pushNamed(context, Strings.routeAddProcedures);
         },
         child: Card(
           child: Column(
@@ -685,7 +772,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      Strings.titleAddProcedure,
+                      Strings.titleAddProcedures,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

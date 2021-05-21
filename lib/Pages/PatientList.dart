@@ -1,3 +1,4 @@
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
@@ -16,13 +17,10 @@ class _PatientListState extends State<PatientList> {
 
   @override
   Widget build(BuildContext context) {
-    final appTitle = 'Patient List';
-
-    // print(resp);
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text(appTitle),
+        title: Text(Strings.titlePatientList),
         centerTitle: false,
         backgroundColor: Colors.grey,
         elevation: 0.0,

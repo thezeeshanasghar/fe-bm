@@ -2,8 +2,9 @@ import 'dart:developer';
 
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/model/Services.dart';
+import 'package:baby_doctor/Models/Services.dart';
 import 'package:baby_doctor/Service/Service.dart' as DAL;
 
 class AddService extends StatefulWidget {
@@ -22,7 +23,7 @@ class _AddServiceState extends State<AddService> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text("Add Service"),
+        title: Text(Strings.titleAddService),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,

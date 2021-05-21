@@ -7,4 +7,5 @@ class Shade {
   static final Color globalAppBarColor = Colors.blueGrey;
   static final Color drawerHeaderColor = Colors.blueGrey;
   static final Color submitButtonColor = Colors.blueGrey;
+  static final Color fabGlobalButtonColor = Colors.blueGrey;
 }

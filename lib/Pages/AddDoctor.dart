@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
+import 'package:baby_doctor/Design/Strings.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -52,7 +53,7 @@ class _AddDoctorState extends State<AddDoctor> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text("Add Doctor"),
+        title: Text(Strings.titleAddDoctor),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
