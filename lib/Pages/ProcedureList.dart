@@ -4,8 +4,8 @@ import 'dart:math';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Procedures.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
-import 'package:baby_doctor/model/Procedures.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
@@ -256,30 +256,39 @@ class _ProcedureListState extends State<ProcedureList> {
   }
 
   // procedure
-  List<Map<String, dynamic>> procedureGenerateData({int n: 100}) {
-    final List sourceprocedure = List.filled(n, Random.secure());
-    DAL.ProcedureService service =  new DAL.ProcedureService();
-    var listOfProducts=service.getProcedures();
-    List<Map<String, dynamic>> tempsprocedure = [];
-    var i = procedureIsSource.length;
-    print(i);
-    for (var data in sourceprocedure) {
-      tempsprocedure.add({
-        "Name": "Syed Basit Ali Shah $i",
-        "PerformedBy": "Performed By $i",
-        "Charges": "10$i",
-        "Share": i % 100,
-        "Action": [i, 100],
-      });
-      i++;
-    }
-    return tempsprocedure;
+  List<Map<String, dynamic>> procedureGenerateData({int n: 100,List<dynamic> list }) {
+     List<dynamic> sourceprocedure = [];
+
+      List<Map<String, dynamic>> tempsprocedure = [];
+      var i = list.length;
+      print(i);
+      for (var data in list) {
+        tempsprocedure.add({
+          "Name": data["name"],
+          "PerformedBy": data["performedBy"],
+          "Charges": data["charges"],
+          "Share": data["performerShare"],
+          "Action": [i, 100],
+        });
+        i++;
+      }
+      return tempsprocedure;
   }
 
   procedureInitData() async {
     setState(() => procedureIsLoading = true);
+
+    DAL.ProcedureService service =  new DAL.ProcedureService();
+    var listOfProducts;
+    List<dynamic> sourceprocedure=[];
+   await service.getProcedures().then((result) {
+      listOfProducts = result;
+      setState(() {
+        sourceprocedure=jsonDecode(result);
+      });
+    });
     Future.delayed(Duration(seconds: 0)).then((value) {
-      procedureIsSource.addAll(procedureGenerateData(n: 100));
+      procedureIsSource.addAll(procedureGenerateData(n: 100,list:sourceprocedure));
       setState(() => procedureIsLoading = false);
     });
   }

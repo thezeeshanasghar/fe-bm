@@ -8,19 +8,19 @@ import 'package:http/http.dart' as http;
 import '../Models/Procedures.dart';
 
 class ProcedureService {
-  Future<List<dynamic>> getProcedures() async {
+  Future<String> getProcedures() async {
     final response = await http.get(Uri.https(Strings.pathAPI, 'api/procedure'));
     if (response.statusCode == 200) {
       log(response.statusCode);
       List<dynamic> body = jsonDecode(response.body);
 
-      List<Procedures> posts = body
-          .map(
-            (dynamic item) => Procedures.fromJson(item),
-          )
-          .toList();
+      // List<Procedures> posts = body
+      //     .map(
+      //       (dynamic item) => Procedures.fromJson(item),
+      //     )
+      //     .toList();
       print(body);
-      return body;
+      return response.body;
     } else {
       throw Exception('Failed to load Procedure');
     }
