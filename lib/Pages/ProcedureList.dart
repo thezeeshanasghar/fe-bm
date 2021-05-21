@@ -1,11 +1,16 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Service/ProcedureService.dart';
+import 'package:baby_doctor/model/Procedures.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
+
 
 class ProcedureList extends StatefulWidget {
   @override
@@ -245,6 +250,8 @@ class _ProcedureListState extends State<ProcedureList> {
   // procedure
   List<Map<String, dynamic>> procedureGenerateData({int n: 100}) {
     final List sourceprocedure = List.filled(n, Random.secure());
+    DAL.ProcedureService service =  new DAL.ProcedureService();
+    var listOfProducts=service.getProcedures();
     List<Map<String, dynamic>> tempsprocedure = [];
     var i = procedureIsSource.length;
     print(i);
