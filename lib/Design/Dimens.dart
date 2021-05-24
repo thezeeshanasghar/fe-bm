@@ -14,4 +14,9 @@ class Dimens {
 
   static const double globalInputFieldLeftWithoutMaxLength = 10;
   static const double globalInputFieldRightWithoutMaxLength = 10;
+
+  static const double actionsGlobalButtonTop = 0;
+  static const double actionsGlobalButtonBottom = 10;
+  static const double actionsGlobalButtonLeft= 0;
+  static const double actionsGlobalButtonRight = 10;
 }

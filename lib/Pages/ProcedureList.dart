@@ -34,6 +34,8 @@ class _ProcedureListState extends State<ProcedureList> {
   List<Map<String, dynamic>> procedureSelecteds;
   List<Procedures> listProcedures;
 
+  ProcedureService procedureService;
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +47,6 @@ class _ProcedureListState extends State<ProcedureList> {
   @override
   void dispose() {
     super.dispose();
-    initVariablesAndClasses();
   }
 
   @override
@@ -113,11 +114,14 @@ class _ProcedureListState extends State<ProcedureList> {
     procedureShowSelect = false;
     listProcedures = [];
     showSearchedList = false;
+
+    procedureService = ProcedureService();
   }
 
   void getProceduresFromApiAndLinkToTable() async {
     setState(() => procedureIsLoading = true);
-    ProcedureService procedureService = ProcedureService();
+    listProcedures = [];
+    procedureIsSource = [];
     listProcedures = await procedureService.getProcedures();
     procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
     setState(() => procedureIsLoading = false);
@@ -259,42 +263,125 @@ class _ProcedureListState extends State<ProcedureList> {
           sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          onPressedEditInTable(Id, row);
-                        },
-                        child: Text('Edit')),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          onPressedDeleteInTable(Id, row);
-                        },
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.red),
-                        )),
-                  ],
-                ));
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    onPressedEditFromTable(Id, row);
+                  },
+                  child: Text('Edit',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextEdit,
+                      )),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () {
+                      onPressedDeleteFromTable(Id, row);
+                    },
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
+                    )),
+              ],
+            ));
           }),
     ];
   }
 
-  bool onPressedEditInTable(Id, row) {
+  void onPressedEditFromTable(Id, row) {
     print('Id');
     print(Id);
     print('row');
     print(row);
   }
 
-  bool onPressedDeleteInTable(Id, row) {
-    print('Id');
-    print(Id);
-    print('row');
-    print(row);
+  void onPressedDeleteFromTable(Id, row) {
+    Widget cancelButton = TextButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
+    );
+
+    Widget deleteButton = TextButton(
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
+      onPressed: () {
+        Navigator.of(context).pop();
+        procedureService.DeleteProcedure(Id).then((response) {
+          if (response == true) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Shade.snackGlobalSuccess,
+                content: Row(
+                  children: [
+                    Text('Success: Deleted procedure '),
+                    Text(
+                      row['Name'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )));
+            getProceduresFromApiAndLinkToTable();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Shade.snackGlobalFailed,
+                content: Row(
+                  children: [
+                    Text('Error: Try Again: Failed to delete procedure '),
+                    Text(
+                      row['Name'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )));
+          }
+        });
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: [
+          Text(Strings.alertDialogTitleDelete),
+        ],
+      ),
+      content: Row(
+        children: [
+          Text(Strings.alertDialogTitleDeleteNote),
+          Text(
+            row['Name'] + ' ?',
+            style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
+          )
+        ],
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
+    );
+
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   void onChangedSearchedValue(value) {
@@ -305,9 +392,9 @@ class _ProcedureListState extends State<ProcedureList> {
             String searchById = element["Id"].toString().toLowerCase();
             String searchByName = element["Name"].toString().toLowerCase();
             String searchByPerformedBy =
-            element["PerformedBy"].toString().toLowerCase();
+                element["PerformedBy"].toString().toLowerCase();
             String searchByCharges =
-            element["Charges"].toString().toLowerCase();
+                element["Charges"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByName.contains(value.toLowerCase()) ||
                 searchByPerformedBy.contains(value.toLowerCase()) ||
@@ -352,12 +439,12 @@ class _ProcedureListState extends State<ProcedureList> {
                   actions: [
                     Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.search_outlined),
-                              hintText: 'Search procedure'),
-                          onChanged: (value) => onChangedSearchedValue(value),
-                        )),
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.search_outlined),
+                          hintText: 'Search procedure'),
+                      onChanged: (value) => onChangedSearchedValue(value),
+                    )),
                   ],
                   headers: procedureHeaders,
                   source: !showSearchedList

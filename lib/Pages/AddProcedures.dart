@@ -17,7 +17,7 @@ class _AddProceduresState extends State<AddProcedures> {
   String PerformedBy;
   double Charges;
   double Share;
-  bool Isloading = false;
+  bool loadingButtonProgressIndicator = false;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,11 +52,7 @@ class _AddProceduresState extends State<AddProcedures> {
                         widgetPerformedBy(),
                         widgetCharges(),
                         widgetShare(),
-                        Isloading == false
-                            ? widgetSubmit()
-                            : Center(
-                                child: CircularProgressIndicator(),
-                              )
+                        widgetSubmit()
                       ],
                     ),
                   ),
@@ -204,68 +200,88 @@ class _AddProceduresState extends State<AddProcedures> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text('Submit'),
-              onPressed: () {
-                onClickDataPost();
-              },
-            ),
-          ),
-        ),
+        loadingButtonProgressIndicator == false
+            ? Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      Dimens.globalInputFieldleft,
+                      Dimens.globalInputFieldTop,
+                      Dimens.globalInputFieldRight,
+                      Dimens.globalInputFieldBottom),
+                  child: ElevatedButton(
+                    autofocus: false,
+                    style: ElevatedButton.styleFrom(
+                      primary: Shade.submitButtonColor,
+                      minimumSize: Size(double.infinity, 45),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    ),
+                    child: Text(Strings.submitGlobal),
+                    onPressed: () {
+                      onPressedSubmitButton();
+                    },
+                  ),
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              )
       ],
     );
   }
 
-  onClickDataPost() async {
+  onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Some input fields are not filled.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
       return;
     }
     setState(() {
-      Isloading = true;
+      loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
 
-    //perform your task after save
-    for (int i = 0; i < 10000; i++) {
-      DAL.ProcedureService service = new DAL.ProcedureService();
-      Procedures obj = new Procedures(
-          name: ProcedureName,
-          performedBy: PerformedBy,
-          charges: Charges,
-          performerShare: Share);
-      var response = await service.InsertProcedure(obj);
-      print(response);
-      if (response == true) {
-        if (i == 9999)
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Success: Record Added Successfully.')));
-        formKey.currentState.reset();
-        setState(() {
-          if (i == 9999) Isloading = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: Operation Unsuccessfull.')));
-        setState(() {
-          Isloading = false;
-        });
-      }
+    DAL.ProcedureService service = new DAL.ProcedureService();
+    Procedures obj = new Procedures(
+        name: ProcedureName,
+        performedBy: PerformedBy,
+        charges: Charges,
+        performerShare: Share);
+    var response = await service.InsertProcedure(obj);
+    print(response);
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Created procedure '),
+              Text(
+                ProcedureName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      formKey.currentState.reset();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to add '),
+              Text(
+                ProcedureName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
     }
   }
 }
