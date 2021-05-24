@@ -9,18 +9,13 @@ import '../Models/Procedures.dart';
 
 class ProcedureService {
   Future<List<Procedures>> getProcedures() async {
-    final response = await http
-        .get(Uri.https(Strings.pathAPI, 'api/procedure'));
+    final response =
+        await http.get(Uri.https(Strings.pathAPI, 'api/procedure'));
     if (response.statusCode == 200) {
-      log(response.statusCode);
-      List<dynamic> body = jsonDecode(response.body);
-
-      List<Procedures> posts = body
-          .map(
-            (dynamic item) => Procedures.fromJson(item),
-          )
+      final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
+      return parsed
+          .map<Procedures>((json) => Procedures.fromJson(json))
           .toList();
-      return posts;
     } else {
       throw Exception('Failed to load Procedure');
     }
@@ -34,12 +29,12 @@ class ProcedureService {
       'performerShare': procedures.performerShare
     };
 
-    final response = await http.post(
-        Uri.https(Strings.pathAPI, 'api/procedure'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(Obj));
+    final response =
+        await http.post(Uri.https(Strings.pathAPI, 'api/procedure'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(Obj));
 
     if (response.statusCode == 201) {
       // If the server did return a 201 CREATED response,

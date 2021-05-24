@@ -1,4 +1,3 @@
-
 class Strings {
   static const String titleHomePage = 'Admin';
   static const String titleAddDoctor = 'Add Doctor';
@@ -34,5 +33,4 @@ class Strings {
   static const String routePatientList = '/PatientList';
 
   static const String pathAPI = 'babymedics.fernflowers.com';
-
 }

@@ -9,8 +9,7 @@ import '../Models/Room.dart';
 
 class RoomService {
   Future<List<Room>> getRooms() async {
-    final response =
-        await http.get(Uri.https(Strings.pathAPI, 'api/room'));
+    final response = await http.get(Uri.https(Strings.pathAPI, 'api/room'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Room> posts = body
@@ -28,8 +27,8 @@ class RoomService {
   }
 
   Future<List<Room>> getRoomsById(int Id) async {
-    final response = await http
-        .get(Uri.https(Strings.pathAPI, 'api/room/${Id}'));
+    final response =
+        await http.get(Uri.https(Strings.pathAPI, 'api/room/${Id}'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Room> posts = body
@@ -54,12 +53,11 @@ class RoomService {
       'performerShare': rooms.Charges
     };
 
-    final response =
-        await http.post(Uri.https(Strings.pathAPI, 'api/room'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode(Obj));
+    final response = await http.post(Uri.https(Strings.pathAPI, 'api/room'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(Obj));
 
     if (response.statusCode == 201) {
       // If the server did return a 201 CREATED response,

@@ -17,7 +17,8 @@ class _AddProceduresState extends State<AddProcedures> {
   String PerformedBy;
   double Charges;
   double Share;
-  bool Isloading=false;
+  bool Isloading = false;
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
@@ -51,11 +52,11 @@ class _AddProceduresState extends State<AddProcedures> {
                         widgetPerformedBy(),
                         widgetCharges(),
                         widgetShare(),
-                        Isloading==false?
-                        widgetSubmit():
-                        Center(
-                          child: CircularProgressIndicator(),
-                        )
+                        Isloading == false
+                            ? widgetSubmit()
+                            : Center(
+                                child: CircularProgressIndicator(),
+                              )
                       ],
                     ),
                   ),
@@ -229,34 +230,42 @@ class _AddProceduresState extends State<AddProcedures> {
     );
   }
 
-  onClickDataPost()  async {
-     if (!formKey.currentState.validate()) {
-       ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text('Error: Some input fields are not filled.')));
-       return;
-     }
-     setState((){Isloading = true;});
-     formKey.currentState.save();
-
-     //perform your task after save
-    DAL.ProcedureService service =  new DAL.ProcedureService();
-    Procedures obj = new Procedures(
-        name: ProcedureName,
-        performedBy: PerformedBy,
-        charges: Charges,
-        performerShare: Share);
-   var response= await service.InsertProcedure(obj);
-  print(response);
-  if(response==true)
-    {
+  onClickDataPost() async {
+    if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Success: Record Added Successfully.')));
-      formKey.currentState.reset();
-      setState((){Isloading = false;});
-    }else{
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: Operation Unsuccessfull.')));
-    setState((){Isloading = false;});
-  }
+          SnackBar(content: Text('Error: Some input fields are not filled.')));
+      return;
+    }
+    setState(() {
+      Isloading = true;
+    });
+    formKey.currentState.save();
+
+    //perform your task after save
+    for (int i = 0; i < 10000; i++) {
+      DAL.ProcedureService service = new DAL.ProcedureService();
+      Procedures obj = new Procedures(
+          name: ProcedureName,
+          performedBy: PerformedBy,
+          charges: Charges,
+          performerShare: Share);
+      var response = await service.InsertProcedure(obj);
+      print(response);
+      if (response == true) {
+        if (i == 9999)
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Success: Record Added Successfully.')));
+        formKey.currentState.reset();
+        setState(() {
+          if (i == 9999) Isloading = false;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: Operation Unsuccessfull.')));
+        setState(() {
+          Isloading = false;
+        });
+      }
+    }
   }
 }
