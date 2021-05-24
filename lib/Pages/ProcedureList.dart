@@ -259,26 +259,26 @@ class _ProcedureListState extends State<ProcedureList> {
           sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      onPressedEditInTable(Id, row);
-                    },
-                    child: Text('Edit')),
-                SizedBox(
-                  width: 10,
-                ),
-                TextButton(
-                    onPressed: () {
-                      onPressedDeleteInTable(Id, row);
-                    },
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
-                    )),
-              ],
-            ));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          onPressedEditInTable(Id, row);
+                        },
+                        child: Text('Edit')),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          onPressedDeleteInTable(Id, row);
+                        },
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        )),
+                  ],
+                ));
           }),
     ];
   }
@@ -305,9 +305,9 @@ class _ProcedureListState extends State<ProcedureList> {
             String searchById = element["Id"].toString().toLowerCase();
             String searchByName = element["Name"].toString().toLowerCase();
             String searchByPerformedBy =
-                element["PerformedBy"].toString().toLowerCase();
+            element["PerformedBy"].toString().toLowerCase();
             String searchByCharges =
-                element["Charges"].toString().toLowerCase();
+            element["Charges"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByName.contains(value.toLowerCase()) ||
                 searchByPerformedBy.contains(value.toLowerCase()) ||
@@ -352,12 +352,12 @@ class _ProcedureListState extends State<ProcedureList> {
                   actions: [
                     Expanded(
                         child: TextField(
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.search_outlined),
-                          hintText: 'Search procedure'),
-                      onChanged: (value) => onChangedSearchedValue(value),
-                    )),
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              prefixIcon: Icon(Icons.search_outlined),
+                              hintText: 'Search procedure'),
+                          onChanged: (value) => onChangedSearchedValue(value),
+                        )),
                   ],
                   headers: procedureHeaders,
                   source: !showSearchedList
