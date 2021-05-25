@@ -19,6 +19,7 @@ import 'package:baby_doctor/Pages/ServiceList.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Pages/AddService.dart';
 import 'package:baby_doctor/Pages/AddRoom.dart';
+import 'package:baby_doctor/Pages/EditProcedures.dart';
 
 import 'Pages/MonthlyShare.dart';
 
@@ -47,6 +48,7 @@ void main() {
       '/NurseShare': (context) => NurseShare(),
       '/MonthlyShare': (context) => MonthlyShare(),
       '/AdminPatient': (context) => AdminPatient(),
+      Strings.routeEditProcedure:(context)=>EditProcedures()
     },
   ));
 }

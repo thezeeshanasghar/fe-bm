@@ -15,6 +15,7 @@ class Strings {
   static const String titleServiceList = 'Service List';
   static const String titlePatientList = 'Patient List';
   static const String titleLogout = 'Log out';
+  static const String editProcedure = 'Edit Procedure';
 
   static const String routeHomePage = '/';
   static const String routeAddDoctor = '/AddDoctor';
@@ -31,12 +32,12 @@ class Strings {
   static const String routeRoomList = '/RoomList';
   static const String routeServiceList = '/ServiceList';
   static const String routePatientList = '/PatientList';
+  static const String routeEditProcedure = '/EditProcedure';
 
   static const String alertDialogTitleDelete = 'Action';
   static const String alertDialogTitleEdit = 'Action';
   static const String alertDialogTitleDeleteNote = 'Are you sure you want to delete ';
 
   static const String submitGlobal = 'Submit';
-
   static const String pathAPI = 'babymedics.fernflowers.com';
 }

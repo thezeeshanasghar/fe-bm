@@ -294,10 +294,8 @@ class _ProcedureListState extends State<ProcedureList> {
   }
 
   void onPressedEditFromTable(Id, row) {
-    print('Id');
     print(Id);
-    print('row');
-    print(row);
+    Navigator.pushNamed(context, Strings.routeEditProcedure,arguments:{'Id': Id});
   }
 
   void onPressedDeleteFromTable(Id, row) {
