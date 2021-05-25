@@ -12,10 +12,11 @@ class Employee {
   final String contact;
   final String emergencyContact;
   final String experience;
-  final String flourNo;
+  final int flourNo;
   final String password;
   final String userName;
-  final DateTime joiningDate;
+  final String joiningDate;
+  final String DOB;
   final String address;
   final String email;
   final List<Qualifications> qualifications;
@@ -37,6 +38,7 @@ class Employee {
       @required this.joiningDate,
       @required this.address,
       @required this.email,
+        @required this.DOB,
       this.qualifications});
 
   factory Employee.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,7 @@ class Employee {
         joiningDate: json['joiningDate'],
         address: json['address'],
         email: json['emails'],
+        DOB: json['DOB'],
         qualifications: json['qualifications']);
   }
 }

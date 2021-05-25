@@ -2,11 +2,12 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Employee.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:baby_doctor/Service/ReceptionistService.dart';
 
 class AddReceptionist extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
   final formKey = GlobalKey<FormState>();
   final ReceptionistController = TextEditingController();
   final joinDateController = TextEditingController();
-
+  final DOBController= TextEditingController();
   String FirstName;
   String LastName;
   String CNIC;
@@ -27,9 +28,14 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String Address;
   String Gender='Choose Gender';
   int FlourNo;
-  DateTime JoiningDate;
-  DateTime DOB;
-
+  String JoiningDate;
+  String DOB;
+  bool loadingButtonProgressIndicator=false;
+  String FatherHusbandName;
+  String Password;
+  String UserName;
+  String Experience;
+  ReceptionistService receptionistService;
   @override
   void initState() {
     super.initState();
@@ -43,6 +49,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
 
   @override
   Widget build(BuildContext context) {
+    receptionistService = ReceptionistService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -73,6 +80,9 @@ class _AddReceptionistState extends State<AddReceptionist> {
                         children: <Widget>[
                           widgetFirstName(),
                           widgetLastName(),
+                          widgetFatherHusbandName(),
+                          widgetUserName(),
+                          widgetPassword(),
                           widgetGender(),
                           widgetDob(),
                           widgetCnicNumber(),
@@ -148,6 +158,94 @@ class _AddReceptionistState extends State<AddReceptionist> {
               },
               onSaved: (String value) {
                 LastName = value;
+              },
+            )),
+      ],
+    );
+  }
+
+  Widget widgetFatherHusbandName() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Father/Husband Name'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                FatherHusbandName = value;
+              },
+            )),
+      ],
+    );
+  }
+  Widget widgetUserName() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.supervised_user_circle),
+                  border: OutlineInputBorder(),
+                  labelText: 'User Name'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                UserName = value;
+              },
+            )),
+      ],
+    );
+  }
+  Widget widgetPassword() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  border: OutlineInputBorder(),
+                  labelText: 'Password'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                Password = value;
               },
             )),
       ],
@@ -362,10 +460,10 @@ class _AddReceptionistState extends State<AddReceptionist> {
               }
             },
             onSaved: (String value) {
-              JoiningDate = DateTime.parse(value);
+              JoiningDate = value;
             },
             onTap: () {
-              pickDate();
+              pickDate1();
             },
           ),
         ),
@@ -383,7 +481,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
               Dimens.globalInputFieldRight,
               Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
-            controller: joinDateController,
+            controller: DOBController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
@@ -395,10 +493,10 @@ class _AddReceptionistState extends State<AddReceptionist> {
               }
             },
             onSaved: (String value) {
-              DOB = DateTime.parse(value);
+              DOB = value;
             },
             onTap: () {
-              pickDate1();
+              pickDate();
             },
           ),
         ),
@@ -429,7 +527,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                Address = value;
+                FlourNo = int.parse(value);
               }),
         ),
       ],
@@ -445,7 +543,8 @@ class _AddReceptionistState extends State<AddReceptionist> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        Align(
+        loadingButtonProgressIndicator == false
+            ? Align(
           alignment: Alignment.center,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -458,23 +557,19 @@ class _AddReceptionistState extends State<AddReceptionist> {
               style: ElevatedButton.styleFrom(
                 primary: Shade.submitButtonColor,
                 minimumSize: Size(double.infinity, 45),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                padding:
+                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
-              child: Text('Submit'),
+              child: Text(Strings.submitGlobal),
               onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                          Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor added')));
-                formKey.currentState.save();
+                onPressedSubmitButton();
               },
             ),
           ),
-        ),
+        )
+            : Center(
+          child: CircularProgressIndicator(),
+        )
       ],
     );
   }
@@ -488,8 +583,8 @@ class _AddReceptionistState extends State<AddReceptionist> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        JoiningDate = date;
-        joinDateController.text = JoiningDate.toString();
+        DOB = date.toString();
+        DOBController.text = DOB.toString();
       });
     }
   }
@@ -502,8 +597,64 @@ class _AddReceptionistState extends State<AddReceptionist> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        JoiningDate = date;
+        JoiningDate = date.toString();
         joinDateController.text = JoiningDate.toString();
+      });
+    }
+  }
+
+  onPressedSubmitButton() async {
+
+    print(JoiningDate);
+    print(DOB);
+
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
+      return;
+    }
+    setState(() {
+      loadingButtonProgressIndicator = true;
+    });
+    formKey.currentState.save();
+
+
+    Employee obj = new Employee(employeeType:'Receptionist',
+        firstName: FirstName, lastName: LastName, fatherHusbandName: FatherHusbandName, gender: Gender, CNIC: CNIC, contact: ContactNumber, emergencyContact: EmergencyContactNumber,
+        experience: Experience, flourNo: FlourNo, password: Password, userName: UserName, joiningDate: JoiningDate,DOB: DOB, address: Address, email: Email);
+    var response = await receptionistService.InsertReceptionist(obj);
+    print(response);
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Created Receptionist '),
+              Text(
+                FirstName +' '+ LastName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      formKey.currentState.reset();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to add '),
+              Text(
+                FirstName +' '+ LastName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
       });
     }
   }
