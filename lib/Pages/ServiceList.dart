@@ -1,8 +1,8 @@
-import 'dart:math';
-
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Services.dart';
+import 'package:baby_doctor/Service/Service.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
@@ -24,23 +24,71 @@ class _ServiceListState extends State<ServiceList> {
   bool serviceListIsSearch = false;
   List<Map<String, dynamic>> serviceListIsSource = [];
   List<Map<String, dynamic>> serviceListSelecteds = [];
+  bool showSearchedList;
   String serviceListSelectableKey = "Invoice";
   String serviceListSortColumn;
   bool serviceListSortAscending = true;
   bool serviceListIsLoading = true;
   bool serviceListShowSelect = false;
+  List<Services> listServices;
+  Service service;
 
   @override
   void initState() {
     super.initState();
     // serviceList
+    initVariablesAndClasses();
     initializeserviceListHeaders();
-    serviceListInitData();
+    getServicesFromApiAndLinkToTable();
+  }
+
+  void initVariablesAndClasses() {
+    serviceListHeaders = [];
+    serviceListPerPage = [5, 10, 15, 100];
+    serviceListTotal = 100;
+    serviceListCurrentPerPage;
+    serviceListCurrentPage = 1;
+    serviceListIsSearch = false;
+    serviceListIsSource = [];
+    serviceListSelecteds = [];
+    serviceListSelectableKey = "Invoice";
+    serviceListSortColumn;
+    serviceListSortAscending = true;
+    serviceListIsLoading = true;
+    serviceListShowSelect = false;
+    listServices = [];
+    showSearchedList = false;
+    showSearchedList = false;
+
+    service = Service();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void getServicesFromApiAndLinkToTable() async {
+    setState(() => serviceListIsLoading = true);
+    listServices = [];
+    serviceListIsSource = [];
+    listServices = await service.getServices();
+    serviceListIsSource.addAll(generateServiceDataFromApi(listServices));
+    setState(() => serviceListIsLoading = false);
+  }
+
+  List<Map<String, dynamic>> generateServiceDataFromApi(
+      List<Services> listOfServices) {
+    List<Map<String, dynamic>> tempservices = [];
+    for (Services services in listOfServices) {
+      tempservices.add({
+        "Id": services.id,
+        "ServiceName": services.name,
+        "ServiceDescription": services.description,
+        "Action": services.id,
+      });
+    }
+    return tempservices;
   }
 
   @override
@@ -250,33 +298,24 @@ class _ServiceListState extends State<ServiceList> {
     );
   }
 
-  // serviceList
-  List<Map<String, dynamic>> serviceListGenerateData({int n: 100}) {
-    final List sourceserviceList = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsserviceList = [];
-    var i = serviceListIsSource.length;
-    print(i);
-    for (var data in sourceserviceList) {
-      tempsserviceList.add({
-        "ServiceName": "ServiceName $i",
-        "ServiceDescription": "ServiceDescription $i",
-        "Action": [i, 100],
-      });
-      i++;
-    }
-    return tempsserviceList;
-  }
-
-  serviceListInitData() async {
-    setState(() => serviceListIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      serviceListIsSource.addAll(serviceListGenerateData(n: 100));
-      setState(() => serviceListIsLoading = false);
-    });
-  }
-
   initializeserviceListHeaders() {
     serviceListHeaders = [
+      DatatableHeader(
+          value: "Id",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
       DatatableHeader(
           value: "ServiceName",
           show: true,
@@ -312,8 +351,8 @@ class _ServiceListState extends State<ServiceList> {
       DatatableHeader(
           value: "Action",
           show: true,
-          flex: 1,
-          sortable: true,
+          flex: 2,
+          sortable: false,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
             return Padding(
@@ -326,36 +365,126 @@ class _ServiceListState extends State<ServiceList> {
               ),
             );
           },
-          sourceBuilder: (value, row) {
+          sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => NewInvoice()),
-                      // );
-                    },
-                    child: Text('Edit')),
+                  onPressed: () {
+                    onPressedEditFromTable(Id, row);
+                  },
+                  child: Text('Edit',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextEdit,
+                      )),
+                ),
                 SizedBox(
                   width: 10,
                 ),
                 TextButton(
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => Refund()),
-                      // );
+                      print(Id);
+                      onPressedDeleteFromTable(Id, row);
                     },
                     child: Text(
                       'Delete',
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
                     )),
               ],
             ));
           }),
     ];
+  }
+
+  void onPressedDeleteFromTable(Id, row) {
+    Widget cancelButton = TextButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
+    );
+
+    Widget deleteButton = TextButton(
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
+      onPressed: () {
+        Navigator.of(context).pop();
+        service.DeleteServices(Id).then((response) {
+          if (response == true) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Shade.snackGlobalSuccess,
+                content: Row(
+                  children: [
+                    Text('Success: Deleted service '),
+                    Text(
+                      row['ServiceName'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )));
+            getServicesFromApiAndLinkToTable();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Shade.snackGlobalFailed,
+                content: Row(
+                  children: [
+                    Text('Error: Try Again: Failed to delete service '),
+                    Text(
+                      row['ServiceName'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )));
+          }
+        });
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: [
+          Text(Strings.alertDialogTitleDelete),
+        ],
+      ),
+      content: Row(
+        children: [
+          Text(Strings.alertDialogTitleDeleteNote),
+          Text(
+            row['ServiceName'] + ' ?',
+            style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
+          )
+        ],
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
+    );
+
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void onPressedEditFromTable(Id, row) {
+    print(Id);
+    Navigator.pushNamed(context, Strings.routeEditService,arguments:{'Id': Id});
   }
 }

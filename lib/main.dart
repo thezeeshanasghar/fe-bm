@@ -5,6 +5,7 @@ import 'package:baby_doctor/Pages/AddProcedures.dart';
 import 'package:baby_doctor/Pages/AdminPatients.dart';
 import 'package:baby_doctor/Pages/BedTime.dart';
 import 'package:baby_doctor/Pages/DoctorList.dart';
+import 'package:baby_doctor/Pages/EditService.dart';
 import 'package:baby_doctor/Pages/Home.dart';
 import 'package:baby_doctor/Pages/AddReceptionist.dart';
 import 'package:baby_doctor/Pages/Nurse%20Share.dart';
@@ -48,7 +49,8 @@ void main() {
       '/NurseShare': (context) => NurseShare(),
       '/MonthlyShare': (context) => MonthlyShare(),
       '/AdminPatient': (context) => AdminPatient(),
-      Strings.routeEditProcedure:(context)=>EditProcedures()
+      Strings.routeEditProcedure:(context)=>EditProcedures(),
+      Strings.routeEditService:(context)=>EditService()
     },
   ));
 }

@@ -17,7 +17,7 @@ class _AddRoomState extends State<AddRoom> {
   String RoomType='Choose Room Type';
   double RoomCapacity;
   double Charges;
-  bool Isloading=false;
+  bool loadingButtonProgressIndicator = false;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -209,7 +209,8 @@ class _AddRoomState extends State<AddRoom> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        Align(
+        loadingButtonProgressIndicator == false
+            ? Align(
           alignment: Alignment.center,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -231,8 +232,11 @@ class _AddRoomState extends State<AddRoom> {
               },
             ),
           ),
-        ),
-      ],
+        )
+        : Center(
+    child: CircularProgressIndicator(),
+    )
+      ]
     );
   }
 
@@ -242,7 +246,7 @@ class _AddRoomState extends State<AddRoom> {
           SnackBar(content: Text('Error: Some input fields are not filled.')));
       return;
     }
-    setState((){Isloading = true;});
+    setState((){loadingButtonProgressIndicator = true;});
     formKey.currentState.save();
 
     //perform your task after save
@@ -260,11 +264,11 @@ class _AddRoomState extends State<AddRoom> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Success: Record Added Successfully.')));
       formKey.currentState.reset();
-      setState((){Isloading = false;});
+      setState((){loadingButtonProgressIndicator = false;});
     }else{
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: Operation Unsuccessfull.')));
-      setState((){Isloading = false;});
+      setState((){loadingButtonProgressIndicator = false;});
     }
   }
 }

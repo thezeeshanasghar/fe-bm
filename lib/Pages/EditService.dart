@@ -1,29 +1,46 @@
-import 'dart:developer';
-
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Service/Service.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/Models/Services.dart';
-import 'package:baby_doctor/Service/Service.dart' as DAL;
 
-class AddService extends StatefulWidget {
+import 'package:baby_doctor/Models/Services.dart';
+
+class EditService extends StatefulWidget {
+
   @override
-  _AddServiceState createState() => _AddServiceState();
+  _EditServiceState createState() => _EditServiceState();
 }
 
-class _AddServiceState extends State<AddService> {
+class _EditServiceState extends State<EditService> {
   @override
   final formKey = GlobalKey<FormState>();
-  String name;
-  String description;
-  bool loadingButtonProgressIndicator = false;
+  String Id;
+  String  ServiceName;
+  String  ServiceDescription;
 
+  bool loadingButtonProgressIndicator = false;
+  Service service;
+  TextEditingController _servicenamecontroller;
+  TextEditingController _serviceDescriptioncontroller;
+
+  dynamic arguments;
   Widget build(BuildContext context) {
+
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    service = Service();
+
+    if (arguments != null) {
+      service.getServicesById(arguments["Id"]).then((value) {
+        _servicenamecontroller = new TextEditingController(text: value["name"]);
+        _serviceDescriptioncontroller =
+        new TextEditingController(text: value["description"]);
+      });
+    }
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddService),
+        title: Text(Strings.editService),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -49,7 +66,8 @@ class _AddServiceState extends State<AddService> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         widgetServiceName(),
-                        widgetDescription(),
+                        widgetServiceDescription(),
+
                         widgetSubmit()
                       ],
                     ),
@@ -61,6 +79,11 @@ class _AddServiceState extends State<AddService> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   Widget widgetServiceName() {
@@ -75,6 +98,7 @@ class _AddServiceState extends State<AddService> {
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
+            controller: _servicenamecontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
@@ -86,7 +110,7 @@ class _AddServiceState extends State<AddService> {
               return null;
             },
             onSaved: (String value) {
-              name = value;
+             ServiceName = value;
             },
           ),
         ),
@@ -94,7 +118,7 @@ class _AddServiceState extends State<AddService> {
     );
   }
 
-  Widget widgetDescription() {
+  Widget widgetServiceDescription(){
     return Column(
       children: [
         Padding(
@@ -105,9 +129,10 @@ class _AddServiceState extends State<AddService> {
               Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 100,
+            maxLength: 15,
+            controller: _serviceDescriptioncontroller,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.description),
+                prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
                 labelText: 'Service Description'),
             validator: (String value) {
@@ -117,7 +142,7 @@ class _AddServiceState extends State<AddService> {
               return null;
             },
             onSaved: (String value) {
-              description = value;
+               ServiceDescription = value;
             },
           ),
         ),
@@ -127,10 +152,9 @@ class _AddServiceState extends State<AddService> {
 
   Widget widgetSubmit() {
     return Column(
-
       children: [
         loadingButtonProgressIndicator == false
-        ? Align(
+            ? Align(
           alignment: Alignment.center,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -143,24 +167,24 @@ class _AddServiceState extends State<AddService> {
               style: ElevatedButton.styleFrom(
                 primary: Shade.submitButtonColor,
                 minimumSize: Size(double.infinity, 45),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                padding:
+                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
-              child: Text('Submit'),
+              child: Text(Strings.submitGlobal),
               onPressed: () {
-                onClickDataPost();
+                onPressedSubmitButton();
               },
             ),
           ),
         )
-                    :  Center(
-                          child: CircularProgressIndicator(),
+            : Center(
+          child: CircularProgressIndicator(),
         )
       ],
     );
   }
 
-
-  onClickDataPost()  async {
+  onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
@@ -172,11 +196,11 @@ class _AddServiceState extends State<AddService> {
     });
     formKey.currentState.save();
 
-    DAL.Service service = new DAL.Service();
     Services obj = new Services(
-        name: name,
-        description: description,
-       );
+        id:arguments["Id"],
+        name:  ServiceName,
+        description:  ServiceDescription,
+        );
     var response = await service.InsertServices(obj);
     print(response);
     if (response == true) {
@@ -187,9 +211,9 @@ class _AddServiceState extends State<AddService> {
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
-              Text('Success: Created Service '),
+              Text('Success:Service Updated'),
               Text(
-                name,
+               ServiceName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -200,9 +224,9 @@ class _AddServiceState extends State<AddService> {
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(
             children: [
-              Text('Error: Try Again: Failed to add '),
+              Text('Error: Try Again: Failed to edit '),
               Text(
-                name,
+               ServiceName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

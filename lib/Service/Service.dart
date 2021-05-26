@@ -23,21 +23,11 @@ class Service {
     }
   }
 
-  Future<List<Services>> getServiceById(int Id) async {
-    final response = await http
-        .get(Uri.https(Strings.pathAPI, 'api/room/${Id}'));
+  Future<dynamic> getServicesById(int Id) async {
+    final response = await http.get(Uri.https(Strings.pathAPI, 'api/service/${Id}'));
     if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List<Services> services = body
-          .map(
-            (dynamic item) => Services.fromJson(item),
-          )
-          .toList();
-
-      return services;
+      return jsonDecode(response.body);
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load Procedure');
     }
   }
@@ -77,13 +67,18 @@ class Service {
     );
   }
 
-  Future<http.Response> DeleteServices(Services services) {
-    return http.delete(
-      Uri.https(Strings.pathAPI, 'api/room/${services.id}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(services),
-    );
+  Future<bool> DeleteServices(int id) async{
+
+    final response = await http.delete(
+        Uri.https(Strings.pathAPI, 'api/service/${id}'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        });
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      return false;
+    }
   }
+
 }
