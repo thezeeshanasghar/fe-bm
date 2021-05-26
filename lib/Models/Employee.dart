@@ -63,4 +63,3 @@ class Employee {
         qualifications: json['qualifications']);
   }
 }
-//public virtual ICollection<Qualifications> Qualifications { get; set; }

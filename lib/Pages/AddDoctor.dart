@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Doctor.dart';
+import 'package:baby_doctor/Models/Employee.dart';
+import 'package:baby_doctor/Models/Qualifications.dart';
+import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +22,8 @@ class AddDoctor extends StatefulWidget {
 class _AddDoctorState extends State<AddDoctor> {
   final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
-
+  final DOBController= TextEditingController();
+  String DOB;
   String FirstName;
   String LastName;
   String FatherHusbandName;
@@ -26,18 +32,23 @@ class _AddDoctorState extends State<AddDoctor> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Speciality = 'Select Speciality';
-  int ConsultationFee;
-  int EmergencyConsultationFee;
-  int FeeShare;
-  DateTime JoiningDate;
-  List<String> qualificationList = [''];
-  List<String> diplomaList = [''];
+  String Gender='Choose Gender';
+  String Speciality ;
+  int ConsultationFee=10;
+  int EmergencyConsultationFee=10;
+  String Experience;
+  int FeeShare=10;
+  String JoiningDate;
+  String Password;
+  String UserName;
+  DoctorService doctorService;
+  List<Qualifications> qualificationList=[new Qualifications(employeeId: "", certificate: "", description: "", qualificationType: "")];
+  List<Qualifications> diplomaList=[new Qualifications(employeeId: "", certificate: "", description: "", qualificationType: "")];
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
   Image image;
-
+  bool loadingButtonProgressIndicator=false;
   @override
   void initState() {
     super.initState();
@@ -50,6 +61,7 @@ class _AddDoctorState extends State<AddDoctor> {
 
   @override
   Widget build(BuildContext context) {
+    doctorService = DoctorService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -83,6 +95,7 @@ class _AddDoctorState extends State<AddDoctor> {
                           widgetFirstName(),
                           widgetLastName(),
                           widgetFatherOrHusbandName(),
+                          widgetGender(),
                           widgetCnicNumber(),
                           widgetContactNumber(),
                           widgetEmergencyContactNumber(),
@@ -110,8 +123,110 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
+  Widget widgetUserName() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.supervised_user_circle),
+                  border: OutlineInputBorder(),
+                  labelText: 'User Name'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                UserName = value;
+              },
+            )),
+      ],
+    );
+  }
+  Widget widgetPassword() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  border: OutlineInputBorder(),
+                  labelText: 'Password'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                Password = value;
+              },
+            )),
+      ],
+    );
+  }
   // widget functions
-
+  Widget widgetDob() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: TextFormField(
+            controller: DOBController,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.date_range),
+              border: OutlineInputBorder(),
+              labelText: 'Date Of Birth',
+            ),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+            },
+            onSaved: (String value) {
+              DOB = value;
+            },
+            onTap: () {
+              pickDateDob();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+  pickDateDob() async {
+    DateTime date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        DOB = date.toString();
+        DOBController.text = DOB.toString();
+      });
+    }
+  }
   List<Widget> widgetQualification() {
     List<Widget> qualificationWidgetList = [];
 
@@ -174,7 +289,9 @@ class _AddDoctorState extends State<AddDoctor> {
                               return null;
                             },
                             onSaved: (String value) {
-                              FirstName = value;
+                              setState(() {
+                                qualificationList[i]=new Qualifications(certificate: "",description: value,qualificationType: "Qualification");
+                              });
                             },
                           ),
                         ),
@@ -194,7 +311,7 @@ class _AddDoctorState extends State<AddDoctor> {
     return qualificationWidgetList;
   }
 
-  Widget _addRemoveButton(bool add, int index, List<String> list) {
+  Widget _addRemoveButton(bool add, int index, List<Qualifications> list) {
     return InkWell(
       onTap: () {
         if (add) {
@@ -281,7 +398,10 @@ class _AddDoctorState extends State<AddDoctor> {
                               return null;
                             },
                             onSaved: (String value) {
-                              FirstName = value;
+
+                              setState(() {
+                                // diplomaList[i]=value;
+                              });
                             },
                           ),
                         ),
@@ -316,15 +436,15 @@ class _AddDoctorState extends State<AddDoctor> {
                 prefixIcon: Icon(Icons.date_range_sharp),
                 border: OutlineInputBorder(),
                 labelText: 'Experience'),
-            // validator: (String value) {
-            //   if (value == null || value.isEmpty) {
-            //     return 'This field cannot be empty';
-            //   }
-            //   return null;
-            // },
-            // onSaved: (String value) {
-            //   FirstName = value;
-            // },
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              Experience = value;
+            },
           ),
         ),
       ],
@@ -364,7 +484,52 @@ class _AddDoctorState extends State<AddDoctor> {
       ],
     );
   }
-
+  Widget widgetGender() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: Gender,
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    Gender = newValue;
+                  });
+                },
+                items: <String>[
+                  'Choose Gender',
+                  'Male',
+                  'Female',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
   Widget widgetFirstName() {
     return Column(
       children: [
@@ -816,7 +981,7 @@ class _AddDoctorState extends State<AddDoctor> {
               }
             },
             onSaved: (String value) {
-              JoiningDate = DateTime.parse(value);
+              JoiningDate = value;
             },
             onTap: () {
               pickDate();
@@ -853,15 +1018,7 @@ class _AddDoctorState extends State<AddDoctor> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                          Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor added')));
-                formKey.currentState.save();
+                onPressedSubmitButton();
               },
             ),
           ),
@@ -928,7 +1085,7 @@ class _AddDoctorState extends State<AddDoctor> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        JoiningDate = date;
+        JoiningDate = date.toString();
         joinDateController.text = JoiningDate.toString();
       });
     }
@@ -941,6 +1098,61 @@ class _AddDoctorState extends State<AddDoctor> {
     });
   }
 
+  onPressedSubmitButton() async {
+    // print(qualificationList);
+    // print(diplomaList);
+    List<dynamic> degrees=[];
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
+      return;
+    }
+    setState(() {
+      loadingButtonProgressIndicator = true;
+    });
+    formKey.currentState.save();
+
+    Employee employee = new Employee(employeeType:'Doctor',
+         firstName: FirstName, lastName: LastName, fatherHusbandName: FatherHusbandName, gender: Gender, CNIC: CNIC, contact: ContactNumber, emergencyContact: EmergencyContactNumber,
+         experience: Experience, flourNo: 0, password: Password, userName: UserName, joiningDate: JoiningDate,DOB: DOB, address: Address, email: Email);
+
+    Doctor doctor=new Doctor(ConsultationFee: ConsultationFee, EmergencyConsultationFee: EmergencyConsultationFee, ShareInFee: FeeShare, SpecialityType: Speciality, employee: employee);
+    var response = await doctorService.InsertDoctor(doctor);
+    print(response);
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Created Receptionist '),
+              Text(
+                FirstName +' '+ LastName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      formKey.currentState.reset();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to add '),
+              Text(
+                FirstName +' '+ LastName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+    }
+  }
 // void takePhotoFromWeb() async {
 //   final pickedFile = await FlutterWebImagePicker.getImage;
 //   setState(() {

@@ -8,7 +8,7 @@ class Qualifications {
 
   Qualifications({
     this.id,
-    @required this.employeeId,
+    this.employeeId,
     @required this.certificate,
     @required this.description,
     @required this.qualificationType,
