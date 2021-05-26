@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-class Invoices {
+class Invoice {
   final int id;
   final String InvoiceType;
   final String UserId;
@@ -12,7 +12,7 @@ class Invoices {
   final DateTime AppointmentDate;
   final double Charges;
 
-  Invoices({
+  Invoice({
     this.id,
     @required this.InvoiceType,
     @required this.UserId,
@@ -26,8 +26,8 @@ class Invoices {
     @required this.DateFrom,
   });
 
-  factory Invoices.fromJson(Map<String, dynamic> json) {
-    return Invoices(
+  factory Invoice.fromJson(Map<String, dynamic> json) {
+    return Invoice(
       id: json['id'],
       InvoiceType: json['InvoiceType'],
       UserId: json['UserId'],
