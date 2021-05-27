@@ -514,15 +514,22 @@ class _AddReceptionistState extends State<AddReceptionist> {
               Dimens.globalInputFieldRight,
               Dimens.globalInputFieldBottom),
           child: TextFormField(
-              maxLength: 50,
               autofocus: false,
+              maxLength: 3,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.home),
+                  prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
-                  labelText: 'FlourNo'),
+                  labelText: 'Flour No'),
               validator: (String value) {
-                if (value == null || value.isEmpty) {
+                if (value.isEmpty) {
                   return 'This field cannot be empty';
+                }
+                int _cFlourNo = int.tryParse(value);
+                if (_cFlourNo == null && !value.isEmpty) {
+                  return 'Input Error: FlourNo must be in numeric form\nCorrect Syntax: 20';
+                }
+                if (_cFlourNo <= 0) {
+                  return 'Input Error: cannot enter negative digits\nCorrect Syntax: 20';
                 }
                 return null;
               },
@@ -533,7 +540,6 @@ class _AddReceptionistState extends State<AddReceptionist> {
       ],
     );
   }
-
   Widget widgetSizedBox() {
     return SizedBox(
       height: 30,

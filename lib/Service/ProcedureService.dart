@@ -20,11 +20,12 @@ class ProcedureService {
       throw Exception('Failed to load Procedure');
     }
   }
-  Future<dynamic> getProceduresById(int Id) async {
+  Future<Procedures> getProceduresById(int Id) async {
     final response =
     await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+    if (response.statusCode == 204) {
+      final JsonResponse= jsonDecode(response.body);
+      return Procedures.fromJson(JsonResponse);
     } else {
       throw Exception('Failed to load Procedure');
     }

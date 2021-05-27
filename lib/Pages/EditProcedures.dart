@@ -2,11 +2,10 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/Service/ProcedureService.dart' ;
+import 'package:baby_doctor/Service/ProcedureService.dart';
 import 'package:baby_doctor/Models/Procedures.dart';
 
 class EditProcedures extends StatefulWidget {
-
   @override
   _EditProceduresState createState() => _EditProceduresState();
 }
@@ -26,22 +25,33 @@ class _EditProceduresState extends State<EditProcedures> {
   TextEditingController _chargescontroller;
   TextEditingController _sharecontroller;
   dynamic arguments;
+
+  @override
+  void initState() {
+    super.initState();
+    initVariablesAndClasses();
+
+    new Future.delayed(Duration.zero,() {
+
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void initVariablesAndClasses() {
+    _namecontroller = new TextEditingController();
+    _performedbycontroller = new TextEditingController();
+    _chargescontroller = new TextEditingController();
+    _sharecontroller = new TextEditingController();
+
+    procedureService = ProcedureService();
+  }
+
   Widget build(BuildContext context) {
 
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    procedureService = ProcedureService();
-
-    if (arguments != null) {
-      procedureService.getProceduresById(arguments["Id"]).then((value) {
-        _namecontroller = new TextEditingController(text: value["name"]);
-        _performedbycontroller =
-        new TextEditingController(text: value["performedBy"]);
-        _chargescontroller =
-        new TextEditingController(text: value["charges"].toString());
-        _sharecontroller =
-        new TextEditingController(text: value["performerShare"].toString());
-      });
-    }
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -88,8 +98,19 @@ class _EditProceduresState extends State<EditProcedures> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() async {
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+
+    if (arguments != null) {
+      Procedures resp= await  procedureService.getProceduresById(arguments['Id']);
+
+        setState(() {
+          _namecontroller.text = resp.name;
+          _performedbycontroller.text = resp.performedBy;
+          _chargescontroller.text =resp.charges.toString();
+          _sharecontroller.text = resp.performerShare.toString();
+        });
+    }
   }
 
   Widget widgetProcedureName() {
@@ -233,31 +254,31 @@ class _EditProceduresState extends State<EditProcedures> {
       children: [
         loadingButtonProgressIndicator == false
             ? Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding:
-                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text(Strings.submitGlobal),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
-            ),
-          ),
-        )
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      Dimens.globalInputFieldleft,
+                      Dimens.globalInputFieldTop,
+                      Dimens.globalInputFieldRight,
+                      Dimens.globalInputFieldBottom),
+                  child: ElevatedButton(
+                    autofocus: false,
+                    style: ElevatedButton.styleFrom(
+                      primary: Shade.submitButtonColor,
+                      minimumSize: Size(double.infinity, 45),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    ),
+                    child: Text(Strings.submitGlobal),
+                    onPressed: () {
+                      onPressedSubmitButton();
+                    },
+                  ),
+                ),
+              )
             : Center(
-          child: CircularProgressIndicator(),
-        )
+                child: CircularProgressIndicator(),
+              )
       ],
     );
   }
@@ -275,12 +296,12 @@ class _EditProceduresState extends State<EditProcedures> {
     formKey.currentState.save();
 
     Procedures obj = new Procedures(
-        id:arguments["Id"],
+        id: arguments["Id"],
         name: ProcedureName,
         performedBy: PerformedBy,
         charges: Charges,
         performerShare: Share);
-    var response = await procedureService.InsertProcedure(obj);
+    var response = await procedureService.UpdateProcedure(obj);
     print(response);
     if (response == true) {
       setState(() {
@@ -298,6 +319,7 @@ class _EditProceduresState extends State<EditProcedures> {
             ],
           )));
       formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeProcedureList);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
