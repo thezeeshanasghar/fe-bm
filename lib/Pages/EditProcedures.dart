@@ -55,7 +55,7 @@ class _EditProceduresState extends State<EditProcedures> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.editProcedure),
+        title: Text(Strings.titleEditProcedure),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
