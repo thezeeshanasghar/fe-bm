@@ -15,9 +15,10 @@ class Strings {
   static const String titleServiceList = 'Service List';
   static const String titlePatientList = 'Patient List';
   static const String titleLogout = 'Log out';
-  static const String editProcedure = 'Edit Procedure';
-  static const String editService = 'Edit Service';
-  static const String editRoom = 'Edit Room';
+  static const String titleEditProcedure = 'Edit Procedure';
+  static const String titleEditService = 'Edit Service';
+  static const String titleEditRoom = 'Edit Room';
+
   static const String routeHomePage = '/';
   static const String routeAddDoctor = '/AddDoctor';
   static const String routeAddNurse = '/AddNurse';

@@ -1,29 +1,52 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Service/RoomService.dart';
 import 'package:flutter/material.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
+
 import 'package:baby_doctor/Models/Room.dart';
-import 'package:baby_doctor/Service/RoomService.dart' as DAL;
-class AddRoom extends StatefulWidget {
+
+class EditRoom extends StatefulWidget {
+
   @override
-  _AddRoomState createState() => _AddRoomState();
+  _EditRoomState createState() => _EditRoomState();
 }
 
-class _AddRoomState extends State<AddRoom> {
+class _EditRoomState extends State<EditRoom> {
   @override
   final formKey = GlobalKey<FormState>();
-  String RoomNo;
-  String RoomType='Choose Room Type';
-  int RoomCapacity;
-  double RoomCharges;
-  bool loadingButtonProgressIndicator = false;
+  String Id;
+  String  RoomNo;
+  String  RoomType;
+  int  RoomCapacity;
+  double  RoomCharges;
 
+  bool loadingButtonProgressIndicator = false;
+  RoomService roomservice;
+  TextEditingController _roomnocontroller;
+  TextEditingController _roomtypecontroller;
+  TextEditingController _roomcapacitycontroller;
+  TextEditingController _roomchargescontroller;
+
+  dynamic arguments;
   Widget build(BuildContext context) {
+
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    roomservice = RoomService();
+
+    if (arguments != null) {
+      roomservice.getRoomById(arguments["Id"]).then((value) {
+
+        _roomnocontroller = new TextEditingController(text: value["roomNo"]);
+        _roomtypecontroller = new TextEditingController(text: value["roomType"]);
+        _roomcapacitycontroller =  new TextEditingController(text: value["roomCapacity"].toString());
+        _roomchargescontroller =   new TextEditingController(text: value["roomCharges"].toString());
+      });
+    }
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddRoom),
+        title: Text(Strings.titleEditRoom),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -48,10 +71,11 @@ class _AddRoomState extends State<AddRoom> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetroomNo(),
+                        widgetRoomNo(),
                         widgetRoomType(),
-                        widgetCapacity(),
-                        widgetCharges(),
+                        widgetRoomCapacity(),
+                        widgetRoomCharges(),
+
                         widgetSubmit()
                       ],
                     ),
@@ -65,7 +89,12 @@ class _AddRoomState extends State<AddRoom> {
     );
   }
 
-  Widget widgetroomNo() {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Widget widgetRoomNo() {
     return Column(
       children: [
         Padding(
@@ -76,7 +105,8 @@ class _AddRoomState extends State<AddRoom> {
               Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 6,
+            maxLength: 30,
+            controller: _roomnocontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
@@ -143,8 +173,7 @@ class _AddRoomState extends State<AddRoom> {
       ],
     );
   }
-
-  Widget widgetCapacity() {
+  Widget widgetRoomCharges() {
     return Column(
       children: [
         Padding(
@@ -155,19 +184,24 @@ class _AddRoomState extends State<AddRoom> {
               Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 2,
+            maxLength: 5,
+            controller: _roomcapacitycontroller,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.fact_check),
+                prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
-                labelText: 'Room Capacity'),
+                labelText: 'Room Charges'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              if (double.tryParse(value) <= 0) {
+                return 'Input Error: cannot enter negative digits';
+              }
               return null;
             },
             onSaved: (String value) {
-              RoomCapacity =int.parse(value);
+              RoomCharges = double.parse(value);
             },
           ),
         ),
@@ -175,7 +209,8 @@ class _AddRoomState extends State<AddRoom> {
     );
   }
 
-  Widget widgetCharges() {
+
+  Widget widgetRoomCapacity() {
     return Column(
       children: [
         Padding(
@@ -186,19 +221,24 @@ class _AddRoomState extends State<AddRoom> {
               Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 4,
+            maxLength: 5,
+            controller: _roomchargescontroller,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
-                labelText: 'Room Charges(Per Hour)'),
+                labelText: 'Room Capacity'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              if (double.tryParse(value) <= 0) {
+                return 'Input Error: cannot enter negative digits';
+              }
               return null;
             },
             onSaved: (String value) {
-              RoomCharges = double.parse(value);
+              RoomCapacity = int.parse(value);
             },
           ),
         ),
@@ -223,52 +263,78 @@ class _AddRoomState extends State<AddRoom> {
               style: ElevatedButton.styleFrom(
                 primary: Shade.submitButtonColor,
                 minimumSize: Size(double.infinity, 45),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                padding:
+                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
-              child: Text('Submit'),
+              child: Text(Strings.submitGlobal),
               onPressed: () {
-
-                onClickDataPost();
+                onPressedSubmitButton();
               },
             ),
           ),
         )
-        : Center(
-    child: CircularProgressIndicator(),
-    )
-      ]
+            : Center(
+          child: CircularProgressIndicator(),
+        )
+      ],
     );
   }
 
-  onClickDataPost()  async {
+  onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Some input fields are not filled.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
       return;
     }
-    setState((){loadingButtonProgressIndicator = true;});
+    setState(() {
+      loadingButtonProgressIndicator = true;
+    });
     formKey.currentState.save();
 
-    //perform your task after save
-    DAL.RoomService service =  new DAL.RoomService();
     Room obj = new Room(
-        RoomNo: RoomNo,
-        RoomType: RoomType,
-        RoomCharges : RoomCharges,
-        RoomCapacity: RoomCapacity,
+      id:arguments["Id"],
+      RoomNo:  RoomNo,
+      RoomType:  RoomType,
+      RoomCapacity:  RoomCapacity,
+      RoomCharges:  RoomCharges,
     );
-    var response= await service.InsertRoom(obj);
+    var response = await roomservice.UpdateRoom(obj);
     print(response);
-    if(response==true)
-    {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Success: Record Added Successfully.')));
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+
+              Text('Success:Room Updated'),
+              Text(
+                RoomNo,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
       formKey.currentState.reset();
-      setState((){loadingButtonProgressIndicator = false;});
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Operation Unsuccessfull.')));
-      setState((){loadingButtonProgressIndicator = false;});
+      Navigator.pushNamed(context, Strings.routeRoomList,arguments:{'Id': Id});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to edit '),
+              Text(
+                RoomNo,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
     }
   }
 }

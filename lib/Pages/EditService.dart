@@ -40,7 +40,7 @@ class _EditServiceState extends State<EditService> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.editService),
+        title: Text(Strings.titleEditService),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
