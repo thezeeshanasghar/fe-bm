@@ -23,7 +23,7 @@ class ProcedureService {
   Future<Procedures> getProceduresById(int Id) async {
     final response =
     await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
-    if (response.statusCode == 204) {
+    if (response.statusCode == 200) {
       final JsonResponse= jsonDecode(response.body);
       return Procedures.fromJson(JsonResponse);
     } else {
@@ -44,7 +44,7 @@ class ProcedureService {
               'Content-Type': 'application/json; charset=UTF-8',
             },
             body: jsonEncode(Obj));
-    if (response.statusCode == 201) {
+    if (response.statusCode == 204) {
       return true;
     } else {
       return false;
@@ -65,7 +65,7 @@ class ProcedureService {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(Obj));
-    if (response.statusCode == 201) {
+    if (response.statusCode == 204) {
       return true;
     } else {
       return false;

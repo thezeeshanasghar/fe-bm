@@ -31,18 +31,6 @@ class _EditRoomState extends State<EditRoom> {
   dynamic arguments;
   Widget build(BuildContext context) {
 
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    roomservice = RoomService();
-
-    if (arguments != null) {
-      roomservice.getRoomById(arguments["Id"]).then((value) {
-
-        _roomnocontroller = new TextEditingController(text: value["roomNo"]);
-        _roomtypecontroller = new TextEditingController(text: value["roomType"]);
-        _roomcapacitycontroller =  new TextEditingController(text: value["roomCapacity"].toString());
-        _roomchargescontroller =   new TextEditingController(text: value["roomCharges"].toString());
-      });
-    }
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -94,6 +82,24 @@ class _EditRoomState extends State<EditRoom> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() async {
+
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    roomservice = RoomService();
+    print( arguments["Id"]);
+    if (arguments != null) {
+      roomservice.getRoomById(arguments["Id"]).then((value) {
+        setState(() {
+          _roomnocontroller = new TextEditingController(text: value["roomNo"]);
+         RoomType=value["roomType"];
+          _roomcapacitycontroller =  new TextEditingController(text: value["roomCapacity"].toString());
+          _roomchargescontroller =   new TextEditingController(text: value["roomCharges"].toString());
+        });
+
+      });
+    }
+  }
   Widget widgetRoomNo() {
     return Column(
       children: [
@@ -208,8 +214,6 @@ class _EditRoomState extends State<EditRoom> {
       ],
     );
   }
-
-
   Widget widgetRoomCapacity() {
     return Column(
       children: [
@@ -245,7 +249,6 @@ class _EditRoomState extends State<EditRoom> {
       ],
     );
   }
-
   Widget widgetSubmit() {
     return Column(
       children: [

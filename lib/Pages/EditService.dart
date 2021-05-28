@@ -26,17 +26,6 @@ class _EditServiceState extends State<EditService> {
 
   dynamic arguments;
   Widget build(BuildContext context) {
-
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    service = Service();
-
-    if (arguments != null) {
-      service.getServicesById(arguments["Id"]).then((value) {
-        _servicenamecontroller = new TextEditingController(text: value["name"]);
-        _serviceDescriptioncontroller =
-        new TextEditingController(text: value["description"]);
-      });
-    }
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -84,6 +73,22 @@ class _EditServiceState extends State<EditService> {
   @override
   void initState() {
     super.initState();
+  }
+  @override
+  void didChangeDependencies() async {
+    arguments = ModalRoute
+        .of(context)
+        .settings
+        .arguments as Map;
+    service = Service();
+    if (arguments != null) {
+      service.getServicesById(arguments["Id"]).then((value) {
+        setState(() {
+          _servicenamecontroller = new TextEditingController(text: value["name"]);
+          _serviceDescriptioncontroller = new TextEditingController(text: value["description"]);
+        });
+      });
+    }
   }
 
   Widget widgetServiceName() {
