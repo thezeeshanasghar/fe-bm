@@ -1,20 +1,17 @@
-import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Employee.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
+import 'package:baby_doctor/Models/Employee.dart';
 
-class AddReceptionist extends StatefulWidget {
+class EditReceptionist extends StatefulWidget {
   @override
-  _AddReceptionistState createState() => _AddReceptionistState();
+  _EditReceptionistState createState() => _EditReceptionistState();
 }
 
-class _AddReceptionistState extends State<AddReceptionist> {
+class _EditReceptionistState extends State<EditReceptionist> {
+  @override
   final formKey = GlobalKey<FormState>();
   final ReceptionistController = TextEditingController();
   final joinDateController = TextEditingController();
@@ -26,7 +23,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Gender='Choose Gender';
+  String Gender;
   int FlourNo;
   String JoiningDate;
   String DOB;
@@ -36,24 +33,62 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String UserName;
   String Experience;
   ReceptionistService receptionistService;
+
+  TextEditingController _firstnamecontroller;
+  TextEditingController _lastnamecontroller;
+  TextEditingController _usennamecontroller;
+  TextEditingController _cniccontroller;
+  TextEditingController _gendercontroller;
+  TextEditingController _flournocontroller;
+  TextEditingController _emailcontroller;
+  TextEditingController _passwwordcontroller;
+  TextEditingController _addresscontroller;
+  TextEditingController _contactnumbercontroller;
+  TextEditingController _emergencycontactnumbercontroller;
+  TextEditingController _fatherhusbandnamecontroller;
+  TextEditingController _dobcontroller;
+
+  dynamic arguments;
+
   @override
   void initState() {
     super.initState();
+    initVariablesAndClasses();
+
+    new Future.delayed(Duration.zero,() {
+
+    });
   }
 
   @override
   void dispose() {
-    ReceptionistController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void initVariablesAndClasses() {
+    _firstnamecontroller = new TextEditingController();
+    _lastnamecontroller = new TextEditingController();
+    _usennamecontroller = new TextEditingController();
+    _cniccontroller = new TextEditingController();
+    _flournocontroller = new TextEditingController();
+    _emailcontroller = new TextEditingController();
+    _passwwordcontroller = new TextEditingController();
+    _addresscontroller = new TextEditingController();
+    _contactnumbercontroller = new TextEditingController();
+    _emergencycontactnumbercontroller = new TextEditingController();
+    _fatherhusbandnamecontroller = new TextEditingController();
+    _dobcontroller = new TextEditingController();
+
+
     receptionistService = ReceptionistService();
+  }
+
+  Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddReceptionist),
+        title: Text(Strings.titleEditReceptionist),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -68,33 +103,34 @@ class _AddReceptionistState extends State<AddReceptionist> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          widgetFirstName(),
-                          widgetLastName(),
-                          widgetFatherHusbandName(),
-                          widgetUserName(),
-                          widgetPassword(),
-                          widgetGender(),
-                          widgetDob(),
-                          widgetCnicNumber(),
-                          widgetContactNumber(),
-                          widgetEmail(),
-                          widgetAddress(),
-                          widgetFlourNo(),
-                          widgetJoiningDate(),
-                          widgetSubmit()
-                        ],
-                      ),
-                    )),
+                  padding: EdgeInsets.fromLTRB(
+                      Dimens.globalPaddingLeft,
+                      Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight,
+                      Dimens.globalPaddingBottom),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        widgetFirstName(),
+                        widgetLastName(),
+                        widgetFatherHusbandName(),
+                        widgetUserName(),
+                        widgetPassword(),
+                        widgetGender(),
+                        widgetDob(),
+                        widgetCnicNumber(),
+                        widgetContactNumber(),
+                        widgetEmail(),
+                        widgetAddress(),
+                        widgetFlourNo(),
+                        widgetJoiningDate(),
+                        widgetSubmit()
+                      ],
+                    ),
+                  ),
+                ),
               ),
             );
           },
@@ -103,6 +139,34 @@ class _AddReceptionistState extends State<AddReceptionist> {
     );
   }
 
+  @override
+  void didChangeDependencies() async {
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+
+
+    receptionistService = ReceptionistService();
+    print( arguments["Id"]);
+    if (arguments != null) {
+      receptionistService.getReceptionistById(arguments["Id"]).then((value) {
+        setState(() {
+          _firstnamecontroller.text = value.firstName;
+          _lastnamecontroller.text = value.lastName;
+          _usennamecontroller.text = value.userName;
+          _cniccontroller.text = value.CNIC;
+          Gender=value.gender;
+          _flournocontroller.text = value.flourNo.toString();
+          _emailcontroller.text = value.email;
+          _passwwordcontroller.text = value.password;
+          _addresscontroller.text =value.address.toString();
+          _contactnumbercontroller.text = value.contact;
+          _emergencycontactnumbercontroller.text = value.emergencyContact;
+          _fatherhusbandnamecontroller.text = value.fatherHusbandName;
+          joinDateController.text = value.joiningDate;
+        });
+
+      });
+    }
+  }
   Widget widgetFirstName() {
     return Column(
       children: [
@@ -115,6 +179,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
+            controller: _firstnamecontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
@@ -146,6 +211,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _lastnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -176,6 +242,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _fatherhusbandnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -205,6 +272,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _usennamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.supervised_user_circle),
                   border: OutlineInputBorder(),
@@ -234,6 +302,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _passwwordcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.lock_outline_rounded),
                   border: OutlineInputBorder(),
@@ -311,6 +380,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
+            controller: _cniccontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
@@ -347,6 +417,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
+              controller: _contactnumbercontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -384,13 +455,14 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
+              controller: _emailcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                   labelText: 'Email'),
               validator: (String value) {
                 bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -420,6 +492,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
+              controller: _addresscontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
@@ -516,6 +589,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
+              controller: _flournocontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -626,10 +700,25 @@ class _AddReceptionistState extends State<AddReceptionist> {
     formKey.currentState.save();
 
 
-    Employee obj = new Employee(employeeType:'Receptionist',
-        firstName: FirstName, lastName: LastName, fatherHusbandName: FatherHusbandName, gender: Gender, CNIC: CNIC, contact: ContactNumber, emergencyContact: EmergencyContactNumber,
-        experience: Experience, flourNo: FlourNo, password: Password, userName: UserName, joiningDate: JoiningDate,DOB: DOB, address: Address, email: Email);
-    var response = await receptionistService.InsertReceptionist(obj);
+    Employee obj = new Employee(
+        employeeType:'Receptionist',
+        id:arguments["Id"],
+        firstName: FirstName,
+        lastName: LastName,
+        fatherHusbandName: FatherHusbandName,
+        gender: Gender,
+        CNIC: CNIC,
+        contact: ContactNumber,
+        emergencyContact: EmergencyContactNumber,
+        experience: Experience,
+        flourNo: FlourNo,
+        password: Password,
+        userName: UserName,
+        joiningDate: JoiningDate,
+        DOB: DOB,
+        address: Address,
+        email: Email );
+    var response = await receptionistService.UpdateReceptionist(obj);
     print(response);
     if (response == true) {
       setState(() {
@@ -639,7 +728,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
-              Text('Success: Created Receptionist '),
+              Text('Success: Updated Receptionist '),
               Text(
                 FirstName +' '+ LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -665,10 +754,228 @@ class _AddReceptionistState extends State<AddReceptionist> {
     }
   }
 
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
+  // Widget widgetProcedureName() {
+  //   return Column(
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.fromLTRB(
+  //             Dimens.globalInputFieldleft,
+  //             Dimens.globalInputFieldTop,
+  //             Dimens.globalInputFieldRight,
+  //             Dimens.globalInputFieldBottom),
+  //         child: TextFormField(
+  //           autofocus: false,
+  //           maxLength: 30,
+  //           controller: _namecontroller,
+  //           decoration: InputDecoration(
+  //               prefixIcon: Icon(Icons.fact_check),
+  //               border: OutlineInputBorder(),
+  //               labelText: 'Procedure Name'),
+  //           validator: (String value) {
+  //             if (value == null || value.isEmpty) {
+  //               return 'This field cannot be empty';
+  //             }
+  //             return null;
+  //           },
+  //           onSaved: (String value) {
+  //             ProcedureName = value;
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+  //
+  // Widget widgetPerformedBy() {
+  //   return Column(
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.fromLTRB(
+  //             Dimens.globalInputFieldleft,
+  //             Dimens.globalInputFieldTop,
+  //             Dimens.globalInputFieldRight,
+  //             Dimens.globalInputFieldBottom),
+  //         child: TextFormField(
+  //           autofocus: false,
+  //           maxLength: 15,
+  //           controller: _performedbycontroller,
+  //           decoration: InputDecoration(
+  //               prefixIcon: Icon(Icons.person),
+  //               border: OutlineInputBorder(),
+  //               labelText: 'Performed By'),
+  //           validator: (String value) {
+  //             if (value == null || value.isEmpty) {
+  //               return 'This field cannot be empty';
+  //             }
+  //             return null;
+  //           },
+  //           onSaved: (String value) {
+  //             PerformedBy = value;
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+  //
+  // Widget widgetCharges() {
+  //   return Column(
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.fromLTRB(
+  //             Dimens.globalInputFieldleft,
+  //             Dimens.globalInputFieldTop,
+  //             Dimens.globalInputFieldRight,
+  //             Dimens.globalInputFieldBottom),
+  //         child: TextFormField(
+  //           autofocus: false,
+  //           maxLength: 5,
+  //           controller: _chargescontroller,
+  //           keyboardType: TextInputType.number,
+  //           decoration: InputDecoration(
+  //               prefixIcon: Icon(Icons.monetization_on),
+  //               border: OutlineInputBorder(),
+  //               labelText: 'Charges'),
+  //           validator: (String value) {
+  //             if (value == null || value.isEmpty) {
+  //               return 'This field cannot be empty';
+  //             }
+  //             if (double.tryParse(value) <= 0) {
+  //               return 'Input Error: cannot enter negative digits';
+  //             }
+  //             return null;
+  //           },
+  //           onSaved: (String value) {
+  //             Charges = double.parse(value);
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+  //
+  // Widget widgetShare() {
+  //   return Column(
+  //     children: [
+  //       Padding(
+  //         padding: const EdgeInsets.fromLTRB(
+  //             Dimens.globalInputFieldleft,
+  //             Dimens.globalInputFieldTop,
+  //             Dimens.globalInputFieldRight,
+  //             Dimens.globalInputFieldBottom),
+  //         child: TextFormField(
+  //           autofocus: false,
+  //           maxLength: 3,
+  //           controller: _sharecontroller,
+  //           keyboardType: TextInputType.number,
+  //           decoration: InputDecoration(
+  //               prefixIcon: Icon(Icons.monetization_on),
+  //               border: OutlineInputBorder(),
+  //               labelText: 'Performer Share'),
+  //           validator: (String value) {
+  //             if (value == null || value.isEmpty) {
+  //               return 'This field cannot be empty';
+  //             }
+  //             //if(value>=0 || value<=100){
+  //             // return 'This field cannot be empty';
+  //             //}
+  //             return null;
+  //           },
+  //           onSaved: (String value) {
+  //             Share = double.tryParse(value);
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+  //
+  // Widget widgetSubmit() {
+  //   return Column(
+  //     children: [
+  //       loadingButtonProgressIndicator == false
+  //           ? Align(
+  //         alignment: Alignment.center,
+  //         child: Padding(
+  //           padding: const EdgeInsets.fromLTRB(
+  //               Dimens.globalInputFieldleft,
+  //               Dimens.globalInputFieldTop,
+  //               Dimens.globalInputFieldRight,
+  //               Dimens.globalInputFieldBottom),
+  //           child: ElevatedButton(
+  //             autofocus: false,
+  //             style: ElevatedButton.styleFrom(
+  //               primary: Shade.submitButtonColor,
+  //               minimumSize: Size(double.infinity, 45),
+  //               padding:
+  //               EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+  //             ),
+  //             child: Text(Strings.submitGlobal),
+  //             onPressed: () {
+  //               onPressedSubmitButton();
+  //             },
+  //           ),
+  //         ),
+  //       )
+  //           : Center(
+  //         child: CircularProgressIndicator(),
+  //       )
+  //     ],
+  //   );
+  // }
+  //
+  // onPressedSubmitButton() async {
+  //   if (!formKey.currentState.validate()) {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //         backgroundColor: Shade.snackGlobalFailed,
+  //         content: Text('Error: Some input fields are not filled')));
+  //     return;
+  //   }
+  //   setState(() {
+  //     loadingButtonProgressIndicator = true;
+  //   });
+  //   formKey.currentState.save();
+  //
+  //   Procedures obj = new Procedures(
+  //       id: arguments["Id"],
+  //       name: ProcedureName,
+  //       performedBy: PerformedBy,
+  //       charges: Charges,
+  //       performerShare: Share);
+  //   var response = await procedureService.UpdateProcedure(obj);
+  //   print(response);
+  //   if (response == true) {
+  //     setState(() {
+  //       loadingButtonProgressIndicator = false;
+  //     });
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //         backgroundColor: Shade.snackGlobalSuccess,
+  //         content: Row(
+  //           children: [
+  //             Text('Success:procedure Updated'),
+  //             Text(
+  //               ProcedureName,
+  //               style: TextStyle(fontWeight: FontWeight.bold),
+  //             ),
+  //           ],
+  //         )));
+  //     formKey.currentState.reset();
+  //     Navigator.pushNamed(context, Strings.routeProcedureList);
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //         backgroundColor: Shade.snackGlobalFailed,
+  //         content: Row(
+  //           children: [
+  //             Text('Error: Try Again: Failed to edit '),
+  //             Text(
+  //               ProcedureName,
+  //               style: TextStyle(fontWeight: FontWeight.bold),
+  //             ),
+  //           ],
+  //         )));
+  //     setState(() {
+  //       loadingButtonProgressIndicator = false;
+  //     });
+  //   }
+  // }
 }

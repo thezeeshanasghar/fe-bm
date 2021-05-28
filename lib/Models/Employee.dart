@@ -45,11 +45,11 @@ class Employee {
     return Employee(
         id: json['id'],
         employeeType: json['name'],
-        firstName: json['performerShare'],
-        lastName: json['performedBy'],
+        firstName: json['firstName'],
+        lastName: json['lastName'],
         fatherHusbandName: json['fatherHusbandName'],
         gender: json['gender'],
-        CNIC: json['CNIC'],
+        CNIC: json['cnic'],
         contact: json['contact'],
         emergencyContact: json['emergencyContact'],
         experience: json['experience'],
@@ -58,7 +58,7 @@ class Employee {
         userName: json['userName'],
         joiningDate: json['joiningDate'],
         address: json['address'],
-        email: json['emails'],
+        email: json['email'],
         DOB: json['DOB'],
         qualifications: json['qualifications']);
   }

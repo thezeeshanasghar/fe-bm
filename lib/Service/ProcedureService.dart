@@ -20,6 +20,7 @@ class ProcedureService {
       throw Exception('Failed to load Procedure');
     }
   }
+
   Future<Procedures> getProceduresById(int Id) async {
     final response =
     await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
