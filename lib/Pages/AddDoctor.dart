@@ -1081,7 +1081,7 @@ class _AddDoctorState extends State<AddDoctor> {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
+        firstDate: DateTime(2014),
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
@@ -1153,10 +1153,5 @@ class _AddDoctorState extends State<AddDoctor> {
       });
     }
   }
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
+
 }

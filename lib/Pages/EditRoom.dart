@@ -20,7 +20,7 @@ class _EditRoomState extends State<EditRoom> {
   String  RoomType;
   int  RoomCapacity;
   double  RoomCharges;
-
+  bool isLoading = false;
   bool loadingButtonProgressIndicator = false;
   RoomService roomservice;
   TextEditingController _roomnocontroller;
@@ -59,12 +59,12 @@ class _EditRoomState extends State<EditRoom> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetRoomNo(),
-                        widgetRoomType(),
-                        widgetRoomCapacity(),
-                        widgetRoomCharges(),
-
-                        widgetSubmit()
+                        if (!isLoading) widgetRoomNo(),
+                        if (!isLoading) widgetRoomType(),
+                        if (!isLoading)  widgetRoomCapacity(),
+                        if (!isLoading) widgetRoomCharges(),
+                        if (!isLoading) widgetSubmit(),
+                        if (isLoading) widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -84,7 +84,9 @@ class _EditRoomState extends State<EditRoom> {
 
   @override
   void didChangeDependencies() async {
-
+    setState(() {
+      isLoading = true;
+    });
     arguments = ModalRoute.of(context).settings.arguments as Map;
     roomservice = RoomService();
     print( arguments["Id"]);
@@ -95,6 +97,7 @@ class _EditRoomState extends State<EditRoom> {
          RoomType=value["roomType"];
           _roomcapacitycontroller =  new TextEditingController(text: value["roomCapacity"].toString());
           _roomchargescontroller =   new TextEditingController(text: value["roomCharges"].toString());
+          isLoading = false;
         });
 
       });
@@ -280,6 +283,29 @@ class _EditRoomState extends State<EditRoom> {
           child: CircularProgressIndicator(),
         )
       ],
+    );
+  }
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

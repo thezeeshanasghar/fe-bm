@@ -15,7 +15,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
   final formKey = GlobalKey<FormState>();
   final ReceptionistController = TextEditingController();
   final joinDateController = TextEditingController();
-  final DOBController= TextEditingController();
+  final DOBController = TextEditingController();
   String FirstName;
   String LastName;
   String CNIC;
@@ -27,11 +27,12 @@ class _EditReceptionistState extends State<EditReceptionist> {
   int FlourNo;
   String JoiningDate;
   String DOB;
-  bool loadingButtonProgressIndicator=false;
+  bool loadingButtonProgressIndicator = false;
   String FatherHusbandName;
   String Password;
   String UserName;
   String Experience;
+  bool isLoading = false;
   ReceptionistService receptionistService;
 
   TextEditingController _firstnamecontroller;
@@ -55,9 +56,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
     super.initState();
     initVariablesAndClasses();
 
-    new Future.delayed(Duration.zero,() {
-
-    });
+    new Future.delayed(Duration.zero, () {});
   }
 
   @override
@@ -79,12 +78,10 @@ class _EditReceptionistState extends State<EditReceptionist> {
     _fatherhusbandnamecontroller = new TextEditingController();
     _dobcontroller = new TextEditingController();
 
-
     receptionistService = ReceptionistService();
   }
 
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -113,20 +110,21 @@ class _EditReceptionistState extends State<EditReceptionist> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetFirstName(),
-                        widgetLastName(),
-                        widgetFatherHusbandName(),
-                        widgetUserName(),
-                        widgetPassword(),
-                        widgetGender(),
-                        widgetDob(),
-                        widgetCnicNumber(),
-                        widgetContactNumber(),
-                        widgetEmail(),
-                        widgetAddress(),
-                        widgetFlourNo(),
-                        widgetJoiningDate(),
-                        widgetSubmit()
+                        if (!isLoading) widgetFirstName(),
+                        if (!isLoading) widgetLastName(),
+                        if (!isLoading) widgetFatherHusbandName(),
+                        if (!isLoading) widgetUserName(),
+                        if (!isLoading) widgetPassword(),
+                        if (!isLoading) widgetGender(),
+                        if (!isLoading) widgetDob(),
+                        if (!isLoading) widgetCnicNumber(),
+                        if (!isLoading) widgetContactNumber(),
+                        if (!isLoading) widgetEmail(),
+                        if (!isLoading) widgetAddress(),
+                        if (!isLoading) widgetFlourNo(),
+                        if (!isLoading) widgetJoiningDate(),
+                        if (!isLoading) widgetSubmit(),
+                        if (isLoading) widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -141,11 +139,12 @@ class _EditReceptionistState extends State<EditReceptionist> {
 
   @override
   void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
     arguments = ModalRoute.of(context).settings.arguments as Map;
-
-
     receptionistService = ReceptionistService();
-    print( arguments["Id"]);
+    print(arguments["Id"]);
     if (arguments != null) {
       receptionistService.getReceptionistById(arguments["Id"]).then((value) {
         setState(() {
@@ -153,20 +152,21 @@ class _EditReceptionistState extends State<EditReceptionist> {
           _lastnamecontroller.text = value.lastName;
           _usennamecontroller.text = value.userName;
           _cniccontroller.text = value.CNIC;
-          Gender=value.gender;
+          Gender = value.gender;
           _flournocontroller.text = value.flourNo.toString();
           _emailcontroller.text = value.email;
           _passwwordcontroller.text = value.password;
-          _addresscontroller.text =value.address.toString();
+          _addresscontroller.text = value.address.toString();
           _contactnumbercontroller.text = value.contact;
           _emergencycontactnumbercontroller.text = value.emergencyContact;
           _fatherhusbandnamecontroller.text = value.fatherHusbandName;
           joinDateController.text = value.joiningDate;
+          isLoading = false;
         });
-
       });
     }
   }
+
   Widget widgetFirstName() {
     return Column(
       children: [
@@ -260,6 +260,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
       ],
     );
   }
+
   Widget widgetUserName() {
     return Column(
       children: [
@@ -290,6 +291,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
       ],
     );
   }
+
   Widget widgetPassword() {
     return Column(
       children: [
@@ -462,7 +464,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                   labelText: 'Email'),
               validator: (String value) {
                 bool emailValid = RegExp(
-                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -614,9 +616,34 @@ class _EditReceptionistState extends State<EditReceptionist> {
       ],
     );
   }
+
   Widget widgetSizedBox() {
     return SizedBox(
       height: 30,
+    );
+  }
+
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -625,31 +652,31 @@ class _EditReceptionistState extends State<EditReceptionist> {
       children: [
         loadingButtonProgressIndicator == false
             ? Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding:
-                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text(Strings.submitGlobal),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
-            ),
-          ),
-        )
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      Dimens.globalInputFieldleft,
+                      Dimens.globalInputFieldTop,
+                      Dimens.globalInputFieldRight,
+                      Dimens.globalInputFieldBottom),
+                  child: ElevatedButton(
+                    autofocus: false,
+                    style: ElevatedButton.styleFrom(
+                      primary: Shade.submitButtonColor,
+                      minimumSize: Size(double.infinity, 45),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    ),
+                    child: Text(Strings.submitGlobal),
+                    onPressed: () {
+                      onPressedSubmitButton();
+                    },
+                  ),
+                ),
+              )
             : Center(
-          child: CircularProgressIndicator(),
-        )
+                child: CircularProgressIndicator(),
+              )
       ],
     );
   }
@@ -684,7 +711,6 @@ class _EditReceptionistState extends State<EditReceptionist> {
   }
 
   onPressedSubmitButton() async {
-
     print(JoiningDate);
     print(DOB);
 
@@ -699,10 +725,9 @@ class _EditReceptionistState extends State<EditReceptionist> {
     });
     formKey.currentState.save();
 
-
     Employee obj = new Employee(
-        employeeType:'Receptionist',
-        id:arguments["Id"],
+        employeeType: 'Receptionist',
+        id: arguments["Id"],
         firstName: FirstName,
         lastName: LastName,
         fatherHusbandName: FatherHusbandName,
@@ -717,7 +742,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
         joiningDate: JoiningDate,
         DOB: DOB,
         address: Address,
-        email: Email );
+        email: Email);
     var response = await receptionistService.UpdateReceptionist(obj);
     print(response);
     if (response == true) {
@@ -730,7 +755,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
             children: [
               Text('Success: Updated Receptionist '),
               Text(
-                FirstName +' '+ LastName,
+                FirstName + ' ' + LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -743,7 +768,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
             children: [
               Text('Error: Try Again: Failed to add '),
               Text(
-                FirstName +' '+ LastName,
+                FirstName + ' ' + LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -754,228 +779,228 @@ class _EditReceptionistState extends State<EditReceptionist> {
     }
   }
 
-  // Widget widgetProcedureName() {
-  //   return Column(
-  //     children: [
-  //       Padding(
-  //         padding: const EdgeInsets.fromLTRB(
-  //             Dimens.globalInputFieldleft,
-  //             Dimens.globalInputFieldTop,
-  //             Dimens.globalInputFieldRight,
-  //             Dimens.globalInputFieldBottom),
-  //         child: TextFormField(
-  //           autofocus: false,
-  //           maxLength: 30,
-  //           controller: _namecontroller,
-  //           decoration: InputDecoration(
-  //               prefixIcon: Icon(Icons.fact_check),
-  //               border: OutlineInputBorder(),
-  //               labelText: 'Procedure Name'),
-  //           validator: (String value) {
-  //             if (value == null || value.isEmpty) {
-  //               return 'This field cannot be empty';
-  //             }
-  //             return null;
-  //           },
-  //           onSaved: (String value) {
-  //             ProcedureName = value;
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-  //
-  // Widget widgetPerformedBy() {
-  //   return Column(
-  //     children: [
-  //       Padding(
-  //         padding: const EdgeInsets.fromLTRB(
-  //             Dimens.globalInputFieldleft,
-  //             Dimens.globalInputFieldTop,
-  //             Dimens.globalInputFieldRight,
-  //             Dimens.globalInputFieldBottom),
-  //         child: TextFormField(
-  //           autofocus: false,
-  //           maxLength: 15,
-  //           controller: _performedbycontroller,
-  //           decoration: InputDecoration(
-  //               prefixIcon: Icon(Icons.person),
-  //               border: OutlineInputBorder(),
-  //               labelText: 'Performed By'),
-  //           validator: (String value) {
-  //             if (value == null || value.isEmpty) {
-  //               return 'This field cannot be empty';
-  //             }
-  //             return null;
-  //           },
-  //           onSaved: (String value) {
-  //             PerformedBy = value;
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-  //
-  // Widget widgetCharges() {
-  //   return Column(
-  //     children: [
-  //       Padding(
-  //         padding: const EdgeInsets.fromLTRB(
-  //             Dimens.globalInputFieldleft,
-  //             Dimens.globalInputFieldTop,
-  //             Dimens.globalInputFieldRight,
-  //             Dimens.globalInputFieldBottom),
-  //         child: TextFormField(
-  //           autofocus: false,
-  //           maxLength: 5,
-  //           controller: _chargescontroller,
-  //           keyboardType: TextInputType.number,
-  //           decoration: InputDecoration(
-  //               prefixIcon: Icon(Icons.monetization_on),
-  //               border: OutlineInputBorder(),
-  //               labelText: 'Charges'),
-  //           validator: (String value) {
-  //             if (value == null || value.isEmpty) {
-  //               return 'This field cannot be empty';
-  //             }
-  //             if (double.tryParse(value) <= 0) {
-  //               return 'Input Error: cannot enter negative digits';
-  //             }
-  //             return null;
-  //           },
-  //           onSaved: (String value) {
-  //             Charges = double.parse(value);
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-  //
-  // Widget widgetShare() {
-  //   return Column(
-  //     children: [
-  //       Padding(
-  //         padding: const EdgeInsets.fromLTRB(
-  //             Dimens.globalInputFieldleft,
-  //             Dimens.globalInputFieldTop,
-  //             Dimens.globalInputFieldRight,
-  //             Dimens.globalInputFieldBottom),
-  //         child: TextFormField(
-  //           autofocus: false,
-  //           maxLength: 3,
-  //           controller: _sharecontroller,
-  //           keyboardType: TextInputType.number,
-  //           decoration: InputDecoration(
-  //               prefixIcon: Icon(Icons.monetization_on),
-  //               border: OutlineInputBorder(),
-  //               labelText: 'Performer Share'),
-  //           validator: (String value) {
-  //             if (value == null || value.isEmpty) {
-  //               return 'This field cannot be empty';
-  //             }
-  //             //if(value>=0 || value<=100){
-  //             // return 'This field cannot be empty';
-  //             //}
-  //             return null;
-  //           },
-  //           onSaved: (String value) {
-  //             Share = double.tryParse(value);
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-  //
-  // Widget widgetSubmit() {
-  //   return Column(
-  //     children: [
-  //       loadingButtonProgressIndicator == false
-  //           ? Align(
-  //         alignment: Alignment.center,
-  //         child: Padding(
-  //           padding: const EdgeInsets.fromLTRB(
-  //               Dimens.globalInputFieldleft,
-  //               Dimens.globalInputFieldTop,
-  //               Dimens.globalInputFieldRight,
-  //               Dimens.globalInputFieldBottom),
-  //           child: ElevatedButton(
-  //             autofocus: false,
-  //             style: ElevatedButton.styleFrom(
-  //               primary: Shade.submitButtonColor,
-  //               minimumSize: Size(double.infinity, 45),
-  //               padding:
-  //               EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-  //             ),
-  //             child: Text(Strings.submitGlobal),
-  //             onPressed: () {
-  //               onPressedSubmitButton();
-  //             },
-  //           ),
-  //         ),
-  //       )
-  //           : Center(
-  //         child: CircularProgressIndicator(),
-  //       )
-  //     ],
-  //   );
-  // }
-  //
-  // onPressedSubmitButton() async {
-  //   if (!formKey.currentState.validate()) {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //         backgroundColor: Shade.snackGlobalFailed,
-  //         content: Text('Error: Some input fields are not filled')));
-  //     return;
-  //   }
-  //   setState(() {
-  //     loadingButtonProgressIndicator = true;
-  //   });
-  //   formKey.currentState.save();
-  //
-  //   Procedures obj = new Procedures(
-  //       id: arguments["Id"],
-  //       name: ProcedureName,
-  //       performedBy: PerformedBy,
-  //       charges: Charges,
-  //       performerShare: Share);
-  //   var response = await procedureService.UpdateProcedure(obj);
-  //   print(response);
-  //   if (response == true) {
-  //     setState(() {
-  //       loadingButtonProgressIndicator = false;
-  //     });
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //         backgroundColor: Shade.snackGlobalSuccess,
-  //         content: Row(
-  //           children: [
-  //             Text('Success:procedure Updated'),
-  //             Text(
-  //               ProcedureName,
-  //               style: TextStyle(fontWeight: FontWeight.bold),
-  //             ),
-  //           ],
-  //         )));
-  //     formKey.currentState.reset();
-  //     Navigator.pushNamed(context, Strings.routeProcedureList);
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //         backgroundColor: Shade.snackGlobalFailed,
-  //         content: Row(
-  //           children: [
-  //             Text('Error: Try Again: Failed to edit '),
-  //             Text(
-  //               ProcedureName,
-  //               style: TextStyle(fontWeight: FontWeight.bold),
-  //             ),
-  //           ],
-  //         )));
-  //     setState(() {
-  //       loadingButtonProgressIndicator = false;
-  //     });
-  //   }
-  // }
+// Widget widgetProcedureName() {
+//   return Column(
+//     children: [
+//       Padding(
+//         padding: const EdgeInsets.fromLTRB(
+//             Dimens.globalInputFieldleft,
+//             Dimens.globalInputFieldTop,
+//             Dimens.globalInputFieldRight,
+//             Dimens.globalInputFieldBottom),
+//         child: TextFormField(
+//           autofocus: false,
+//           maxLength: 30,
+//           controller: _namecontroller,
+//           decoration: InputDecoration(
+//               prefixIcon: Icon(Icons.fact_check),
+//               border: OutlineInputBorder(),
+//               labelText: 'Procedure Name'),
+//           validator: (String value) {
+//             if (value == null || value.isEmpty) {
+//               return 'This field cannot be empty';
+//             }
+//             return null;
+//           },
+//           onSaved: (String value) {
+//             ProcedureName = value;
+//           },
+//         ),
+//       ),
+//     ],
+//   );
+// }
+//
+// Widget widgetPerformedBy() {
+//   return Column(
+//     children: [
+//       Padding(
+//         padding: const EdgeInsets.fromLTRB(
+//             Dimens.globalInputFieldleft,
+//             Dimens.globalInputFieldTop,
+//             Dimens.globalInputFieldRight,
+//             Dimens.globalInputFieldBottom),
+//         child: TextFormField(
+//           autofocus: false,
+//           maxLength: 15,
+//           controller: _performedbycontroller,
+//           decoration: InputDecoration(
+//               prefixIcon: Icon(Icons.person),
+//               border: OutlineInputBorder(),
+//               labelText: 'Performed By'),
+//           validator: (String value) {
+//             if (value == null || value.isEmpty) {
+//               return 'This field cannot be empty';
+//             }
+//             return null;
+//           },
+//           onSaved: (String value) {
+//             PerformedBy = value;
+//           },
+//         ),
+//       ),
+//     ],
+//   );
+// }
+//
+// Widget widgetCharges() {
+//   return Column(
+//     children: [
+//       Padding(
+//         padding: const EdgeInsets.fromLTRB(
+//             Dimens.globalInputFieldleft,
+//             Dimens.globalInputFieldTop,
+//             Dimens.globalInputFieldRight,
+//             Dimens.globalInputFieldBottom),
+//         child: TextFormField(
+//           autofocus: false,
+//           maxLength: 5,
+//           controller: _chargescontroller,
+//           keyboardType: TextInputType.number,
+//           decoration: InputDecoration(
+//               prefixIcon: Icon(Icons.monetization_on),
+//               border: OutlineInputBorder(),
+//               labelText: 'Charges'),
+//           validator: (String value) {
+//             if (value == null || value.isEmpty) {
+//               return 'This field cannot be empty';
+//             }
+//             if (double.tryParse(value) <= 0) {
+//               return 'Input Error: cannot enter negative digits';
+//             }
+//             return null;
+//           },
+//           onSaved: (String value) {
+//             Charges = double.parse(value);
+//           },
+//         ),
+//       ),
+//     ],
+//   );
+// }
+//
+// Widget widgetShare() {
+//   return Column(
+//     children: [
+//       Padding(
+//         padding: const EdgeInsets.fromLTRB(
+//             Dimens.globalInputFieldleft,
+//             Dimens.globalInputFieldTop,
+//             Dimens.globalInputFieldRight,
+//             Dimens.globalInputFieldBottom),
+//         child: TextFormField(
+//           autofocus: false,
+//           maxLength: 3,
+//           controller: _sharecontroller,
+//           keyboardType: TextInputType.number,
+//           decoration: InputDecoration(
+//               prefixIcon: Icon(Icons.monetization_on),
+//               border: OutlineInputBorder(),
+//               labelText: 'Performer Share'),
+//           validator: (String value) {
+//             if (value == null || value.isEmpty) {
+//               return 'This field cannot be empty';
+//             }
+//             //if(value>=0 || value<=100){
+//             // return 'This field cannot be empty';
+//             //}
+//             return null;
+//           },
+//           onSaved: (String value) {
+//             Share = double.tryParse(value);
+//           },
+//         ),
+//       ),
+//     ],
+//   );
+// }
+//
+// Widget widgetSubmit() {
+//   return Column(
+//     children: [
+//       loadingButtonProgressIndicator == false
+//           ? Align(
+//         alignment: Alignment.center,
+//         child: Padding(
+//           padding: const EdgeInsets.fromLTRB(
+//               Dimens.globalInputFieldleft,
+//               Dimens.globalInputFieldTop,
+//               Dimens.globalInputFieldRight,
+//               Dimens.globalInputFieldBottom),
+//           child: ElevatedButton(
+//             autofocus: false,
+//             style: ElevatedButton.styleFrom(
+//               primary: Shade.submitButtonColor,
+//               minimumSize: Size(double.infinity, 45),
+//               padding:
+//               EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+//             ),
+//             child: Text(Strings.submitGlobal),
+//             onPressed: () {
+//               onPressedSubmitButton();
+//             },
+//           ),
+//         ),
+//       )
+//           : Center(
+//         child: CircularProgressIndicator(),
+//       )
+//     ],
+//   );
+// }
+//
+// onPressedSubmitButton() async {
+//   if (!formKey.currentState.validate()) {
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//         backgroundColor: Shade.snackGlobalFailed,
+//         content: Text('Error: Some input fields are not filled')));
+//     return;
+//   }
+//   setState(() {
+//     loadingButtonProgressIndicator = true;
+//   });
+//   formKey.currentState.save();
+//
+//   Procedures obj = new Procedures(
+//       id: arguments["Id"],
+//       name: ProcedureName,
+//       performedBy: PerformedBy,
+//       charges: Charges,
+//       performerShare: Share);
+//   var response = await procedureService.UpdateProcedure(obj);
+//   print(response);
+//   if (response == true) {
+//     setState(() {
+//       loadingButtonProgressIndicator = false;
+//     });
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//         backgroundColor: Shade.snackGlobalSuccess,
+//         content: Row(
+//           children: [
+//             Text('Success:procedure Updated'),
+//             Text(
+//               ProcedureName,
+//               style: TextStyle(fontWeight: FontWeight.bold),
+//             ),
+//           ],
+//         )));
+//     formKey.currentState.reset();
+//     Navigator.pushNamed(context, Strings.routeProcedureList);
+//   } else {
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//         backgroundColor: Shade.snackGlobalFailed,
+//         content: Row(
+//           children: [
+//             Text('Error: Try Again: Failed to edit '),
+//             Text(
+//               ProcedureName,
+//               style: TextStyle(fontWeight: FontWeight.bold),
+//             ),
+//           ],
+//         )));
+//     setState(() {
+//       loadingButtonProgressIndicator = false;
+//     });
+//   }
+// }
 }

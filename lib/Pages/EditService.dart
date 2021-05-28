@@ -18,7 +18,7 @@ class _EditServiceState extends State<EditService> {
   String Id;
   String  ServiceName;
   String  ServiceDescription;
-
+  bool isLoading = false;
   bool loadingButtonProgressIndicator = false;
   Service service;
   TextEditingController _servicenamecontroller;
@@ -54,10 +54,10 @@ class _EditServiceState extends State<EditService> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetServiceName(),
-                        widgetServiceDescription(),
-
-                        widgetSubmit()
+                        if (!isLoading)widgetServiceName(),
+                        if (!isLoading)widgetServiceDescription(),
+                        if (!isLoading) widgetSubmit(),
+                        if (isLoading)  widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -76,6 +76,9 @@ class _EditServiceState extends State<EditService> {
   }
   @override
   void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
     arguments = ModalRoute
         .of(context)
         .settings
@@ -86,6 +89,7 @@ class _EditServiceState extends State<EditService> {
         setState(() {
           _servicenamecontroller = new TextEditingController(text: value["name"]);
           _serviceDescriptioncontroller = new TextEditingController(text: value["description"]);
+          isLoading = false;
         });
       });
     }
@@ -152,6 +156,29 @@ class _EditServiceState extends State<EditService> {
           ),
         ),
       ],
+    );
+  }
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

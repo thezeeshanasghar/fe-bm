@@ -665,10 +665,4 @@ class _AddReceptionistState extends State<AddReceptionist> {
     }
   }
 
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
 }

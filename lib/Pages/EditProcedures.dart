@@ -19,6 +19,7 @@ class _EditProceduresState extends State<EditProcedures> {
   double Charges;
   double Share;
   bool loadingButtonProgressIndicator = false;
+  bool isLoading = false;
   ProcedureService procedureService;
   TextEditingController _namecontroller;
   TextEditingController _performedbycontroller;
@@ -80,11 +81,12 @@ class _EditProceduresState extends State<EditProcedures> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetProcedureName(),
-                        widgetPerformedBy(),
-                        widgetCharges(),
-                        widgetShare(),
-                        widgetSubmit()
+                        if (!isLoading)  widgetProcedureName(),
+                        if (!isLoading) widgetPerformedBy(),
+                        if (!isLoading) widgetCharges(),
+                        if (!isLoading) widgetShare(),
+                        if (!isLoading)  widgetSubmit(),
+                        if (isLoading) widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -99,6 +101,9 @@ class _EditProceduresState extends State<EditProcedures> {
 
   @override
   void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
     arguments = ModalRoute.of(context).settings.arguments as Map;
 
     if (arguments != null) {
@@ -109,8 +114,32 @@ class _EditProceduresState extends State<EditProcedures> {
           _performedbycontroller.text = resp.performedBy;
           _chargescontroller.text =resp.charges.toString();
           _sharecontroller.text = resp.performerShare.toString();
+          isLoading = false;
         });
     }
+  }
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget widgetProcedureName() {
