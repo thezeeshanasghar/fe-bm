@@ -740,7 +740,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
         password: Password,
         userName: UserName,
         joiningDate: JoiningDate,
-        DOB: DOB,
+        // DOB: DOB,
         address: Address,
         email: Email);
     var response = await receptionistService.UpdateReceptionist(obj);

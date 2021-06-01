@@ -19,6 +19,8 @@ class Strings {
   static const String titleEditService = 'Edit Service';
   static const String titleEditRoom = 'Edit Room';
   static const String titleEditReceptionist = 'Edit Receptionist';
+  static const String titleEditDoctor = 'Edit Doctor';
+  static const String titleEditNurse = 'Edit Nurse';
 
   static const String routeHomePage = '/';
   static const String routeAddDoctor = '/AddDoctor';
@@ -38,6 +40,8 @@ class Strings {
   static const String routeEditProcedure = '/EditProcedure';
   static const String routeEditService = '/EditService';
   static const String routeEditRoom = '/EditRoom';
+  static const String routeEditDoctor = '/EditDoctor';
+  static const String routeEditNurse = '/EditNurse';
   static const String routeEditReceptionist = '/EditReceptionist';
   static const String alertDialogTitleDelete = 'Action';
   static const String alertDialogTitleEdit = 'Action';

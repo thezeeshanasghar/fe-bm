@@ -136,7 +136,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
         "FirstName": receptionists.firstName,
         "LastName":  receptionists.lastName,
         "Gender":  receptionists.gender,
-        "DOB": receptionists.DOB,
+        // "DOB": receptionists.DOB,
         "CNIC": receptionists.CNIC,
         "ContactNumber":  receptionists.contact,
         "Email":  receptionists.email,

@@ -1,9 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Nurse.dart';
+import 'package:baby_doctor/Models/Employee.dart';
+import 'package:baby_doctor/Models/Qualifications.dart';
+import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,12 +35,17 @@ class _AddNurseState extends State<AddNurse> {
   String Address;
   String Speciality;
   int DutyDuration;
+  String UserName;
   int EmergencyConsultationFee;
   int FeeShare;
+  String Experience;
   int ProceduresShare;
   int Salary;
-  DateTime JoiningDate;
+  String JoiningDate;
+
+  NurseService nurseService= NurseService();
   List<String> qualificationList = [''];
+  bool loadingButtonProgressIndicator = false;
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
@@ -88,7 +99,8 @@ class _AddNurseState extends State<AddNurse> {
                           widgetCnicNumber(),
                           widgetContactNumber(),
                           widgetEmergencyContactNumber(),
-                          // widgetEmail(),
+                          widgetEmail(),
+                          widgetExperience(),
                           widgetAddress(),
                           widgetDuration(),
                           widgetJoiningDate(),
@@ -116,7 +128,7 @@ class _AddNurseState extends State<AddNurse> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        JoiningDate = date;
+        JoiningDate = date.toString();
         joinDateController.text = JoiningDate.toString();
       });
     }
@@ -583,7 +595,35 @@ class _AddNurseState extends State<AddNurse> {
       ],
     );
   }
-
+  Widget widgetExperience() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: TextFormField(
+            autofocus: false,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.date_range_sharp),
+                border: OutlineInputBorder(),
+                labelText: 'Experience'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              Experience = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget widgetSalary() {
     return Column(
@@ -724,7 +764,7 @@ class _AddNurseState extends State<AddNurse> {
               }
             },
             onSaved: (String value) {
-              JoiningDate = DateTime.parse(value);
+              JoiningDate = value;
             },
             onTap: () {
               pickDate();
@@ -761,15 +801,7 @@ class _AddNurseState extends State<AddNurse> {
               ),
               child: Text('Submit'),
               onPressed: () {
-                if (!formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                      Text('Error: Some input fields are not filled.')));
-                  return;
-                }
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Doctor added')));
-                formKey.currentState.save();
+                onPressedSubmitButton();
               },
             ),
           ),
@@ -823,5 +855,84 @@ class _AddNurseState extends State<AddNurse> {
         ],
       ),
     );
+  }
+
+  onPressedSubmitButton() async {
+    // print(qualificationList);
+    // print(diplomaList);
+    List<dynamic> degrees = [];
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
+      return;
+    }
+    setState(() {
+      loadingButtonProgressIndicator = true;
+    });
+    formKey.currentState.save();
+
+    Employee employee = new Employee(
+        employeeType: 'Nurse',
+        firstName: FirstName,
+        lastName: LastName,
+        fatherHusbandName: FatherHusbandName,
+        gender: Gender,
+        CNIC: CNIC,
+        contact: ContactNumber,
+        emergencyContact: EmergencyContactNumber,
+        experience: Experience,
+        flourNo: 0,
+        password: "222222",
+        userName: UserName,
+        joiningDate: JoiningDate,
+        // DOB: DOB,
+        address: Address,
+        email: Email);
+
+    Nurse nurse = new Nurse(
+        DutyDuration: DutyDuration,
+        Salary: Salary,
+        SharePercentage: ProceduresShare,
+        employee: employee);
+
+    var json = jsonEncode(employee.toJson());
+    print(json);
+
+    var response = await nurseService.InsertNurse(nurse);
+    print(response);
+    if (response == true) {
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Created Receptionist '),
+              Text(
+                FirstName + ' ' + LastName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      formKey.currentState.reset();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to add '),
+              Text(
+                FirstName + ' ' + LastName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      setState(() {
+        loadingButtonProgressIndicator = false;
+      });
+    }
   }
 }

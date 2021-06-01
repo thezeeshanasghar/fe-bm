@@ -18,7 +18,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
   final formKey = GlobalKey<FormState>();
   final ReceptionistController = TextEditingController();
   final joinDateController = TextEditingController();
-  final DOBController= TextEditingController();
+  final DOBController = TextEditingController();
   String FirstName;
   String LastName;
   String CNIC;
@@ -26,16 +26,17 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Gender='Choose Gender';
+  String Gender = 'Choose Gender';
   int FlourNo;
   String JoiningDate;
   String DOB;
-  bool loadingButtonProgressIndicator=false;
+  bool loadingButtonProgressIndicator = false;
   String FatherHusbandName;
   String Password;
   String UserName;
   String Experience;
   ReceptionistService receptionistService;
+
   @override
   void initState() {
     super.initState();
@@ -193,6 +194,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
       ],
     );
   }
+
   Widget widgetUserName() {
     return Column(
       children: [
@@ -222,6 +224,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
       ],
     );
   }
+
   Widget widgetPassword() {
     return Column(
       children: [
@@ -540,6 +543,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
       ],
     );
   }
+
   Widget widgetSizedBox() {
     return SizedBox(
       height: 30,
@@ -551,31 +555,31 @@ class _AddReceptionistState extends State<AddReceptionist> {
       children: [
         loadingButtonProgressIndicator == false
             ? Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding:
-                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text(Strings.submitGlobal),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
-            ),
-          ),
-        )
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      Dimens.globalInputFieldleft,
+                      Dimens.globalInputFieldTop,
+                      Dimens.globalInputFieldRight,
+                      Dimens.globalInputFieldBottom),
+                  child: ElevatedButton(
+                    autofocus: false,
+                    style: ElevatedButton.styleFrom(
+                      primary: Shade.submitButtonColor,
+                      minimumSize: Size(double.infinity, 45),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    ),
+                    child: Text(Strings.submitGlobal),
+                    onPressed: () {
+                      onPressedSubmitButton();
+                    },
+                  ),
+                ),
+              )
             : Center(
-          child: CircularProgressIndicator(),
-        )
+                child: CircularProgressIndicator(),
+              )
       ],
     );
   }
@@ -610,7 +614,6 @@ class _AddReceptionistState extends State<AddReceptionist> {
   }
 
   onPressedSubmitButton() async {
-
     print(JoiningDate);
     print(DOB);
 
@@ -625,10 +628,23 @@ class _AddReceptionistState extends State<AddReceptionist> {
     });
     formKey.currentState.save();
 
-
-    Employee obj = new Employee(employeeType:'Receptionist',
-        firstName: FirstName, lastName: LastName, fatherHusbandName: FatherHusbandName, gender: Gender, CNIC: CNIC, contact: ContactNumber, emergencyContact: EmergencyContactNumber,
-        experience: Experience, flourNo: FlourNo, password: Password, userName: UserName, joiningDate: JoiningDate,DOB: DOB, address: Address, email: Email);
+    Employee obj = new Employee(
+        employeeType: 'Receptionist',
+        firstName: FirstName,
+        lastName: LastName,
+        fatherHusbandName: FatherHusbandName,
+        gender: Gender,
+        CNIC: CNIC,
+        contact: ContactNumber,
+        emergencyContact: EmergencyContactNumber,
+        experience: Experience,
+        flourNo: FlourNo,
+        password: Password,
+        userName: UserName,
+        joiningDate: JoiningDate,
+        // DOB: DOB,
+        address: Address,
+        email: Email);
     var response = await receptionistService.InsertReceptionist(obj);
     print(response);
     if (response == true) {
@@ -641,7 +657,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             children: [
               Text('Success: Created Receptionist '),
               Text(
-                FirstName +' '+ LastName,
+                FirstName + ' ' + LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -654,7 +670,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             children: [
               Text('Error: Try Again: Failed to add '),
               Text(
-                FirstName +' '+ LastName,
+                FirstName + ' ' + LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -664,5 +680,4 @@ class _AddReceptionistState extends State<AddReceptionist> {
       });
     }
   }
-
 }

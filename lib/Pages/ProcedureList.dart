@@ -138,6 +138,7 @@ class _ProcedureListState extends State<ProcedureList> {
         "Charges": procedures.charges,
         "Share": procedures.performerShare,
         "Action": procedures.id,
+
       });
     }
     return tempsprocedure;
