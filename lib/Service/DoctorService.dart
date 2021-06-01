@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Doctor.dart';
+import 'package:baby_doctor/Models/Request/EmployeeModel.dart';
 import 'package:http/http.dart' as http;
 import '../Models/Employee.dart';
 
@@ -49,22 +50,15 @@ class DoctorService {
       return false;
     }
   }
-  Future<bool> UpdateDoctor(Doctor doctor) async {
-    Map<String, dynamic> Obj = {
-      'id':doctor.id,
-      'consultationFee':doctor.ConsultationFee,
-      "emergencyConsultationFee":doctor.EmergencyConsultationFee,
-      "shareInFee":doctor.ShareInFee,
-      "specialityType":doctor.SpecialityType,
-      "employee":doctor.employee
-    };
-    final response =
-    await http.put(Uri.https(Strings.pathAPI, 'api/Doctor/${doctor.id}'),
+
+  Future<bool> UpdateDoctor(DoctorModel doctorModel) async {
+    final response = await http.put(
+        Uri.https(Strings.pathAPI, 'api/Doctor/${doctorModel.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(Obj));
-    if (response.statusCode == 201) {
+        body: jsonEncode(doctorModel.toJson()));
+    if (response.statusCode == 204) {
       return true;
     } else {
       return false;

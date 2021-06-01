@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 
 class AddNurse extends StatefulWidget {
@@ -42,7 +43,7 @@ class _AddNurseState extends State<AddNurse> {
   int ProceduresShare;
   int Salary;
   String JoiningDate;
-
+  SimpleFontelicoProgressDialog _dialog;
   NurseService nurseService= NurseService();
   List<String> qualificationList = [''];
   bool loadingButtonProgressIndicator = false;
@@ -53,6 +54,8 @@ class _AddNurseState extends State<AddNurse> {
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -204,7 +207,7 @@ class _AddNurseState extends State<AddNurse> {
                               return null;
                             },
                             onSaved: (String value) {
-                              FirstName = value;
+                              // FirstName = value;
                             },
                           ),
                         ),
@@ -872,6 +875,10 @@ class _AddNurseState extends State<AddNurse> {
     });
     formKey.currentState.save();
 
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+
     Employee employee = new Employee(
         employeeType: 'Nurse',
         firstName: FirstName,
@@ -905,20 +912,24 @@ class _AddNurseState extends State<AddNurse> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
-
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
-              Text('Success: Created Receptionist '),
+              Text('Success: Created Nurse '),
               Text(
                 FirstName + ' ' + LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
+
           )));
       formKey.currentState.reset();
+
+      Navigator.pushNamed(context, Strings.routeNurseList);
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

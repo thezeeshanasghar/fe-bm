@@ -5,6 +5,7 @@ import 'package:baby_doctor/Service/Service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:baby_doctor/Models/Services.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditService extends StatefulWidget {
 
@@ -21,6 +22,7 @@ class _EditServiceState extends State<EditService> {
   bool isLoading = false;
   bool loadingButtonProgressIndicator = false;
   Service service;
+  SimpleFontelicoProgressDialog _dialog;
   TextEditingController _servicenamecontroller;
   TextEditingController _serviceDescriptioncontroller;
 
@@ -73,6 +75,8 @@ class _EditServiceState extends State<EditService> {
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
   @override
   void didChangeDependencies() async {
@@ -227,6 +231,9 @@ class _EditServiceState extends State<EditService> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
     Services obj = new Services(
         id:arguments["Id"],
@@ -239,6 +246,7 @@ class _EditServiceState extends State<EditService> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -252,6 +260,7 @@ class _EditServiceState extends State<EditService> {
           )));
       formKey.currentState.reset();
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class AddDoctor extends StatefulWidget {
   @override
@@ -34,7 +35,7 @@ class _AddDoctorState extends State<AddDoctor> {
   String Address;
   String Gender = 'Choose Gender';
   String Speciality;
-
+  SimpleFontelicoProgressDialog _dialog;
   int ConsultationFee = 10;
   int EmergencyConsultationFee = 10;
   String Experience;
@@ -60,6 +61,8 @@ class _AddDoctorState extends State<AddDoctor> {
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -1129,6 +1132,9 @@ class _AddDoctorState extends State<AddDoctor> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
     Employee employee = new Employee(
         employeeType: 'Doctor',
@@ -1164,7 +1170,7 @@ class _AddDoctorState extends State<AddDoctor> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
-
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -1178,6 +1184,7 @@ class _AddDoctorState extends State<AddDoctor> {
           )));
       formKey.currentState.reset();
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import '../Models/Request/EmployeeModel.dart';
 import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
@@ -23,6 +25,7 @@ class _EditNurseState extends State<EditNurse> {
   final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
 
+  int id;
   String FirstName;
   String LastName;
   String FatherHusbandName;
@@ -42,6 +45,14 @@ class _EditNurseState extends State<EditNurse> {
   int Salary;
   String JoiningDate;
   int employeeId;
+  bool isLoading = false;
+  NurseService nurseService;
+  List<String> qualificationList = [''];
+  bool loadingButtonProgressIndicator = false;
+  dynamic arguments;
+  PickedFile _imageFile;
+  final ImagePicker _imagePicker = ImagePicker();
+  SimpleFontelicoProgressDialog _dialog;
   TextEditingController _firstnamecontroller;
   TextEditingController _lastnamecontroller;
   TextEditingController _fatherhusbandnamecontroller;
@@ -55,19 +66,14 @@ class _EditNurseState extends State<EditNurse> {
   TextEditingController _dutydurationcontroller;
   TextEditingController _salerycontroller;
   TextEditingController _proceduressharecontroller;
-  bool isLoading = false;
-  NurseService nurseService = NurseService();
-  List<String> qualificationList = [''];
-  bool loadingButtonProgressIndicator = false;
-  dynamic arguments;
-  PickedFile _imageFile;
-  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
     new Future.delayed(Duration.zero, () {});
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -83,7 +89,7 @@ class _EditNurseState extends State<EditNurse> {
 
     arguments = ModalRoute.of(context).settings.arguments as Map;
     nurseService = NurseService();
-    print(arguments["Id"]);
+    id = arguments["Id"];
     if (arguments != null) {
       nurseService.getNurseById(arguments["Id"]).then((value) {
         setState(() {
@@ -295,7 +301,7 @@ class _EditNurseState extends State<EditNurse> {
                               return null;
                             },
                             onSaved: (String value) {
-                              FirstName = value;
+
                             },
                           ),
                         ),
@@ -961,9 +967,7 @@ class _EditNurseState extends State<EditNurse> {
     );
   }
 
-  onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
+  void onPressedSubmitButton() async {
     List<dynamic> degrees = [];
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -975,70 +979,49 @@ class _EditNurseState extends State<EditNurse> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines, width: MediaQuery.of(context).size.width-50);
 
-    Employee employee = new Employee(
-        id: employeeId,
-        employeeType: 'Nurse',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: 0,
-        password: "222222",
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        qualifications: [],
-        address: Address,
-        email: Email);
+    NurseModel nurseModel = NurseModel(
+        id,
+        employeeId,
+        DutyDuration,
+        ProceduresShare,
+        Salary,
+        EmployeeModelDetails(
+            employeeId,
+            'Nurse',
+            FirstName,
+            LastName,
+            FatherHusbandName,
+            Gender,
+            CNIC,
+            ContactNumber,
+            EmergencyContactNumber,
+            Email,
+            Address,
+            JoiningDate,
+            UserName,
+            'Password',
+            2,
+            Experience, []));
 
-    Nurse nurse = new Nurse(
-        id: arguments["Id"],
-        DutyDuration: DutyDuration,
-        Salary: Salary,
-        SharePercentage: ProceduresShare,
-        employee: employee);
+    print(nurseModel.employeeModelDetails.firstName);
 
-    var json = jsonEncode(employee.toJson());
-    print(json);
-    var response = await nurseService.UpdateNurse(nurse);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-
+    bool hasUpdated = await nurseService.UpdateNurse(nurseModel);
+    if (hasUpdated) {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Receptionist '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
+          content: Text('Success: Updated $FirstName')));
+
+      Navigator.pushNamed(context, Strings.routeNurseList);
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+          content: Text('Error: Failed to update $FirstName')));
     }
   }
 }

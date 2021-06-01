@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:baby_doctor/Models/Room.dart';
 import 'package:baby_doctor/Service/RoomService.dart' as DAL;
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 class AddRoom extends StatefulWidget {
   @override
   _AddRoomState createState() => _AddRoomState();
@@ -17,6 +18,7 @@ class _AddRoomState extends State<AddRoom> {
   String RoomType='Choose Room Type';
   int RoomCapacity;
   double RoomCharges;
+  SimpleFontelicoProgressDialog _dialog;
   bool loadingButtonProgressIndicator = false;
 
   Widget build(BuildContext context) {
@@ -65,6 +67,13 @@ class _AddRoomState extends State<AddRoom> {
     );
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+  }
   Widget widgetroomNo() {
     return Column(
       children: [
@@ -248,6 +257,9 @@ class _AddRoomState extends State<AddRoom> {
     }
     setState((){loadingButtonProgressIndicator = true;});
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
     //perform your task after save
     DAL.RoomService service =  new DAL.RoomService();
@@ -261,11 +273,13 @@ class _AddRoomState extends State<AddRoom> {
     print(response);
     if(response==true)
     {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Success: Record Added Successfully.')));
       formKey.currentState.reset();
       setState((){loadingButtonProgressIndicator = false;});
     }else{
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: Operation Unsuccessfull.')));
       setState((){loadingButtonProgressIndicator = false;});

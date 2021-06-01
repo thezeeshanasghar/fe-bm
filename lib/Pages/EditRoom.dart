@@ -5,9 +5,9 @@ import 'package:baby_doctor/Service/RoomService.dart';
 import 'package:flutter/material.dart';
 
 import 'package:baby_doctor/Models/Room.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditRoom extends StatefulWidget {
-
   @override
   _EditRoomState createState() => _EditRoomState();
 }
@@ -16,21 +16,22 @@ class _EditRoomState extends State<EditRoom> {
   @override
   final formKey = GlobalKey<FormState>();
   String Id;
-  String  RoomNo;
-  String  RoomType;
-  int  RoomCapacity;
-  double  RoomCharges;
+  String RoomNo;
+  String RoomType;
+  int RoomCapacity;
+  double RoomCharges;
   bool isLoading = false;
   bool loadingButtonProgressIndicator = false;
   RoomService roomservice;
+  SimpleFontelicoProgressDialog _dialog;
   TextEditingController _roomnocontroller;
   TextEditingController _roomtypecontroller;
   TextEditingController _roomcapacitycontroller;
   TextEditingController _roomchargescontroller;
 
   dynamic arguments;
-  Widget build(BuildContext context) {
 
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -61,7 +62,7 @@ class _EditRoomState extends State<EditRoom> {
                       children: <Widget>[
                         if (!isLoading) widgetRoomNo(),
                         if (!isLoading) widgetRoomType(),
-                        if (!isLoading)  widgetRoomCapacity(),
+                        if (!isLoading) widgetRoomCapacity(),
                         if (!isLoading) widgetRoomCharges(),
                         if (!isLoading) widgetSubmit(),
                         if (isLoading) widgetCircularProgress(),
@@ -80,6 +81,8 @@ class _EditRoomState extends State<EditRoom> {
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -89,20 +92,22 @@ class _EditRoomState extends State<EditRoom> {
     });
     arguments = ModalRoute.of(context).settings.arguments as Map;
     roomservice = RoomService();
-    print( arguments["Id"]);
+    print(arguments["Id"]);
     if (arguments != null) {
       roomservice.getRoomById(arguments["Id"]).then((value) {
         setState(() {
           _roomnocontroller = new TextEditingController(text: value["roomNo"]);
-         RoomType=value["roomType"];
-          _roomcapacitycontroller =  new TextEditingController(text: value["roomCapacity"].toString());
-          _roomchargescontroller =   new TextEditingController(text: value["roomCharges"].toString());
+          RoomType = value["roomType"];
+          _roomcapacitycontroller =
+              new TextEditingController(text: value["roomCapacity"].toString());
+          _roomchargescontroller =
+              new TextEditingController(text: value["roomCharges"].toString());
           isLoading = false;
         });
-
       });
     }
   }
+
   Widget widgetRoomNo() {
     return Column(
       children: [
@@ -182,6 +187,7 @@ class _EditRoomState extends State<EditRoom> {
       ],
     );
   }
+
   Widget widgetRoomCharges() {
     return Column(
       children: [
@@ -217,6 +223,7 @@ class _EditRoomState extends State<EditRoom> {
       ],
     );
   }
+
   Widget widgetRoomCapacity() {
     return Column(
       children: [
@@ -252,39 +259,41 @@ class _EditRoomState extends State<EditRoom> {
       ],
     );
   }
+
   Widget widgetSubmit() {
     return Column(
       children: [
         loadingButtonProgressIndicator == false
             ? Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding:
-                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text(Strings.submitGlobal),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
-            ),
-          ),
-        )
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      Dimens.globalInputFieldleft,
+                      Dimens.globalInputFieldTop,
+                      Dimens.globalInputFieldRight,
+                      Dimens.globalInputFieldBottom),
+                  child: ElevatedButton(
+                    autofocus: false,
+                    style: ElevatedButton.styleFrom(
+                      primary: Shade.submitButtonColor,
+                      minimumSize: Size(double.infinity, 45),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    ),
+                    child: Text(Strings.submitGlobal),
+                    onPressed: () {
+                      onPressedSubmitButton();
+                    },
+                  ),
+                ),
+              )
             : Center(
-          child: CircularProgressIndicator(),
-        )
+                child: CircularProgressIndicator(),
+              )
       ],
     );
   }
+
   Widget widgetCircularProgress() {
     return Container(
       height: MediaQuery.of(context).size.height - 100,
@@ -320,26 +329,29 @@ class _EditRoomState extends State<EditRoom> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 50);
 
     Room obj = new Room(
-      id:arguments["Id"],
-      RoomNo:  RoomNo,
-      RoomType:  RoomType,
-      RoomCapacity:  RoomCapacity,
-      RoomCharges:  RoomCharges,
+      id: arguments["Id"],
+      RoomNo: RoomNo,
+      RoomType: RoomType,
+      RoomCapacity: RoomCapacity,
+      RoomCharges: RoomCharges,
     );
     var response = await roomservice.UpdateRoom(obj);
     print(response);
     if (response == true) {
       setState(() {
         loadingButtonProgressIndicator = false;
-
       });
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
-
               Text('Success:Room Updated'),
               Text(
                 RoomNo,
@@ -348,8 +360,10 @@ class _EditRoomState extends State<EditRoom> {
             ],
           )));
       formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeRoomList,arguments:{'Id': Id});
+      Navigator.pushNamed(context, Strings.routeRoomList,
+          arguments: {'Id': Id});
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

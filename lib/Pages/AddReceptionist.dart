@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class AddReceptionist extends StatefulWidget {
   @override
@@ -35,11 +36,14 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String Password;
   String UserName;
   String Experience;
+  SimpleFontelicoProgressDialog _dialog;
   ReceptionistService receptionistService;
 
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -627,6 +631,9 @@ class _AddReceptionistState extends State<AddReceptionist> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
     Employee obj = new Employee(
         employeeType: 'Receptionist',
@@ -651,6 +658,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -664,6 +672,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           )));
       formKey.currentState.reset();
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

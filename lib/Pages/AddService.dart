@@ -6,6 +6,7 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Models/Services.dart';
 import 'package:baby_doctor/Service/Service.dart' as DAL;
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class AddService extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _AddServiceState extends State<AddService> {
   final formKey = GlobalKey<FormState>();
   String name;
   String description;
+  SimpleFontelicoProgressDialog _dialog;
   bool loadingButtonProgressIndicator = false;
 
   Widget build(BuildContext context) {
@@ -93,7 +95,12 @@ class _AddServiceState extends State<AddService> {
       ],
     );
   }
-
+  @override
+  void initState() {
+    super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+  }
   Widget widgetDescription() {
     return Column(
       children: [
@@ -171,7 +178,9 @@ class _AddServiceState extends State<AddService> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
-
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
     DAL.Service service = new DAL.Service();
     Services obj = new Services(
         name: name,
@@ -183,6 +192,7 @@ class _AddServiceState extends State<AddService> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -196,6 +206,7 @@ class _AddServiceState extends State<AddService> {
           )));
       formKey.currentState.reset();
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

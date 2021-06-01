@@ -7,12 +7,14 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Doctor.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
+import 'package:baby_doctor/Models/Request/EmployeeModel.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditDoctor extends StatefulWidget {
   @override
@@ -23,6 +25,7 @@ class _EditDoctorState extends State<EditDoctor> {
   final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
   final DOBController = TextEditingController();
+  int id;
   String DOB;
   String FirstName;
   String LastName;
@@ -57,6 +60,7 @@ class _EditDoctorState extends State<EditDoctor> {
   TextEditingController _emergencyconsultationfeecontroller;
   TextEditingController _feesharecontroller;
   dynamic arguments;
+  SimpleFontelicoProgressDialog _dialog;
 
   List<Qualifications> qualificationList = [
     new Qualifications(
@@ -77,21 +81,24 @@ class _EditDoctorState extends State<EditDoctor> {
     super.initState();
     initVariablesAndClasses();
     new Future.delayed(Duration.zero, () {});
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
   void didChangeDependencies() async {
+
     setState(() {
       isLoading = true;
     });
 
     arguments = ModalRoute.of(context).settings.arguments as Map;
     doctorService = DoctorService();
-    print(arguments["Id"]);
+    id = arguments["Id"];
     if (arguments != null) {
       doctorService.getDoctorById(arguments["Id"]).then((value) {
         setState(() {
-          employeeId=value.employee.id;
+          employeeId = value.employee.id;
           _firstnamecontroller.text = value.employee.firstName;
           _lastnamecontroller.text = value.employee.lastName;
           _fatherhusbandnamecontroller.text = value.employee.fatherHusbandName;
@@ -100,11 +107,12 @@ class _EditDoctorState extends State<EditDoctor> {
           _addresscontroller.text = value.employee.address;
           _emailcontroller.text = value.employee.email;
           Gender = value.employee.gender;
-           Speciality = value.SpecialityType;
+          Speciality = value.SpecialityType;
           _cniccontroller.text = value.employee.CNIC;
           _experiencecontroller.text = value.employee.experience;
           _consultationfeecontroller.text = value.ConsultationFee.toString();
-          _emergencyconsultationfeecontroller.text = value.EmergencyConsultationFee.toString();
+          _emergencyconsultationfeecontroller.text =
+              value.EmergencyConsultationFee.toString();
           _feesharecontroller.text = value.ShareInFee.toString();
           joinDateController.text = value.employee.joiningDate;
           isLoading = false;
@@ -1220,9 +1228,7 @@ class _EditDoctorState extends State<EditDoctor> {
     });
   }
 
-  onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
+  void onPressedSubmitButton() async {
     List<dynamic> degrees = [];
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1234,77 +1240,46 @@ class _EditDoctorState extends State<EditDoctor> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines, width: MediaQuery.of(context).size.width-50);
 
-    Employee employee = new Employee(
-        id: employeeId,
-        employeeType: 'Doctor',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: 0,
-        password: "222222",
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
+    DoctorModel doctorModel = DoctorModel(
+        id,
+        employeeId,
+        ConsultationFee,
+        EmergencyConsultationFee,
+        FeeShare,
+        Speciality,
+        EmployeeModelDetails(
+            employeeId,
+            'Doctor',
+            FirstName,
+            LastName,
+            FatherHusbandName,
+            Gender,
+            CNIC,
+            ContactNumber,
+            EmergencyContactNumber,
+            Email,
+            Address,
+            JoiningDate,
+            UserName,
+            'Password',
+            2,
+            Experience, []));
 
-    var json = jsonEncode(employee.toJson());
-    print(json);
-
-    Doctor doctor = new Doctor(
-        id: arguments["Id"],
-        ConsultationFee: ConsultationFee,
-        EmergencyConsultationFee: EmergencyConsultationFee,
-        ShareInFee: FeeShare,
-        SpecialityType: Speciality,
-        employee: employee);
-
-    var response = await doctorService.UpdateDoctor(doctor);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-
+    bool hasUpdated = await doctorService.UpdateDoctor(doctorModel);
+    if (hasUpdated) {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Receptionist '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
+          content: Text('Success: Updated $FirstName')));
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+          content: Text('Error: Failed to update $FirstName')));
     }
   }
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
 }

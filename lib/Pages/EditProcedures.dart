@@ -4,6 +4,7 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
 import 'package:baby_doctor/Models/Procedures.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditProcedures extends StatefulWidget {
   @override
@@ -20,6 +21,7 @@ class _EditProceduresState extends State<EditProcedures> {
   double Share;
   bool loadingButtonProgressIndicator = false;
   bool isLoading = false;
+  SimpleFontelicoProgressDialog _dialog;
   ProcedureService procedureService;
   TextEditingController _namecontroller;
   TextEditingController _performedbycontroller;
@@ -31,10 +33,9 @@ class _EditProceduresState extends State<EditProcedures> {
   void initState() {
     super.initState();
     initVariablesAndClasses();
-
-    new Future.delayed(Duration.zero,() {
-
-    });
+    new Future.delayed(Duration.zero, () {});
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
   }
 
   @override
@@ -52,7 +53,6 @@ class _EditProceduresState extends State<EditProcedures> {
   }
 
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -81,11 +81,11 @@ class _EditProceduresState extends State<EditProcedures> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        if (!isLoading)  widgetProcedureName(),
+                        if (!isLoading) widgetProcedureName(),
                         if (!isLoading) widgetPerformedBy(),
                         if (!isLoading) widgetCharges(),
                         if (!isLoading) widgetShare(),
-                        if (!isLoading)  widgetSubmit(),
+                        if (!isLoading) widgetSubmit(),
                         if (isLoading) widgetCircularProgress(),
                       ],
                     ),
@@ -107,17 +107,19 @@ class _EditProceduresState extends State<EditProcedures> {
     arguments = ModalRoute.of(context).settings.arguments as Map;
 
     if (arguments != null) {
-      Procedures resp= await  procedureService.getProceduresById(arguments['Id']);
+      Procedures resp =
+          await procedureService.getProceduresById(arguments['Id']);
 
-        setState(() {
-          _namecontroller.text = resp.name;
-          _performedbycontroller.text = resp.performedBy;
-          _chargescontroller.text =resp.charges.toString();
-          _sharecontroller.text = resp.performerShare.toString();
-          isLoading = false;
-        });
+      setState(() {
+        _namecontroller.text = resp.name;
+        _performedbycontroller.text = resp.performedBy;
+        _chargescontroller.text = resp.charges.toString();
+        _sharecontroller.text = resp.performerShare.toString();
+        isLoading = false;
+      });
     }
   }
+
   Widget widgetCircularProgress() {
     return Container(
       height: MediaQuery.of(context).size.height - 100,
@@ -323,7 +325,10 @@ class _EditProceduresState extends State<EditProcedures> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
-
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 50);
     Procedures obj = new Procedures(
         id: arguments["Id"],
         name: ProcedureName,
@@ -336,6 +341,7 @@ class _EditProceduresState extends State<EditProcedures> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -350,6 +356,7 @@ class _EditProceduresState extends State<EditProcedures> {
       formKey.currentState.reset();
       Navigator.pushNamed(context, Strings.routeProcedureList);
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(
