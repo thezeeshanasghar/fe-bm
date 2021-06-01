@@ -362,6 +362,7 @@ class _EditRoomState extends State<EditRoom> {
       formKey.currentState.reset();
       Navigator.pushNamed(context, Strings.routeRoomList,
           arguments: {'Id': Id});
+      Navigator.pushNamed(context, Strings.routeRoomList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

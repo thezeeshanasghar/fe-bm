@@ -671,6 +671,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             ],
           )));
       formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeReceptionistList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

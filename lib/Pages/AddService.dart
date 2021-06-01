@@ -205,6 +205,7 @@ class _AddServiceState extends State<AddService> {
             ],
           )));
       formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeServiceList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

@@ -1275,6 +1275,7 @@ class _EditDoctorState extends State<EditDoctor> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Text('Success: Updated $FirstName')));
+      Navigator.pushNamed(context, Strings.routeDoctorList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

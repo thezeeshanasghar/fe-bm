@@ -1182,6 +1182,7 @@ class _AddDoctorState extends State<AddDoctor> {
               ),
             ],
           )));
+      Navigator.pushNamed(context, Strings.routeDoctorList);
       formKey.currentState.reset();
     } else {
       _dialog.hide();

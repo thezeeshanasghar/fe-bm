@@ -259,6 +259,7 @@ class _EditServiceState extends State<EditService> {
             ],
           )));
       formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeServiceList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

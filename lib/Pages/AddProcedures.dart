@@ -279,6 +279,7 @@ class _AddProceduresState extends State<AddProcedures> {
             ],
           )));
       formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeProcedureList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
