@@ -20,9 +20,10 @@ class ProcedureService {
       throw Exception('Failed to load Procedure');
     }
   }
+
   Future<dynamic> getProceduresById(int Id) async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
+        await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -52,14 +53,14 @@ class ProcedureService {
 
   Future<bool> UpdateProcedure(Procedures procedures) async {
     Map<String, dynamic> Obj = {
-      'id':procedures.id,
+      'id': procedures.id,
       'name': procedures.name,
       'performedBy': procedures.performedBy,
       'charges': procedures.charges,
       'performerShare': procedures.performerShare
     };
-    final response =
-        await http.put(Uri.https(Strings.pathAPI, 'api/procedure/${procedures.id}'),
+    final response = await http.put(
+        Uri.https(Strings.pathAPI, 'api/procedure/${procedures.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
