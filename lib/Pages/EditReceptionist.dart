@@ -1,21 +1,18 @@
-import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Employee.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
+import 'package:baby_doctor/Models/Employee.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-class AddReceptionist extends StatefulWidget {
+class EditReceptionist extends StatefulWidget {
   @override
-  _AddReceptionistState createState() => _AddReceptionistState();
+  _EditReceptionistState createState() => _EditReceptionistState();
 }
 
-class _AddReceptionistState extends State<AddReceptionist> {
+class _EditReceptionistState extends State<EditReceptionist> {
+  @override
   final formKey = GlobalKey<FormState>();
   final ReceptionistController = TextEditingController();
   final joinDateController = TextEditingController();
@@ -27,7 +24,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Gender = 'Choose Gender';
+  String Gender;
   int FlourNo;
   String JoiningDate;
   String DOB;
@@ -36,29 +33,61 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String Password;
   String UserName;
   String Experience;
-  SimpleFontelicoProgressDialog _dialog;
+  bool isLoading = false;
   ReceptionistService receptionistService;
+  SimpleFontelicoProgressDialog _dialog;
+  TextEditingController _firstnamecontroller;
+  TextEditingController _lastnamecontroller;
+  TextEditingController _usennamecontroller;
+  TextEditingController _cniccontroller;
+  TextEditingController _gendercontroller;
+  TextEditingController _flournocontroller;
+  TextEditingController _emailcontroller;
+  TextEditingController _passwwordcontroller;
+  TextEditingController _addresscontroller;
+  TextEditingController _contactnumbercontroller;
+  TextEditingController _emergencycontactnumbercontroller;
+  TextEditingController _fatherhusbandnamecontroller;
+  TextEditingController _dobcontroller;
+
+  dynamic arguments;
 
   @override
   void initState() {
     super.initState();
+    initVariablesAndClasses();
+    new Future.delayed(Duration.zero, () {});
     _dialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
   }
 
   @override
   void dispose() {
-    ReceptionistController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void initVariablesAndClasses() {
+    _firstnamecontroller = new TextEditingController();
+    _lastnamecontroller = new TextEditingController();
+    _usennamecontroller = new TextEditingController();
+    _cniccontroller = new TextEditingController();
+    _flournocontroller = new TextEditingController();
+    _emailcontroller = new TextEditingController();
+    _passwwordcontroller = new TextEditingController();
+    _addresscontroller = new TextEditingController();
+    _contactnumbercontroller = new TextEditingController();
+    _emergencycontactnumbercontroller = new TextEditingController();
+    _fatherhusbandnamecontroller = new TextEditingController();
+    _dobcontroller = new TextEditingController();
+
     receptionistService = ReceptionistService();
+  }
+
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddReceptionist),
+        title: Text(Strings.titleEditReceptionist),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -73,39 +102,71 @@ class _AddReceptionistState extends State<AddReceptionist> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          widgetFirstName(),
-                          widgetLastName(),
-                          widgetFatherHusbandName(),
-                          widgetUserName(),
-                          widgetPassword(),
-                          widgetGender(),
-                          widgetDob(),
-                          widgetCnicNumber(),
-                          widgetContactNumber(),
-                          widgetEmail(),
-                          widgetAddress(),
-                          widgetFlourNo(),
-                          widgetJoiningDate(),
-                          widgetSubmit()
-                        ],
-                      ),
-                    )),
+                  padding: EdgeInsets.fromLTRB(
+                      Dimens.globalPaddingLeft,
+                      Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight,
+                      Dimens.globalPaddingBottom),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        if (!isLoading) widgetFirstName(),
+                        if (!isLoading) widgetLastName(),
+                        if (!isLoading) widgetFatherHusbandName(),
+                        if (!isLoading) widgetUserName(),
+                        if (!isLoading) widgetPassword(),
+                        if (!isLoading) widgetGender(),
+                        if (!isLoading) widgetDob(),
+                        if (!isLoading) widgetCnicNumber(),
+                        if (!isLoading) widgetContactNumber(),
+                        if (!isLoading) widgetEmail(),
+                        if (!isLoading) widgetAddress(),
+                        if (!isLoading) widgetFlourNo(),
+                        if (!isLoading) widgetJoiningDate(),
+                        if (!isLoading) widgetSubmit(),
+                        if (isLoading) widgetCircularProgress(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             );
           },
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    receptionistService = ReceptionistService();
+    print(arguments["Id"]);
+    if (arguments != null) {
+      receptionistService.getReceptionistById(arguments["Id"]).then((value) {
+        setState(() {
+          _firstnamecontroller.text = value.firstName;
+          _lastnamecontroller.text = value.lastName;
+          _usennamecontroller.text = value.userName;
+          _cniccontroller.text = value.CNIC;
+          Gender = value.gender;
+          _flournocontroller.text = value.flourNo.toString();
+          _emailcontroller.text = value.email;
+          _passwwordcontroller.text = value.password;
+          _addresscontroller.text = value.address.toString();
+          _contactnumbercontroller.text = value.contact;
+          _emergencycontactnumbercontroller.text = value.emergencyContact;
+          _fatherhusbandnamecontroller.text = value.fatherHusbandName;
+          joinDateController.text = value.joiningDate;
+          isLoading = false;
+        });
+      });
+    }
   }
 
   Widget widgetFirstName() {
@@ -120,6 +181,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
+            controller: _firstnamecontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
@@ -151,6 +213,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _lastnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -181,6 +244,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _fatherhusbandnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -211,6 +275,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _usennamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.supervised_user_circle),
                   border: OutlineInputBorder(),
@@ -241,6 +306,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _passwwordcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.lock_outline_rounded),
                   border: OutlineInputBorder(),
@@ -318,6 +384,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
+            controller: _cniccontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
@@ -354,6 +421,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
+              controller: _contactnumbercontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -391,6 +459,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
+              controller: _emailcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
@@ -427,6 +496,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
+              controller: _addresscontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
@@ -523,6 +593,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
+              controller: _flournocontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -551,6 +622,30 @@ class _AddReceptionistState extends State<AddReceptionist> {
   Widget widgetSizedBox() {
     return SizedBox(
       height: 30,
+    );
+  }
+
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -637,6 +732,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
 
     Employee obj = new Employee(
         employeeType: 'Receptionist',
+        id: arguments["Id"],
         firstName: FirstName,
         lastName: LastName,
         fatherHusbandName: FatherHusbandName,
@@ -652,7 +748,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
         // DOB: DOB,
         address: Address,
         email: Email);
-    var response = await receptionistService.InsertReceptionist(obj);
+    var response = await receptionistService.UpdateReceptionist(obj);
     print(response);
     if (response == true) {
       setState(() {
@@ -663,7 +759,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
-              Text('Success: Created Receptionist '),
+              Text('Success: Updated Receptionist '),
               Text(
                 FirstName + ' ' + LastName,
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -690,4 +786,5 @@ class _AddReceptionistState extends State<AddReceptionist> {
       });
     }
   }
+
 }

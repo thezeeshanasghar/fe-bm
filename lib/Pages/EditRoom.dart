@@ -1,31 +1,41 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Service/RoomService.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
-import 'package:baby_doctor/Models/Procedures.dart';
+
+import 'package:baby_doctor/Models/Room.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-class AddProcedures extends StatefulWidget {
+class EditRoom extends StatefulWidget {
   @override
-  _AddProceduresState createState() => _AddProceduresState();
+  _EditRoomState createState() => _EditRoomState();
 }
 
-class _AddProceduresState extends State<AddProcedures> {
+class _EditRoomState extends State<EditRoom> {
   @override
   final formKey = GlobalKey<FormState>();
-  String ProcedureName;
-  String PerformedBy;
-  double Charges;
-  double Share;
-  SimpleFontelicoProgressDialog _dialog;
+  String Id;
+  String RoomNo;
+  String RoomType;
+  int RoomCapacity;
+  double RoomCharges;
+  bool isLoading = false;
   bool loadingButtonProgressIndicator = false;
+  RoomService roomservice;
+  SimpleFontelicoProgressDialog _dialog;
+  TextEditingController _roomnocontroller;
+  TextEditingController _roomtypecontroller;
+  TextEditingController _roomcapacitycontroller;
+  TextEditingController _roomchargescontroller;
+
+  dynamic arguments;
 
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddProcedures),
+        title: Text(Strings.titleEditRoom),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -50,11 +60,12 @@ class _AddProceduresState extends State<AddProcedures> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetProcedureName(),
-                        widgetPerformedBy(),
-                        widgetCharges(),
-                        widgetShare(),
-                        widgetSubmit()
+                        if (!isLoading) widgetRoomNo(),
+                        if (!isLoading) widgetRoomType(),
+                        if (!isLoading) widgetRoomCapacity(),
+                        if (!isLoading) widgetRoomCharges(),
+                        if (!isLoading) widgetSubmit(),
+                        if (isLoading) widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -66,6 +77,7 @@ class _AddProceduresState extends State<AddProcedures> {
       ),
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +85,30 @@ class _AddProceduresState extends State<AddProcedures> {
         context: context, barrierDimisable: false);
   }
 
-  Widget widgetProcedureName() {
+  @override
+  void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    roomservice = RoomService();
+    print(arguments["Id"]);
+    if (arguments != null) {
+      roomservice.getRoomById(arguments["Id"]).then((value) {
+        setState(() {
+          _roomnocontroller = new TextEditingController(text: value["roomNo"]);
+          RoomType = value["roomType"];
+          _roomcapacitycontroller =
+              new TextEditingController(text: value["roomCapacity"].toString());
+          _roomchargescontroller =
+              new TextEditingController(text: value["roomCharges"].toString());
+          isLoading = false;
+        });
+      });
+    }
+  }
+
+  Widget widgetRoomNo() {
     return Column(
       children: [
         Padding(
@@ -85,10 +120,11 @@ class _AddProceduresState extends State<AddProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
+            controller: _roomnocontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
-                labelText: 'Procedure Name'),
+                labelText: 'Room No'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -96,7 +132,7 @@ class _AddProceduresState extends State<AddProcedures> {
               return null;
             },
             onSaved: (String value) {
-              ProcedureName = value;
+              RoomNo = value;
             },
           ),
         ),
@@ -104,38 +140,55 @@ class _AddProceduresState extends State<AddProcedures> {
     );
   }
 
-  Widget widgetPerformedBy() {
+  Widget widgetRoomType() {
     return Column(
-      children: [
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(
               Dimens.globalInputFieldleft,
               Dimens.globalInputFieldTop,
               Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
-          child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Performed By'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              PerformedBy = value;
-            },
+              Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.grey)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: RoomType,
+                elevation: 16,
+                underline: Container(
+                  height: 0,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    RoomType = newValue;
+                  });
+                },
+                items: <String>[
+                  'Choose Room Type',
+                  'Room Type 1',
+                  'Room Type 2',
+                  'Other',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget widgetCharges() {
+  Widget widgetRoomCharges() {
     return Column(
       children: [
         Padding(
@@ -147,11 +200,12 @@ class _AddProceduresState extends State<AddProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
+            controller: _roomcapacitycontroller,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
-                labelText: 'Charges'),
+                labelText: 'Room Charges'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -162,7 +216,7 @@ class _AddProceduresState extends State<AddProcedures> {
               return null;
             },
             onSaved: (String value) {
-              Charges = double.parse(value);
+              RoomCharges = double.parse(value);
             },
           ),
         ),
@@ -170,7 +224,7 @@ class _AddProceduresState extends State<AddProcedures> {
     );
   }
 
-  Widget widgetShare() {
+  Widget widgetRoomCapacity() {
     return Column(
       children: [
         Padding(
@@ -181,23 +235,24 @@ class _AddProceduresState extends State<AddProcedures> {
               Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 3,
+            maxLength: 5,
+            controller: _roomchargescontroller,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
-                labelText: 'Performer Share'),
+                labelText: 'Room Capacity'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              //if(value>=0 || value<=100){
-              // return 'This field cannot be empty';
-              //}
+              if (double.tryParse(value) <= 0) {
+                return 'Input Error: cannot enter negative digits';
+              }
               return null;
             },
             onSaved: (String value) {
-              Share = double.tryParse(value);
+              RoomCapacity = int.parse(value);
             },
           ),
         ),
@@ -239,6 +294,30 @@ class _AddProceduresState extends State<AddProcedures> {
     );
   }
 
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -252,15 +331,17 @@ class _AddProceduresState extends State<AddProcedures> {
     formKey.currentState.save();
     _dialog.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 50);
 
-    DAL.ProcedureService service = new DAL.ProcedureService();
-    Procedures obj = new Procedures(
-        name: ProcedureName,
-        performedBy: PerformedBy,
-        charges: Charges,
-        performerShare: Share);
-    var response = await service.InsertProcedure(obj);
+    Room obj = new Room(
+      id: arguments["Id"],
+      RoomNo: RoomNo,
+      RoomType: RoomType,
+      RoomCapacity: RoomCapacity,
+      RoomCharges: RoomCharges,
+    );
+    var response = await roomservice.UpdateRoom(obj);
     print(response);
     if (response == true) {
       setState(() {
@@ -271,24 +352,26 @@ class _AddProceduresState extends State<AddProcedures> {
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
-              Text('Success: Created procedure '),
+              Text('Success:Room Updated'),
               Text(
-                ProcedureName,
+                RoomNo,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
           )));
       formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeProcedureList);
+      Navigator.pushNamed(context, Strings.routeRoomList,
+          arguments: {'Id': Id});
+      Navigator.pushNamed(context, Strings.routeRoomList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(
             children: [
-              Text('Error: Try Again: Failed to add '),
+              Text('Error: Try Again: Failed to edit '),
               Text(
-                ProcedureName,
+                RoomNo,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

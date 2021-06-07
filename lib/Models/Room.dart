@@ -3,24 +3,24 @@ class Room {
   final int id;
   final String RoomNo;
   final String RoomType;
-  final double RoomCapacity;
-  final double Charges;
+  final int RoomCapacity;
+  final double RoomCharges;
 
   Room({
     this.id,
     @required this.RoomNo,
     @required this.RoomType,
     @required this.RoomCapacity,
-    @required this.Charges
+    @required this.RoomCharges
   });
 
   factory Room.fromJson(Map<String, dynamic> json) {
     return Room(
       id: json['id'],
-      RoomNo: json['RoomNo'],
-      RoomType: json['RoomType'],
-      RoomCapacity: json['RoomCapacity'],
-      Charges: json['Charges'],
+      RoomNo: json['roomNo'],
+      RoomType: json['roomType'],
+      RoomCapacity: json['roomCapacity'],
+      RoomCharges: json['roomCharges'],
     );
   }
 }

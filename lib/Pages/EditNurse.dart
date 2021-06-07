@@ -4,63 +4,74 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Doctor.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import '../Models/Request/EmployeeModel.dart';
+import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
-import 'package:baby_doctor/Service/DoctorService.dart';
+import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-class AddDoctor extends StatefulWidget {
+class EditNurse extends StatefulWidget {
   @override
-  _AddDoctorState createState() => _AddDoctorState();
+  _EditNurseState createState() => _EditNurseState();
 }
 
-class _AddDoctorState extends State<AddDoctor> {
+class _EditNurseState extends State<EditNurse> {
   final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
-  final DOBController = TextEditingController();
-  String DOB;
+
+  int id;
   String FirstName;
   String LastName;
   String FatherHusbandName;
+  String Gender = 'Choose Gender';
   String CNIC;
   String ContactNumber;
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Gender = 'Choose Gender';
   String Speciality;
-  SimpleFontelicoProgressDialog _dialog;
-  int ConsultationFee = 10;
-  int EmergencyConsultationFee = 10;
-  String Experience;
-  int FeeShare = 10;
-  String JoiningDate;
-  String Password = "222222";
+  int DutyDuration;
   String UserName;
-  DoctorService doctorService;
-  List<Qualifications> qualificationList = [
-    new Qualifications(
-        employeeId: "", certificate: "", description: "", qualificationType: "")
-  ];
-  List<Qualifications> diplomaList = [
-    new Qualifications(
-        employeeId: "", certificate: "", description: "", qualificationType: "")
-  ];
-
+  int EmergencyConsultationFee;
+  int FeeShare;
+  String Experience;
+  int ProceduresShare;
+  int Salary;
+  String JoiningDate;
+  int employeeId;
+  bool isLoading = false;
+  NurseService nurseService;
+  List<String> qualificationList = [''];
+  bool loadingButtonProgressIndicator = false;
+  dynamic arguments;
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
-  Image image;
-  bool loadingButtonProgressIndicator = false;
+  SimpleFontelicoProgressDialog _dialog;
+  TextEditingController _firstnamecontroller;
+  TextEditingController _lastnamecontroller;
+  TextEditingController _fatherhusbandnamecontroller;
+  TextEditingController _contacnumbercontroller;
+  TextEditingController _emergencycontactcontroller;
+  TextEditingController _addresscontroller;
+  TextEditingController _consultationfeecontroller;
+  TextEditingController _emailcontroller;
+  TextEditingController _cniccontroller;
+  TextEditingController _experiencecontroller;
+  TextEditingController _dutydurationcontroller;
+  TextEditingController _salerycontroller;
+  TextEditingController _proceduressharecontroller;
 
   @override
   void initState() {
     super.initState();
+    initVariablesAndClasses();
+    new Future.delayed(Duration.zero, () {});
     _dialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
   }
@@ -71,12 +82,62 @@ class _AddDoctorState extends State<AddDoctor> {
   }
 
   @override
+  void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    nurseService = NurseService();
+    id = arguments["Id"];
+    if (arguments != null) {
+      nurseService.getNurseById(arguments["Id"]).then((value) {
+        setState(() {
+          employeeId = value.employee.id;
+          _firstnamecontroller.text = value.employee.firstName;
+          _lastnamecontroller.text = value.employee.lastName;
+          _fatherhusbandnamecontroller.text = value.employee.fatherHusbandName;
+          _contacnumbercontroller.text = value.employee.contact;
+          _emergencycontactcontroller.text = value.employee.emergencyContact;
+          _addresscontroller.text = value.employee.address;
+          _emailcontroller.text = value.employee.email;
+          Gender = value.employee.gender;
+          _cniccontroller.text = value.employee.CNIC;
+          _experiencecontroller.text = value.employee.experience;
+          _dutydurationcontroller.text = value.DutyDuration.toString();
+          _proceduressharecontroller.text = value.SharePercentage.toString();
+          _salerycontroller.text = value.Salary.toString();
+          joinDateController.text = value.employee.joiningDate;
+          isLoading = false;
+        });
+      });
+    }
+  }
+
+  void initVariablesAndClasses() {
+    _firstnamecontroller = new TextEditingController();
+    _lastnamecontroller = new TextEditingController();
+    _addresscontroller = new TextEditingController();
+    _cniccontroller = new TextEditingController();
+    _emailcontroller = new TextEditingController();
+    _experiencecontroller = new TextEditingController();
+    _addresscontroller = new TextEditingController();
+    _contacnumbercontroller = new TextEditingController();
+    _emergencycontactcontroller = new TextEditingController();
+    _fatherhusbandnamecontroller = new TextEditingController();
+    _dutydurationcontroller = new TextEditingController();
+    _proceduressharecontroller = new TextEditingController();
+    _salerycontroller = new TextEditingController();
+
+    nurseService = NurseService();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    doctorService = DoctorService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddDoctor),
+        title: Text(Strings.titleEditNurse),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -101,26 +162,25 @@ class _AddDoctorState extends State<AddDoctor> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          widgetFirstName(),
-                          widgetLastName(),
-                          widgetFatherOrHusbandName(),
-                          widgetGender(),
-                          widgetCnicNumber(),
-                          widgetContactNumber(),
-                          widgetEmergencyContactNumber(),
-                          widgetEmail(),
-                          widgetAddress(),
-                          widgetSpeciality(),
-                          widgetExperience(),
-                          widgetConsultationFee(),
-                          widgetEmergencyConsultationFee(),
-                          widgetFeeShare(),
-                          widgetJoiningDate(),
-                          widgetSizedBox(),
-                          ...widgetQualification(),
-                          widgetSizedBox(),
-                          ...widgetDiplomas(),
-                          widgetSubmit()
+                          // widgetProfileImage(),
+                          // widgetSizedBox(),
+                          if (!isLoading) widgetFirstName(),
+                          if (!isLoading) widgetLastName(),
+                          if (!isLoading) widgetFatherOrHusbandName(),
+                          if (!isLoading) widgetGender(),
+                          if (!isLoading) widgetCnicNumber(),
+                          if (!isLoading) widgetContactNumber(),
+                          if (!isLoading) widgetEmergencyContactNumber(),
+                          if (!isLoading) widgetEmail(),
+                          if (!isLoading) widgetExperience(),
+                          if (!isLoading) widgetAddress(),
+                          if (!isLoading) widgetDuration(),
+                          if (!isLoading) widgetJoiningDate(),
+                          if (!isLoading) widgetProcedureShare(),
+                          if (!isLoading) widgetSalary(),
+                          if (!isLoading) ...widgetQualification(),
+                          if (!isLoading) widgetSubmit(),
+                          if (isLoading) widgetCircularProgress(),
                         ],
                       ),
                     )),
@@ -132,101 +192,32 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-  Widget widgetUserName() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.supervised_user_circle),
-                  border: OutlineInputBorder(),
-                  labelText: 'User Name'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                UserName = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  Widget widgetPassword() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline_rounded),
-                  border: OutlineInputBorder(),
-                  labelText: 'Password'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                Password = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  // widget functions
-  Widget widgetDob() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
-          child: TextFormField(
-            controller: DOBController,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.date_range),
-              border: OutlineInputBorder(),
-              labelText: 'Date Of Birth',
-            ),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-            },
-            onSaved: (String value) {
-              DOB = value;
-            },
-            onTap: () {
-              pickDateDob();
-            },
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  pickDateDob() async {
+  // functions required for working
+  pickDate() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -234,12 +225,20 @@ class _AddDoctorState extends State<AddDoctor> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        DOB = date.toString();
-        DOBController.text = DOB.toString();
+        JoiningDate = date.toString();
+        joinDateController.text = JoiningDate.toString();
       });
     }
   }
 
+  void takePhotoFromPhone(ImageSource source) async {
+    final pickedFile = await _imagePicker.getImage(source: source);
+    setState(() {
+      _imageFile = pickedFile;
+    });
+  }
+
+  // widget functions
   List<Widget> widgetQualification() {
     List<Widget> qualificationWidgetList = [];
 
@@ -302,20 +301,14 @@ class _AddDoctorState extends State<AddDoctor> {
                               return null;
                             },
                             onSaved: (String value) {
-                              setState(() {
-                                qualificationList[i] = new Qualifications(
-                                    certificate: "",
-                                    description: value,
-                                    qualificationType: "Qualification");
-                              });
+
                             },
                           ),
                         ),
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(i == qualificationList.length - 1, i,
-                            qualificationList)
+                        _addRemoveButton(i == qualificationList.length - 1, i)
                       ],
                     ),
                   ],
@@ -327,13 +320,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return qualificationWidgetList;
   }
 
-  Widget _addRemoveButton(bool add, int index, List<Qualifications> list) {
+  Widget _addRemoveButton(bool add, int index) {
     return InkWell(
       onTap: () {
         if (add) {
-          list.insert(0, null);
+          qualificationList.insert(0, null);
         } else {
-          list.removeAt(index);
+          qualificationList.removeAt(index);
         }
         setState(() {});
       },
@@ -349,120 +342,6 @@ class _AddDoctorState extends State<AddDoctor> {
           color: Colors.white,
         ),
       ),
-    );
-  }
-
-  List<Widget> widgetDiplomas() {
-    List<Widget> diplomaWidgetList = [];
-
-    for (int i = 0; i < diplomaList.length; i++) {
-      diplomaWidgetList.add(Column(
-        children: [
-          Card(
-            color: Colors.grey[100],
-            shadowColor: Colors.grey,
-            child: Padding(
-                padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Column(
-                          children: [
-                            Stack(
-                              children: <Widget>[
-                                CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage: _imageFile != null
-                                      ? FileImage(File(_imageFile.path))
-                                      : AssetImage('assets/diplomas.png'),
-                                ),
-                                Positioned(
-                                    bottom: 10.0,
-                                    right: 10.0,
-                                    child: InkWell(
-                                      onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
-                                      },
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.teal,
-                                        size: 22,
-                                      ),
-                                    ))
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Diplomas'),
-                            validator: (String value) {
-                              if (value == null || value.isEmpty) {
-                                return 'This field cannot be empty';
-                              }
-                              return null;
-                            },
-                            onSaved: (String value) {
-                              setState(() {
-                                // diplomaList[i]=value;
-                              });
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        _addRemoveButton(
-                            i == diplomaList.length - 1, i, diplomaList)
-                      ],
-                    ),
-                  ],
-                )),
-          ),
-        ],
-      ));
-    }
-    return diplomaWidgetList;
-  }
-
-  Widget widgetExperience() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
-          child: TextFormField(
-            autofocus: false,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.date_range_sharp),
-                border: OutlineInputBorder(),
-                labelText: 'Experience'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              Experience = value;
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -495,6 +374,100 @@ class _AddDoctorState extends State<AddDoctor> {
                   ))
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetFirstName() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
+          child: TextFormField(
+            autofocus: false,
+            maxLength: 15,
+            controller: _firstnamecontroller,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                border: OutlineInputBorder(),
+                labelText: 'First Name'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              FirstName = value;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetLastName() {
+    return Column(
+      children: [
+        Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: TextFormField(
+              autofocus: false,
+              maxLength: 15,
+              controller: _lastnamecontroller,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Last Name'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                LastName = value;
+              },
+            )),
+      ],
+    );
+  }
+
+  Widget widgetFatherOrHusbandName() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
+          child: TextFormField(
+              autofocus: false,
+              maxLength: 30,
+              controller: _fatherhusbandnamecontroller,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
+                  labelText: 'Father Name OR Husband Name'),
+              validator: (String value) {
+                if (value == null || value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                FatherHusbandName = value;
+              }),
         ),
       ],
     );
@@ -547,97 +520,6 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-  Widget widgetFirstName() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
-          child: TextFormField(
-            autofocus: false,
-            maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'First Name'),
-            validator: (String value) {
-              if (value == null || value.isEmpty) {
-                return 'This field cannot be empty';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              FirstName = value;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget widgetLastName() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Last Name'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                LastName = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  Widget widgetFatherOrHusbandName() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
-          child: TextFormField(
-              autofocus: false,
-              maxLength: 30,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Father Name OR Husband Name'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                FatherHusbandName = value;
-              }),
-        ),
-      ],
-    );
-  }
-
   Widget widgetCnicNumber() {
     return Column(
       children: [
@@ -650,6 +532,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
+            controller: _cniccontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
@@ -686,6 +569,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
+              controller: _contacnumbercontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -723,6 +607,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
+              controller: _emergencycontactcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -760,6 +645,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
+              controller: _emailcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
@@ -796,6 +682,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
+              controller: _addresscontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
@@ -814,55 +701,38 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-  Widget widgetSpeciality() {
+  Widget widgetExperience() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
+      children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(
               Dimens.globalInputFieldleft,
               Dimens.globalInputFieldTop,
               Dimens.globalInputFieldRight,
               Dimens.globalInputFieldBottomWithoutMaxLength),
-          child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                value: Speciality,
-                elevation: 16,
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
-                onChanged: (String newValue) {
-                  setState(() {
-                    Speciality = newValue;
-                  });
-                },
-                items: <String>[
-                  'Select Speciality',
-                  'Speciality 1',
-                  'Speciality 2',
-                  'Other',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            ),
+          child: TextFormField(
+            autofocus: false,
+            controller: _experiencecontroller,
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.date_range_sharp),
+                border: OutlineInputBorder(),
+                labelText: 'Experience'),
+            validator: (String value) {
+              if (value == null || value.isEmpty) {
+                return 'This field cannot be empty';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              Experience = value;
+            },
           ),
         ),
       ],
     );
   }
 
-  Widget widgetConsultationFee() {
+  Widget widgetSalary() {
     return Column(
       children: [
         Padding(
@@ -873,11 +743,12 @@ class _AddDoctorState extends State<AddDoctor> {
               Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
-              maxLength: 4,
+              maxLength: 5,
+              controller: _salerycontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
-                  labelText: 'Consultation Fee'),
+                  labelText: 'Salary'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
@@ -892,51 +763,14 @@ class _AddDoctorState extends State<AddDoctor> {
                 return null;
               },
               onSaved: (String value) {
-                ConsultationFee = int.parse(value);
+                Salary = int.parse(value);
               }),
         ),
       ],
     );
   }
 
-  Widget widgetEmergencyConsultationFee() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
-          child: TextFormField(
-              autofocus: false,
-              maxLength: 4,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on),
-                  border: OutlineInputBorder(),
-                  labelText: 'Emergency Consultation Fee'),
-              validator: (String value) {
-                if (value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                int _cFee = int.tryParse(value);
-                if (_cFee == null && !value.isEmpty) {
-                  return 'Input Error: fee must be in numeric form\nCorrect Syntax: 2000';
-                }
-                if (_cFee <= 0) {
-                  return 'Input Error: cannot enter negative digits\nCorrect Syntax: 2000';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                ConsultationFee = int.parse(value);
-              }),
-        ),
-      ],
-    );
-  }
-
-  Widget widgetFeeShare() {
+  Widget widgetProcedureShare() {
     return Column(
       children: [
         Padding(
@@ -948,17 +782,18 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
+              controller: _proceduressharecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
-                  labelText: 'Fee Share (in percentage %)'),
+                  labelText: 'Procedures Share (in percentage %)'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
                 }
                 int _cFee = int.tryParse(value);
                 if (_cFee == null && !value.isEmpty) {
-                  return 'Input Error: fee must be in numeric form\nCorrect Syntax: 20';
+                  return 'Input Error: Procedures Share must be in numeric form\nCorrect Syntax: 20';
                 }
                 if (_cFee <= 0) {
                   return 'Input Error: cannot enter negative digits\nCorrect Syntax: 20';
@@ -969,7 +804,48 @@ class _AddDoctorState extends State<AddDoctor> {
                 return null;
               },
               onSaved: (String value) {
-                ConsultationFee = int.parse(value);
+                ProceduresShare = int.parse(value);
+              }),
+        ),
+      ],
+    );
+  }
+
+  Widget widgetDuration() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
+          child: TextFormField(
+              autofocus: false,
+              maxLength: 2,
+              controller: _dutydurationcontroller,
+              decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.monetization_on),
+                  border: OutlineInputBorder(),
+                  labelText: 'Duty Duration (in hrs)'),
+              validator: (String value) {
+                if (value.isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                int _cFee = int.tryParse(value);
+                if (_cFee == null && !value.isEmpty) {
+                  return 'Input Error: Duty Duration must be in numeric form\nCorrect Syntax: 8';
+                }
+                if (_cFee <= 0) {
+                  return 'Input Error: cannot enter negative digits\nCorrect Syntax: 20';
+                }
+                if (_cFee > 24) {
+                  return 'Input Error: Duty Duration cannot be greater than 24\nCorrect Syntax: 8';
+                }
+                return null;
+              },
+              onSaved: (String value) {
+                DutyDuration = int.parse(value);
               }),
         ),
       ],
@@ -984,7 +860,7 @@ class _AddDoctorState extends State<AddDoctor> {
               Dimens.globalInputFieldleft,
               Dimens.globalInputFieldTop,
               Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+              Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
@@ -1064,7 +940,6 @@ class _AddDoctorState extends State<AddDoctor> {
               TextButton.icon(
                   onPressed: () {
                     if (kIsWeb) {
-                      // takePhotoFromWeb();
                       takePhotoFromPhone(ImageSource.gallery);
                     } else {
                       takePhotoFromPhone(ImageSource.camera);
@@ -1078,7 +953,6 @@ class _AddDoctorState extends State<AddDoctor> {
               TextButton.icon(
                   onPressed: () {
                     if (kIsWeb) {
-                      // takePhotoFromWeb();
                       takePhotoFromPhone(ImageSource.gallery);
                     } else {
                       takePhotoFromPhone(ImageSource.gallery);
@@ -1093,34 +967,7 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-
-
-
-  // functions required for working
-  pickDate() async {
-    DateTime date = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2014),
-        lastDate: DateTime(DateTime.now().year + 1));
-    if (date != null) {
-      setState(() {
-        JoiningDate = date.toString();
-        joinDateController.text = JoiningDate.toString();
-      });
-    }
-  }
-
-  void takePhotoFromPhone(ImageSource source) async {
-    final pickedFile = await _imagePicker.getImage(source: source);
-    setState(() {
-      _imageFile = pickedFile;
-    });
-  }
-
-  onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
+  void onPressedSubmitButton() async {
     List<dynamic> degrees = [];
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1134,78 +981,47 @@ class _AddDoctorState extends State<AddDoctor> {
     formKey.currentState.save();
     _dialog.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+        type: SimpleFontelicoProgressDialogType.multilines, width: MediaQuery.of(context).size.width-50);
 
-    Employee employee = new Employee(
-        employeeType: 'Doctor',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: 0,
-        password: "222222",
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
+    NurseModel nurseModel = NurseModel(
+        id,
+        employeeId,
+        DutyDuration,
+        ProceduresShare,
+        Salary,
+        EmployeeModelDetails(
+            employeeId,
+            'Nurse',
+            FirstName,
+            LastName,
+            FatherHusbandName,
+            Gender,
+            CNIC,
+            ContactNumber,
+            EmergencyContactNumber,
+            Email,
+            Address,
+            JoiningDate,
+            UserName,
+            'Password',
+            2,
+            Experience, []));
 
-    var json = jsonEncode(employee.toJson());
-    print(json);
+    print(nurseModel.employeeModelDetails.firstName);
 
-    Doctor doctor = new Doctor(
-        ConsultationFee: ConsultationFee,
-        EmergencyConsultationFee: EmergencyConsultationFee,
-        ShareInFee: FeeShare,
-        SpecialityType: Speciality,
-        employee: employee);
-
-    var response = await doctorService.InsertDoctor(doctor);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+    bool hasUpdated = await nurseService.UpdateNurse(nurseModel);
+    if (hasUpdated) {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Doctor '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      Navigator.pushNamed(context, Strings.routeDoctorList);
-      formKey.currentState.reset();
+          content: Text('Success: Updated $FirstName')));
+
+      Navigator.pushNamed(context, Strings.routeNurseList);
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+          content: Text('Error: Failed to update $FirstName')));
     }
   }
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
 }

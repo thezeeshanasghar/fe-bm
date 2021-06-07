@@ -16,13 +16,15 @@ class ReceptionistService {
       throw Exception('Failed to load Employee');
     }
   }
-  Future<dynamic> getReceptionistById(int Id) async {
+
+  Future<Employee> getReceptionistById(int Id) async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/Employee/${Id}'));
+    await http.get(Uri.https(Strings.pathAPI, 'api/employee/${Id}'));
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final JsonResponse= jsonDecode(response.body);
+      return Employee.fromJson(JsonResponse);
     } else {
-      throw Exception('Failed to load Employee');
+      throw Exception('Failed to load Receptionist');
     }
   }
   Future<bool> InsertReceptionist(Employee employee) async {
@@ -56,6 +58,7 @@ class ReceptionistService {
       return false;
     }
   }
+
   Future<bool> UpdateReceptionist(Employee employee) async {
     Map<String, dynamic> Obj = {
       'id':employee.id,
@@ -81,7 +84,7 @@ class ReceptionistService {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(Obj));
-    if (response.statusCode == 201) {
+    if (response.statusCode == 204) {
       return true;
     } else {
       return false;

@@ -138,6 +138,7 @@ class _ProcedureListState extends State<ProcedureList> {
         "Charges": procedures.charges,
         "Share": procedures.performerShare,
         "Action": procedures.id,
+
       });
     }
     return tempsprocedure;
@@ -294,9 +295,7 @@ class _ProcedureListState extends State<ProcedureList> {
   }
 
   void onPressedEditFromTable(Id, row) {
-    print(Id);
     Navigator.pushNamed(context, Strings.routeEditProcedure,arguments:{'Id': Id});
-    print(Id);
   }
 
   void onPressedDeleteFromTable(Id, row) {

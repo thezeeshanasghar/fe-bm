@@ -1,11 +1,12 @@
-import 'dart:math';
-
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Nurse.dart';
+import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class NurseList extends StatefulWidget {
   @override
@@ -15,27 +16,32 @@ class NurseList extends StatefulWidget {
 class _NurseListState extends State<NurseList> {
   final formKey = GlobalKey<FormState>();
 
-  // nurseList Data
-  List<DatatableHeader> nurseListHeaders = [];
-  List<int> nurseListPerPage = [5, 10, 15, 100];
-  int nurseListTotal = 100;
-  int nurseListCurrentPerPage;
-  int nurseListCurrentPage = 1;
-  bool nurseListIsSearch = false;
-  List<Map<String, dynamic>> nurseListIsSource = [];
-  List<Map<String, dynamic>> nurseListSelecteds = [];
-  String nurseListSelectableKey = "Invoice";
-  String nurseListSortColumn;
-  bool nurseListSortAscending = true;
-  bool nurseListIsLoading = true;
-  bool nurseListShowSelect = false;
+  int nurseTotal;
+  int nurseCurrentPerPage;
+  int nurseCurrentPage;
+  bool nurseIsSearch;
+  String nurseSelectableKey;
+  String nurseSortColumn;
+  bool nurseSortAscending;
+  bool nurseIsLoading;
+  bool nurseShowSelect;
+  bool showSearchedList;
+
+  List<DatatableHeader> nurseHeaders;
+  List<int> nursePerPage;
+  List<Map<String, dynamic>> nurseIsSource;
+  List<Map<String, dynamic>> nurseIsSearched;
+  List<Map<String, dynamic>> nurseSelecteds;
+  List<Nurse> listNurses;
+
+  NurseService nurseService;
 
   @override
   void initState() {
     super.initState();
-    // nurseList
+    initVariablesAndClasses();
     initializenurseListHeaders();
-    nurseListInitData();
+    getNursesFromApiAndLinkToTable();
   }
 
   @override
@@ -73,7 +79,7 @@ class _NurseListState extends State<NurseList> {
                         key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[widgetnurseListPatients()],
+                          children: <Widget>[widgetnursePatients()],
                         ),
                       )),
                 ),
@@ -91,203 +97,79 @@ class _NurseListState extends State<NurseList> {
         ));
   }
 
-  Widget widgetnurseListPatients() {
-    return Card(
-      elevation: 1,
-      shadowColor: Colors.black,
-      clipBehavior: Clip.none,
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(0),
-              constraints: BoxConstraints(
-                maxHeight: 500,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ResponsiveDatatable(
-                  title: !nurseListIsSearch
-                      ? Row(
-                          children: [
-                            // Padding(
-                            //   padding: const EdgeInsets.all(8.0),
-                            //   child: Icon(Icons.person_outline_outlined),
-                            // ),
-                            // Text(
-                            //   'Click on search icon to search',
-                            //   style: TextStyle(fontWeight: FontWeight.normal),
-                            // ),
-                          ],
-                        )
-                      : null,
-                  actions: [
-                    if (nurseListIsSearch)
-                      Expanded(
-                          child: TextField(
-                        decoration: InputDecoration(
-                            prefixIcon: IconButton(
-                                icon: Icon(Icons.cancel),
-                                onPressed: () {
-                                  setState(() {
-                                    nurseListIsSearch = false;
-                                  });
-                                }),
-                            suffixIcon: IconButton(
-                                icon: Icon(Icons.search), onPressed: () {})),
-                      )),
-                    if (!nurseListIsSearch)
-                      IconButton(
-                          icon: Icon(Icons.search),
-                          onPressed: () {
-                            setState(() {
-                              nurseListIsSearch = true;
-                            });
-                          })
-                  ],
-                  headers: nurseListHeaders,
-                  source: nurseListIsSource,
-                  selecteds: nurseListSelecteds,
-                  showSelect: nurseListShowSelect,
-                  autoHeight: false,
-                  onTabRow: (data) {
-                    print(data);
-                  },
-                  onSort: (value) {
-                    setState(() {
-                      nurseListSortColumn = value;
-                      nurseListSortAscending = !nurseListSortAscending;
-                      if (nurseListSortAscending) {
-                        nurseListIsSource.sort((a, b) =>
-                            b["$nurseListSortColumn"]
-                                .compareTo(a["$nurseListSortColumn"]));
-                      } else {
-                        nurseListIsSource.sort((a, b) =>
-                            a["$nurseListSortColumn"]
-                                .compareTo(b["$nurseListSortColumn"]));
-                      }
-                    });
-                  },
-                  sortAscending: nurseListSortAscending,
-                  sortColumn: nurseListSortColumn,
-                  isLoading: nurseListIsLoading,
-                  onSelect: (value, item) {
-                    print("$value  $item ");
-                    if (value) {
-                      setState(() => nurseListSelecteds.add(item));
-                    } else {
-                      setState(() => nurseListSelecteds
-                          .removeAt(nurseListSelecteds.indexOf(item)));
-                    }
-                  },
-                  onSelectAll: (value) {
-                    if (value) {
-                      setState(() => nurseListSelecteds = nurseListIsSource
-                          .map((entry) => entry)
-                          .toList()
-                          .cast());
-                    } else {
-                      setState(() => nurseListSelecteds.clear());
-                    }
-                  },
-                  footers: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: Text("Rows per page:"),
-                    ),
-                    if (nurseListPerPage != null)
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        child: DropdownButton(
-                            value: nurseListCurrentPerPage,
-                            items: nurseListPerPage
-                                .map((e) => DropdownMenuItem(
-                                      child: Text("$e"),
-                                      value: e,
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                nurseListCurrentPerPage = value;
-                              });
-                            }),
-                      ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: Text(
-                          "$nurseListCurrentPage - $nurseListCurrentPerPage of $nurseListTotal"),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        size: 16,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          nurseListCurrentPage = nurseListCurrentPage >= 2
-                              ? nurseListCurrentPage - 1
-                              : 1;
-                        });
-                      },
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_forward_ios, size: 16),
-                      onPressed: () {
-                        setState(() {
-                          nurseListCurrentPage++;
-                        });
-                      },
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ]),
-    );
+  void initVariablesAndClasses() {
+    nurseHeaders = [];
+    nursePerPage = [5, 10, 15, 100];
+    nurseTotal = 100;
+    nurseCurrentPerPage;
+    nurseCurrentPage = 1;
+    nurseIsSearch = false;
+    nurseIsSource = [];
+    nurseIsSearched = [];
+    nurseSelecteds = [];
+    nurseSelectableKey = "Invoice";
+    nurseSortColumn;
+    nurseSortAscending = true;
+    nurseIsLoading = true;
+    nurseShowSelect = false;
+    listNurses = [];
+    showSearchedList = false;
+
+    nurseService = NurseService();
   }
 
-  // nurseList
-  List<Map<String, dynamic>> nurseListGenerateData({int n: 100}) {
-    final List sourcenurseList = List.filled(n, Random.secure());
-    List<Map<String, dynamic>> tempsnurseList = [];
-    var i = nurseListIsSource.length;
-    print(i);
-    for (var data in sourcenurseList) {
-      tempsnurseList.add({
-        "FirstName": "FirstName $i",
-        "LastName": "LastName $i",
-        "FatherName": "FatherName $i",
-        "Gender": "Gender $i",
-        "CNIC": "CNIC $i",
-        "ContactNumber": "ContactNumber $i",
-        "EmergencyContactNumber": "EmergencyContactNumber $i",
-        "Address": "Address $i",
-        "DutyDuration": "DutyDuration $i",
-        "JoiningDate": "JoiningDate $i",
-        "ProcedureShare": "35%",
-        "Salary": "1000$i",
-        "Qualification": "Qualification",
-        "Action": [i, 100],
+  void getNursesFromApiAndLinkToTable() async {
+    setState(() => nurseIsLoading = true);
+    listNurses = [];
+    nurseIsSource = [];
+    listNurses = await nurseService.getNurse();
+    nurseIsSource.addAll(generateNurseDataFromApi(listNurses));
+    setState(() => nurseIsLoading = false);
+  }
+
+  List<Map<String, dynamic>> generateNurseDataFromApi(
+      List<Nurse> listOfNurses) {
+    List<Map<String, dynamic>> tempsnurse = [];
+    for (Nurse nurses in listOfNurses) {
+      tempsnurse.add({
+        "Id": nurses.id,
+        "FirstName": nurses.employee.firstName,
+        "lastName": nurses.employee.lastName,
+        "FatherName": nurses.employee.fatherHusbandName,
+        "ContactNumber": nurses.employee.contact,
+        "EmergencyContactNumber": nurses.employee.emergencyContact,
+        "Gender": nurses.employee.gender,
+        "CNIC": nurses.employee.CNIC,
+        "DutyDuration": nurses.DutyDuration,
+        "Address": nurses.employee.address,
+        "JoiningDate": nurses.employee.joiningDate.substring(0,10),
+        "DutyDuration": nurses.DutyDuration,
+        "Salary": nurses.Salary,
+        "ProcedureShare": nurses.SharePercentage,
+        "Action": nurses.id,
       });
-      i++;
     }
-    return tempsnurseList;
+    return tempsnurse;
   }
 
-  nurseListInitData() async {
-    setState(() => nurseListIsLoading = true);
-    Future.delayed(Duration(seconds: 0)).then((value) {
-      nurseListIsSource.addAll(nurseListGenerateData(n: 100));
-      setState(() => nurseListIsLoading = false);
-    });
+  List<Map<String, dynamic>> generateNurseSearchData(
+      Iterable<Map<String, dynamic>> iterableList) {
+    List<Map<String, dynamic>> tempsnurse = [];
+    for (var iterable in iterableList) {
+      tempsnurse.add({
+        "Id": iterable["Id"],
+        "ConsultationFee": iterable["consultationFee"],
+        "EmergencyConsultationFee": iterable["emergencyConsultationFee"],
+        "ShareInFee": iterable["shareInFee"],
+        "SpecialityType": iterable["specialityType"],
+        "Action": iterable["Action"],
+      });
+    }
+    return tempsnurse;
   }
 
   initializenurseListHeaders() {
-    nurseListHeaders = [
+    nurseHeaders = [
       DatatableHeader(
           value: "FirstName",
           show: true,
@@ -513,36 +395,235 @@ class _NurseListState extends State<NurseList> {
               ),
             );
           },
-          sourceBuilder: (value, row) {
+          sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => NewInvoice()),
-                      // );
-                    },
-                    child: Text('Edit')),
-                SizedBox(
-                  width: 10,
-                ),
-                TextButton(
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => Refund()),
-                      // );
-                    },
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
-                    )),
-              ],
-            ));
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          onPressedEditFromTable(Id, row);
+                        },
+                        child: Text('Edit')),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          onPressedDeleteFromTable(Id, row);
+                        },
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.red),
+                        )),
+                  ],
+                ));
           }),
     ];
+  }
+
+  void onPressedEditFromTable(Id, row) {
+    print(Id);
+    Navigator.pushNamed(context, Strings.routeEditNurse,arguments:{'Id': Id});
+  }
+
+  void onPressedDeleteFromTable(Id, row) {
+    Widget cancelButton = TextButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
+    );
+
+    Widget deleteButton = TextButton(
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
+      onPressed: () {
+        Navigator.of(context).pop();
+        nurseService.DeleteNurse(Id).then((response) {
+          if (response == true) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Shade.snackGlobalSuccess,
+                content: Row(
+                  children: [
+                    Text('Success: Deleted Nurse '),
+                    Text(
+                      row['FirstName'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )));
+            getNursesFromApiAndLinkToTable();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: Shade.snackGlobalFailed,
+                content: Row(
+                  children: [
+                    Text('Error: Try Again: Failed to delete Nurse '),
+                    Text(
+                      row['FirstName'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )));
+          }
+        });
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: [
+          Text(Strings.alertDialogTitleDelete),
+        ],
+      ),
+      content: Row(
+        children: [
+          Text(Strings.alertDialogTitleDeleteNote),
+          Text(
+            row['FirstName'] + ' ?',
+            style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
+          )
+        ],
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
+    );
+
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void onChangedSearchedValue(value) {
+    if (!nurseIsLoading) {
+      if (value.isNotEmpty) {
+        if (value.length >= 2) {
+          var searchList = nurseIsSource.where((element) {
+            String searchById = element["Id"].toString().toLowerCase();
+            String searchByName = element["Name"].toString().toLowerCase();
+            String searchByPerformedBy =
+            element["PerformedBy"].toString().toLowerCase();
+            String searchByCharges =
+            element["Charges"].toString().toLowerCase();
+            if (searchById.contains(value.toLowerCase()) ||
+                searchByName.contains(value.toLowerCase()) ||
+                searchByPerformedBy.contains(value.toLowerCase()) ||
+                searchByCharges.contains(value.toLowerCase())) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+          nurseIsSearched = [];
+          nurseIsSearched.addAll(generateNurseSearchData(searchList));
+          setState(() {
+            showSearchedList = true;
+          });
+        } else {
+          setState(() {
+            showSearchedList = false;
+          });
+        }
+      }
+    }
+  }
+
+  Widget widgetnursePatients() {
+    return Card(
+      elevation: 1,
+      shadowColor: Colors.black,
+      clipBehavior: Clip.none,
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(0),
+              constraints: BoxConstraints(
+                maxHeight: 500,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ResponsiveDatatable(
+                  actions: [
+                    Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              prefixIcon: Icon(Icons.search_outlined),
+                              hintText: 'Search nurse'),
+                          onChanged: (value) => onChangedSearchedValue(value),
+                        )),
+                  ],
+                  headers: nurseHeaders,
+                  source: !showSearchedList
+                      ? nurseIsSource
+                      : nurseIsSearched,
+                  selecteds: nurseSelecteds,
+                  showSelect: nurseShowSelect,
+                  autoHeight: false,
+                  onTabRow: (data) {
+                    print(data);
+                  },
+                  onSort: (value) {
+                    setState(() {
+                      nurseSortColumn = value;
+                      nurseSortAscending = !nurseSortAscending;
+                      if (nurseSortAscending) {
+                        nurseIsSource.sort((a, b) =>
+                            b["$nurseSortColumn"]
+                                .compareTo(a["$nurseSortColumn"]));
+                      } else {
+                        nurseIsSource.sort((a, b) =>
+                            a["$nurseSortColumn"]
+                                .compareTo(b["$nurseSortColumn"]));
+                      }
+                    });
+                  },
+                  sortAscending: nurseSortAscending,
+                  sortColumn: nurseSortColumn,
+                  isLoading: nurseIsLoading,
+                  onSelect: (value, item) {
+                    print("$value  $item ");
+                    if (value) {
+                      setState(() => nurseSelecteds.add(item));
+                    } else {
+                      setState(() => nurseSelecteds
+                          .removeAt(nurseSelecteds.indexOf(item)));
+                    }
+                  },
+                  onSelectAll: (value) {
+                    if (value) {
+                      setState(() => nurseSelecteds = nurseIsSource
+                          .map((entry) => entry)
+                          .toList()
+                          .cast());
+                    } else {
+                      setState(() => nurseSelecteds.clear());
+                    }
+                  },
+                ),
+              ),
+            ),
+          ]),
+    );
   }
 }

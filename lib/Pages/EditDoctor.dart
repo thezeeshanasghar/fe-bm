@@ -7,6 +7,7 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Doctor.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
+import 'package:baby_doctor/Models/Request/EmployeeModel.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,15 +16,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-class AddDoctor extends StatefulWidget {
+class EditDoctor extends StatefulWidget {
   @override
-  _AddDoctorState createState() => _AddDoctorState();
+  _EditDoctorState createState() => _EditDoctorState();
 }
 
-class _AddDoctorState extends State<AddDoctor> {
+class _EditDoctorState extends State<EditDoctor> {
   final formKey = GlobalKey<FormState>();
   final joinDateController = TextEditingController();
   final DOBController = TextEditingController();
+  int id;
   String DOB;
   String FirstName;
   String LastName;
@@ -33,17 +35,33 @@ class _AddDoctorState extends State<AddDoctor> {
   String EmergencyContactNumber;
   String Email;
   String Address;
-  String Gender = 'Choose Gender';
-  String Speciality;
-  SimpleFontelicoProgressDialog _dialog;
-  int ConsultationFee = 10;
-  int EmergencyConsultationFee = 10;
+  String Gender = "Choose Gender";
+  int employeeId;
+  String Speciality = "Select Speciality";
+  int ConsultationFee;
+  int EmergencyConsultationFee;
   String Experience;
-  int FeeShare = 10;
+  int FeeShare;
   String JoiningDate;
   String Password = "222222";
   String UserName;
   DoctorService doctorService;
+  bool isLoading = false;
+  TextEditingController _firstnamecontroller;
+  TextEditingController _lastnamecontroller;
+  TextEditingController _fatherhusbandnamecontroller;
+  TextEditingController _contacnumbercontroller;
+  TextEditingController _emergencycontactcontroller;
+  TextEditingController _addresscontroller;
+  TextEditingController _consultationfeecontroller;
+  TextEditingController _emailcontroller;
+  TextEditingController _cniccontroller;
+  TextEditingController _experiencecontroller;
+  TextEditingController _emergencyconsultationfeecontroller;
+  TextEditingController _feesharecontroller;
+  dynamic arguments;
+  SimpleFontelicoProgressDialog _dialog;
+
   List<Qualifications> qualificationList = [
     new Qualifications(
         employeeId: "", certificate: "", description: "", qualificationType: "")
@@ -61,13 +79,69 @@ class _AddDoctorState extends State<AddDoctor> {
   @override
   void initState() {
     super.initState();
+    initVariablesAndClasses();
+    new Future.delayed(Duration.zero, () {});
     _dialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
   }
 
   @override
+  void didChangeDependencies() async {
+
+    setState(() {
+      isLoading = true;
+    });
+
+    arguments = ModalRoute.of(context).settings.arguments as Map;
+    doctorService = DoctorService();
+    id = arguments["Id"];
+    if (arguments != null) {
+      doctorService.getDoctorById(arguments["Id"]).then((value) {
+        setState(() {
+          employeeId = value.employee.id;
+          _firstnamecontroller.text = value.employee.firstName;
+          _lastnamecontroller.text = value.employee.lastName;
+          _fatherhusbandnamecontroller.text = value.employee.fatherHusbandName;
+          _contacnumbercontroller.text = value.employee.contact;
+          _emergencycontactcontroller.text = value.employee.emergencyContact;
+          _addresscontroller.text = value.employee.address;
+          _emailcontroller.text = value.employee.email;
+          Gender = value.employee.gender;
+          Speciality = value.SpecialityType;
+          _cniccontroller.text = value.employee.CNIC;
+          _experiencecontroller.text = value.employee.experience;
+          _consultationfeecontroller.text = value.ConsultationFee.toString();
+          _emergencyconsultationfeecontroller.text =
+              value.EmergencyConsultationFee.toString();
+          _feesharecontroller.text = value.ShareInFee.toString();
+          joinDateController.text = value.employee.joiningDate;
+          isLoading = false;
+        });
+      });
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
+  }
+
+  void initVariablesAndClasses() {
+    _firstnamecontroller = new TextEditingController();
+    _lastnamecontroller = new TextEditingController();
+    _addresscontroller = new TextEditingController();
+    _cniccontroller = new TextEditingController();
+    _emailcontroller = new TextEditingController();
+    _experiencecontroller = new TextEditingController();
+    _addresscontroller = new TextEditingController();
+    _contacnumbercontroller = new TextEditingController();
+    _emergencycontactcontroller = new TextEditingController();
+    _fatherhusbandnamecontroller = new TextEditingController();
+    _emergencyconsultationfeecontroller = new TextEditingController();
+    _consultationfeecontroller = new TextEditingController();
+    _feesharecontroller = new TextEditingController();
+
+    doctorService = DoctorService();
   }
 
   @override
@@ -76,7 +150,7 @@ class _AddDoctorState extends State<AddDoctor> {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.titleAddDoctor),
+        title: Text(Strings.titleEditDoctor),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -101,26 +175,29 @@ class _AddDoctorState extends State<AddDoctor> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          widgetFirstName(),
-                          widgetLastName(),
-                          widgetFatherOrHusbandName(),
-                          widgetGender(),
-                          widgetCnicNumber(),
-                          widgetContactNumber(),
-                          widgetEmergencyContactNumber(),
-                          widgetEmail(),
-                          widgetAddress(),
-                          widgetSpeciality(),
-                          widgetExperience(),
-                          widgetConsultationFee(),
-                          widgetEmergencyConsultationFee(),
-                          widgetFeeShare(),
-                          widgetJoiningDate(),
-                          widgetSizedBox(),
-                          ...widgetQualification(),
-                          widgetSizedBox(),
-                          ...widgetDiplomas(),
-                          widgetSubmit()
+                          // widgetProfileImage(),
+                          // widgetSizedBox(),
+                          if (!isLoading) widgetFirstName(),
+                          if (!isLoading) widgetLastName(),
+                          if (!isLoading) widgetFatherOrHusbandName(),
+                          if (!isLoading) widgetGender(),
+                          if (!isLoading) widgetCnicNumber(),
+                          if (!isLoading) widgetContactNumber(),
+                          if (!isLoading) widgetEmergencyContactNumber(),
+                          if (!isLoading) widgetEmail(),
+                          if (!isLoading) widgetAddress(),
+                          if (!isLoading) widgetSpeciality(),
+                          if (!isLoading) widgetExperience(),
+                          if (!isLoading) widgetConsultationFee(),
+                          if (!isLoading) widgetEmergencyConsultationFee(),
+                          if (!isLoading) widgetFeeShare(),
+                          if (!isLoading) widgetJoiningDate(),
+                          if (!isLoading) widgetSizedBox(),
+                          if (!isLoading) ...widgetQualification(),
+                          if (!isLoading) widgetSizedBox(),
+                          if (!isLoading) ...widgetDiplomas(),
+                          if (!isLoading) widgetSubmit(),
+                          if (isLoading) widgetCircularProgress(),
                         ],
                       ),
                     )),
@@ -128,6 +205,30 @@ class _AddDoctorState extends State<AddDoctor> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -447,6 +548,7 @@ class _AddDoctorState extends State<AddDoctor> {
               Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             autofocus: false,
+            controller: _experiencecontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.date_range_sharp),
                 border: OutlineInputBorder(),
@@ -559,6 +661,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
+            controller: _firstnamecontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
@@ -590,6 +693,7 @@ class _AddDoctorState extends State<AddDoctor> {
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
+              controller: _lastnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -620,6 +724,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
+              controller: _fatherhusbandnamecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -650,6 +755,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
+            controller: _cniccontroller,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.credit_card),
                 border: OutlineInputBorder(),
@@ -686,6 +792,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
+              controller: _contacnumbercontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -723,6 +830,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
+              controller: _emergencycontactcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -760,6 +868,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
+              controller: _emailcontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
@@ -796,6 +905,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
+              controller: _addresscontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.home),
                   border: OutlineInputBorder(),
@@ -874,6 +984,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
+              controller: _consultationfeecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -911,6 +1022,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
+              controller: _emergencyconsultationfeecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -929,7 +1041,7 @@ class _AddDoctorState extends State<AddDoctor> {
                 return null;
               },
               onSaved: (String value) {
-                ConsultationFee = int.parse(value);
+                EmergencyConsultationFee = int.parse(value);
               }),
         ),
       ],
@@ -948,6 +1060,7 @@ class _AddDoctorState extends State<AddDoctor> {
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
+              controller: _feesharecontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -969,7 +1082,7 @@ class _AddDoctorState extends State<AddDoctor> {
                 return null;
               },
               onSaved: (String value) {
-                ConsultationFee = int.parse(value);
+                FeeShare = int.parse(value);
               }),
         ),
       ],
@@ -1093,9 +1206,6 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-
-
-
   // functions required for working
   pickDate() async {
     DateTime date = await showDatePicker(
@@ -1118,9 +1228,7 @@ class _AddDoctorState extends State<AddDoctor> {
     });
   }
 
-  onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
+  void onPressedSubmitButton() async {
     List<dynamic> degrees = [];
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1134,78 +1242,45 @@ class _AddDoctorState extends State<AddDoctor> {
     formKey.currentState.save();
     _dialog.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+        type: SimpleFontelicoProgressDialogType.multilines, width: MediaQuery.of(context).size.width-50);
 
-    Employee employee = new Employee(
-        employeeType: 'Doctor',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: 0,
-        password: "222222",
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
+    DoctorModel doctorModel = DoctorModel(
+        id,
+        employeeId,
+        ConsultationFee,
+        EmergencyConsultationFee,
+        FeeShare,
+        Speciality,
+        EmployeeModelDetails(
+            employeeId,
+            'Doctor',
+            FirstName,
+            LastName,
+            FatherHusbandName,
+            Gender,
+            CNIC,
+            ContactNumber,
+            EmergencyContactNumber,
+            Email,
+            Address,
+            JoiningDate,
+            UserName,
+            'Password',
+            2,
+            Experience, []));
 
-    var json = jsonEncode(employee.toJson());
-    print(json);
-
-    Doctor doctor = new Doctor(
-        ConsultationFee: ConsultationFee,
-        EmergencyConsultationFee: EmergencyConsultationFee,
-        ShareInFee: FeeShare,
-        SpecialityType: Speciality,
-        employee: employee);
-
-    var response = await doctorService.InsertDoctor(doctor);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+    bool hasUpdated = await doctorService.UpdateDoctor(doctorModel);
+    if (hasUpdated) {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Doctor '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
+          content: Text('Success: Updated $FirstName')));
       Navigator.pushNamed(context, Strings.routeDoctorList);
-      formKey.currentState.reset();
     } else {
       _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
+          content: Text('Error: Failed to update $FirstName')));
     }
   }
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
 }

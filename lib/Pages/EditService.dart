@@ -5,6 +5,7 @@ import 'package:baby_doctor/Service/Service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:baby_doctor/Models/Services.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditService extends StatefulWidget {
 
@@ -18,29 +19,19 @@ class _EditServiceState extends State<EditService> {
   String Id;
   String  ServiceName;
   String  ServiceDescription;
-
+  bool isLoading = false;
   bool loadingButtonProgressIndicator = false;
   Service service;
+  SimpleFontelicoProgressDialog _dialog;
   TextEditingController _servicenamecontroller;
   TextEditingController _serviceDescriptioncontroller;
 
   dynamic arguments;
   Widget build(BuildContext context) {
-
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    service = Service();
-
-    if (arguments != null) {
-      service.getServicesById(arguments["Id"]).then((value) {
-        _servicenamecontroller = new TextEditingController(text: value["name"]);
-        _serviceDescriptioncontroller =
-        new TextEditingController(text: value["description"]);
-      });
-    }
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
-        title: Text(Strings.editService),
+        title: Text(Strings.titleEditService),
         centerTitle: false,
         backgroundColor: Shade.globalAppBarColor,
         elevation: 0.0,
@@ -65,10 +56,10 @@ class _EditServiceState extends State<EditService> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        widgetServiceName(),
-                        widgetServiceDescription(),
-
-                        widgetSubmit()
+                        if (!isLoading)widgetServiceName(),
+                        if (!isLoading)widgetServiceDescription(),
+                        if (!isLoading) widgetSubmit(),
+                        if (isLoading)  widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -84,6 +75,28 @@ class _EditServiceState extends State<EditService> {
   @override
   void initState() {
     super.initState();
+    _dialog = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+  }
+  @override
+  void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
+    arguments = ModalRoute
+        .of(context)
+        .settings
+        .arguments as Map;
+    service = Service();
+    if (arguments != null) {
+      service.getServicesById(arguments["Id"]).then((value) {
+        setState(() {
+          _servicenamecontroller = new TextEditingController(text: value["name"]);
+          _serviceDescriptioncontroller = new TextEditingController(text: value["description"]);
+          isLoading = false;
+        });
+      });
+    }
   }
 
   Widget widgetServiceName() {
@@ -149,6 +162,29 @@ class _EditServiceState extends State<EditService> {
       ],
     );
   }
+  Widget widgetCircularProgress() {
+    return Container(
+      height: MediaQuery.of(context).size.height - 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Please wait...'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget widgetSubmit() {
     return Column(
@@ -195,6 +231,9 @@ class _EditServiceState extends State<EditService> {
       loadingButtonProgressIndicator = true;
     });
     formKey.currentState.save();
+    _dialog.show(
+        message: 'Loading...',
+        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
     Services obj = new Services(
         id:arguments["Id"],
@@ -207,6 +246,7 @@ class _EditServiceState extends State<EditService> {
       setState(() {
         loadingButtonProgressIndicator = false;
       });
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -219,7 +259,9 @@ class _EditServiceState extends State<EditService> {
             ],
           )));
       formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeServiceList);
     } else {
+      _dialog.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

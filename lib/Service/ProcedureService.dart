@@ -1,9 +1,5 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Room.dart';
-import 'package:baby_doctor/Models/Services.dart';
 import 'package:http/http.dart' as http;
 import '../Models/Procedures.dart';
 
@@ -21,11 +17,12 @@ class ProcedureService {
     }
   }
 
-  Future<dynamic> getProceduresById(int Id) async {
+  Future<Procedures> getProceduresById(int Id) async {
     final response =
         await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final JsonResponse = jsonDecode(response.body);
+      return Procedures.fromJson(JsonResponse);
     } else {
       throw Exception('Failed to load Procedure');
     }
@@ -65,7 +62,7 @@ class ProcedureService {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(Obj));
-    if (response.statusCode == 201) {
+    if (response.statusCode == 204) {
       return true;
     } else {
       return false;

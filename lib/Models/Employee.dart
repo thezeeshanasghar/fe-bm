@@ -16,10 +16,9 @@ class Employee {
   final String password;
   final String userName;
   final String joiningDate;
-  final String DOB;
   final String address;
   final String email;
-  final List<Qualifications> qualifications;
+  final List<dynamic> qualifications;
 
   Employee(
       {this.id,
@@ -38,18 +37,17 @@ class Employee {
       @required this.joiningDate,
       @required this.address,
       @required this.email,
-        @required this.DOB,
       this.qualifications});
 
   factory Employee.fromJson(Map<String, dynamic> json) {
     return Employee(
         id: json['id'],
-        employeeType: json['name'],
-        firstName: json['performerShare'],
-        lastName: json['performedBy'],
+        employeeType: json['employeeType'],
+        firstName: json['firstName'],
+        lastName: json['lastName'],
         fatherHusbandName: json['fatherHusbandName'],
         gender: json['gender'],
-        CNIC: json['CNIC'],
+        CNIC: json['cnic'],
         contact: json['contact'],
         emergencyContact: json['emergencyContact'],
         experience: json['experience'],
@@ -58,8 +56,26 @@ class Employee {
         userName: json['userName'],
         joiningDate: json['joiningDate'],
         address: json['address'],
-        email: json['emails'],
-        DOB: json['DOB'],
+        email: json['email'],
         qualifications: json['qualifications']);
   }
+
+  Map<String, dynamic> toJson() => {
+        "employeeType": employeeType,
+        "firstName": firstName,
+        "lastName": lastName,
+        "fatherHusbandName": fatherHusbandName,
+        "gender": gender,
+        "cnic": CNIC,
+        "contact": contact,
+        "emergencyContact": emergencyContact,
+        "experience": experience,
+        "flourNo": flourNo,
+        "password": password,
+        "userName": userName,
+        "joiningDate": joiningDate,
+        "address": address,
+        "email": email,
+        "qualifications": qualifications,
+      };
 }
