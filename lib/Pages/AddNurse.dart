@@ -879,7 +879,7 @@ class _AddNurseState extends State<AddNurse> {
         message: 'Loading...',
         type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
-    Employee employee = new Employee(
+    EmployeeData employee = new EmployeeData(
         employeeType: 'Nurse',
         firstName: FirstName,
         lastName: LastName,
@@ -897,7 +897,7 @@ class _AddNurseState extends State<AddNurse> {
         address: Address,
         email: Email);
 
-    Nurse nurse = new Nurse(
+    NurseData nurse = new NurseData(
         DutyDuration: DutyDuration,
         Salary: Salary,
         SharePercentage: ProceduresShare,

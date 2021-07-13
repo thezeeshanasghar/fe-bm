@@ -2,10 +2,13 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Procedures.dart';
+import 'package:baby_doctor/Models/ResponseData/ProcedureResponse.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
+import 'package:baby_doctor/ShareArguments/ProcedureArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class ProcedureList extends StatefulWidget {
@@ -26,13 +29,13 @@ class _ProcedureListState extends State<ProcedureList> {
   bool procedureIsLoading;
   bool procedureShowSelect;
   bool showSearchedList;
-
+  SimpleFontelicoProgressDialog sfpd;
   List<DatatableHeader> procedureHeaders;
   List<int> procedurePerPage;
   List<Map<String, dynamic>> procedureIsSource;
   List<Map<String, dynamic>> procedureIsSearched;
   List<Map<String, dynamic>> procedureSelecteds;
-  List<Procedures> listProcedures;
+  List<ProcedureData> listProcedures;
 
   ProcedureService procedureService;
 
@@ -122,15 +125,17 @@ class _ProcedureListState extends State<ProcedureList> {
     setState(() => procedureIsLoading = true);
     listProcedures = [];
     procedureIsSource = [];
-    listProcedures = await procedureService.getProcedures();
+    Procedure procedureResponse = await procedureService.getProcedures();
+    listProcedures = procedureResponse.data;
     procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
+
     setState(() => procedureIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateProcedureDataFromApi(
-      List<Procedures> listOfProcedures) {
+      List<ProcedureData> listOfProcedures) {
     List<Map<String, dynamic>> tempsprocedure = [];
-    for (Procedures procedures in listOfProcedures) {
+    for (ProcedureData procedures in listOfProcedures) {
       tempsprocedure.add({
         "Id": procedures.id,
         "Name": procedures.name,
@@ -138,7 +143,6 @@ class _ProcedureListState extends State<ProcedureList> {
         "Charges": procedures.charges,
         "Share": procedures.performerShare,
         "Action": procedures.id,
-
       });
     }
     return tempsprocedure;
@@ -295,7 +299,13 @@ class _ProcedureListState extends State<ProcedureList> {
   }
 
   void onPressedEditFromTable(Id, row) {
-    Navigator.pushNamed(context, Strings.routeEditProcedure,arguments:{'Id': Id});
+    Navigator.pushNamed(context, Strings.routeEditProcedure,
+        arguments: ProcedureArguments(
+            id: Id,
+            name: row['Name'],
+            performedBy: row['PerformedBy'],
+            charges: row['Charges'],
+            performerShare: row['Share']));
   }
 
   void onPressedDeleteFromTable(Id, row) {
@@ -314,10 +324,18 @@ class _ProcedureListState extends State<ProcedureList> {
           style: TextStyle(
               color: Shade.alertBoxButtonTextDelete,
               fontWeight: FontWeight.w900)),
-      onPressed: () {
+      onPressed: ()  async{
         Navigator.of(context).pop();
-        procedureService.DeleteProcedure(Id).then((response) {
+        sfpd = SimpleFontelicoProgressDialog(
+            context: context, barrierDimisable: false);
+       await sfpd.show(
+            message: 'Deleting ...',
+            type: SimpleFontelicoProgressDialogType.hurricane,
+            width: MediaQuery.of(context).size.width - 20,
+            horizontal: true);
+        procedureService.DeleteProcedure(Id).then((response) async {
           if (response == true) {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalSuccess,
                 content: Row(
@@ -331,6 +349,7 @@ class _ProcedureListState extends State<ProcedureList> {
                 )));
             getProceduresFromApiAndLinkToTable();
           } else {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalFailed,
                 content: Row(

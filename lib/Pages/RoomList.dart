@@ -3,9 +3,11 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Room.dart';
 import 'package:baby_doctor/Service/RoomService.dart';
+import 'package:baby_doctor/ShareArguments/RoomArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class RoomList extends StatefulWidget {
@@ -15,7 +17,7 @@ class RoomList extends StatefulWidget {
 
 class _RoomListState extends State<RoomList> {
   final formKey = GlobalKey<FormState>();
-
+  SimpleFontelicoProgressDialog sfpd;
   int roomTotal;
   int roomCurrentPerPage;
   int roomCurrentPage;
@@ -32,7 +34,7 @@ class _RoomListState extends State<RoomList> {
   List<Map<String, dynamic>> roomIsSource;
   List<Map<String, dynamic>> roomIsSearched;
   List<Map<String, dynamic>> roomSelecteds;
-  List<Room> listrooms;
+  List<RoomData> listrooms;
 
   RoomService roomService;
 
@@ -122,15 +124,16 @@ class _RoomListState extends State<RoomList> {
     setState(() => roomIsLoading = true);
     listrooms = [];
     roomIsSource = [];
-    listrooms = await roomService.getRooms();
+    Room roomdata = await roomService.getRooms();
+    listrooms = roomdata.data;
     roomIsSource.addAll(generateRoomDataFromApi(listrooms));
     setState(() => roomIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateRoomDataFromApi(
-      List<Room> listOfRooms) {
+      List<RoomData> listOfRooms) {
     List<Map<String, dynamic>> tempsroom = [];
-    for (Room rooms in listOfRooms) {
+    for (RoomData rooms in listOfRooms) {
       tempsroom.add({
         "Id": rooms.id,
         "RoomNo": rooms.RoomNo,
@@ -263,40 +266,46 @@ class _RoomListState extends State<RoomList> {
           sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        onPressedEditFromTable(Id, row);
-                      },
-                      child: Text('Edit',
-                          style: TextStyle(
-                            color: Shade.actionButtonTextEdit,
-                          )),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          onPressedDeleteFromTable(Id, row);
-                        },
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(
-                            color: Shade.actionButtonTextDelete,
-                          ),
-                        )),
-                  ],
-                ));
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    onPressedEditFromTable(Id, row);
+                  },
+                  child: Text('Edit',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextEdit,
+                      )),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () {
+                      onPressedDeleteFromTable(Id, row);
+                    },
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
+                    )),
+              ],
+            ));
           }),
     ];
   }
 
   void onPressedEditFromTable(Id, row) {
-    print(Id);
-    Navigator.pushNamed(context, Strings.routeEditRoom,arguments:{'Id': Id});
-    print(Id);
+    Navigator.pushNamed(context, Strings.routeEditRoom,
+        arguments: RoomArguments(
+          id: Id,
+          RoomNo: row['RoomNo'],
+          RoomType: row['RoomType'],
+          RoomCharges: row['RoomCharges'],
+          RoomCapacity: row['RoomCapacity'],
+        ));
+
   }
 
   void onPressedDeleteFromTable(Id, row) {
@@ -315,10 +324,18 @@ class _RoomListState extends State<RoomList> {
           style: TextStyle(
               color: Shade.alertBoxButtonTextDelete,
               fontWeight: FontWeight.w900)),
-      onPressed: () {
+      onPressed: () async {
         Navigator.of(context).pop();
-        roomService.Deleteroom(Id).then((response) {
+        sfpd = SimpleFontelicoProgressDialog(
+            context: context, barrierDimisable: false);
+        await sfpd.show(
+            message: 'Deleting ...',
+            type: SimpleFontelicoProgressDialogType.hurricane,
+            width: MediaQuery.of(context).size.width - 20,
+            horizontal: true);
+        roomService.Deleteroom(Id).then((response) async {
           if (response == true) {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalSuccess,
                 content: Row(
@@ -332,6 +349,7 @@ class _RoomListState extends State<RoomList> {
                 )));
             getroomsFromApiAndLinkToTable();
           } else {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalFailed,
                 content: Row(
@@ -391,11 +409,11 @@ class _RoomListState extends State<RoomList> {
             String searchById = element["Id"].toString().toLowerCase();
             String searchByRoomNo = element["RoomNo"].toString().toLowerCase();
             String searchByRoomType =
-            element["RoomType"].toString().toLowerCase();
+                element["RoomType"].toString().toLowerCase();
             String searchByCharges =
-            element["RoomCharges"].toString().toLowerCase();
+                element["RoomCharges"].toString().toLowerCase();
             String searchByCapacity =
-            element["RoomCapacity"].toString().toLowerCase();
+                element["RoomCapacity"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByRoomNo.contains(value.toLowerCase()) ||
                 searchByRoomType.contains(value.toLowerCase()) ||
@@ -441,17 +459,15 @@ class _RoomListState extends State<RoomList> {
                   actions: [
                     Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.search_outlined),
-                              hintText: 'Search room'),
-                          onChanged: (value) => onChangedSearchedValue(value),
-                        )),
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.search_outlined),
+                          hintText: 'Search room'),
+                      onChanged: (value) => onChangedSearchedValue(value),
+                    )),
                   ],
                   headers: roomHeaders,
-                  source: !showSearchedList
-                      ? roomIsSource
-                      : roomIsSearched,
+                  source: !showSearchedList ? roomIsSource : roomIsSearched,
                   selecteds: roomSelecteds,
                   showSelect: roomShowSelect,
                   autoHeight: false,
@@ -463,13 +479,11 @@ class _RoomListState extends State<RoomList> {
                       roomSortColumn = value;
                       roomSortAscending = !roomSortAscending;
                       if (roomSortAscending) {
-                        roomIsSource.sort((a, b) =>
-                            b["$roomSortColumn"]
-                                .compareTo(a["$roomSortColumn"]));
+                        roomIsSource.sort((a, b) => b["$roomSortColumn"]
+                            .compareTo(a["$roomSortColumn"]));
                       } else {
-                        roomIsSource.sort((a, b) =>
-                            a["$roomSortColumn"]
-                                .compareTo(b["$roomSortColumn"]));
+                        roomIsSource.sort((a, b) => a["$roomSortColumn"]
+                            .compareTo(b["$roomSortColumn"]));
                       }
                     });
                   },
@@ -481,16 +495,14 @@ class _RoomListState extends State<RoomList> {
                     if (value) {
                       setState(() => roomSelecteds.add(item));
                     } else {
-                      setState(() => roomSelecteds
-                          .removeAt(roomSelecteds.indexOf(item)));
+                      setState(() =>
+                          roomSelecteds.removeAt(roomSelecteds.indexOf(item)));
                     }
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => roomSelecteds = roomIsSource
-                          .map((entry) => entry)
-                          .toList()
-                          .cast());
+                      setState(() => roomSelecteds =
+                          roomIsSource.map((entry) => entry).toList().cast());
                     } else {
                       setState(() => roomSelecteds.clear());
                     }

@@ -7,8 +7,9 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Doctor.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
-import 'package:baby_doctor/Models/Request/EmployeeModel.dart';
+import 'package:baby_doctor/Models/RequestData/EmployeeModel.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
+import 'package:baby_doctor/ShareArguments/DoctorArguments.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -50,7 +51,7 @@ class _EditDoctorState extends State<EditDoctor> {
   TextEditingController _firstnamecontroller;
   TextEditingController _lastnamecontroller;
   TextEditingController _fatherhusbandnamecontroller;
-  TextEditingController _contacnumbercontroller;
+  TextEditingController _contactnumbercontroller;
   TextEditingController _emergencycontactcontroller;
   TextEditingController _addresscontroller;
   TextEditingController _consultationfeecontroller;
@@ -59,8 +60,8 @@ class _EditDoctorState extends State<EditDoctor> {
   TextEditingController _experiencecontroller;
   TextEditingController _emergencyconsultationfeecontroller;
   TextEditingController _feesharecontroller;
-  dynamic arguments;
-  SimpleFontelicoProgressDialog _dialog;
+  DoctorArguments arguments;
+  SimpleFontelicoProgressDialog sfpd;
 
   List<Qualifications> qualificationList = [
     new Qualifications(
@@ -74,51 +75,21 @@ class _EditDoctorState extends State<EditDoctor> {
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
   Image image;
-  bool loadingButtonProgressIndicator = false;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-    new Future.delayed(Duration.zero, () {});
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-  }
+   }
 
   @override
   void didChangeDependencies() async {
-
     setState(() {
       isLoading = true;
     });
+    arguments = ModalRoute.of(context).settings.arguments;
 
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    doctorService = DoctorService();
-    id = arguments["Id"];
-    if (arguments != null) {
-      doctorService.getDoctorById(arguments["Id"]).then((value) {
-        setState(() {
-          employeeId = value.employee.id;
-          _firstnamecontroller.text = value.employee.firstName;
-          _lastnamecontroller.text = value.employee.lastName;
-          _fatherhusbandnamecontroller.text = value.employee.fatherHusbandName;
-          _contacnumbercontroller.text = value.employee.contact;
-          _emergencycontactcontroller.text = value.employee.emergencyContact;
-          _addresscontroller.text = value.employee.address;
-          _emailcontroller.text = value.employee.email;
-          Gender = value.employee.gender;
-          Speciality = value.SpecialityType;
-          _cniccontroller.text = value.employee.CNIC;
-          _experiencecontroller.text = value.employee.experience;
-          _consultationfeecontroller.text = value.ConsultationFee.toString();
-          _emergencyconsultationfeecontroller.text =
-              value.EmergencyConsultationFee.toString();
-          _feesharecontroller.text = value.ShareInFee.toString();
-          joinDateController.text = value.employee.joiningDate;
-          isLoading = false;
-        });
-      });
-    }
+    setValuesOfDoctor();
   }
 
   @override
@@ -134,14 +105,34 @@ class _EditDoctorState extends State<EditDoctor> {
     _emailcontroller = new TextEditingController();
     _experiencecontroller = new TextEditingController();
     _addresscontroller = new TextEditingController();
-    _contacnumbercontroller = new TextEditingController();
+    _contactnumbercontroller = new TextEditingController();
     _emergencycontactcontroller = new TextEditingController();
     _fatherhusbandnamecontroller = new TextEditingController();
     _emergencyconsultationfeecontroller = new TextEditingController();
     _consultationfeecontroller = new TextEditingController();
     _feesharecontroller = new TextEditingController();
-
     doctorService = DoctorService();
+  }
+
+  void setValuesOfDoctor() {
+    setState(() {
+       _firstnamecontroller.text = arguments.firstName;
+       _lastnamecontroller.text = arguments.lastName;
+       _fatherhusbandnamecontroller.text = arguments.fatherHusbandName;
+       Gender=arguments.gender;
+       _cniccontroller.text = arguments.CNIC;
+       _contactnumbercontroller.text = arguments.contact;
+       _emergencycontactcontroller.text = arguments.emergencyContact;
+        _emailcontroller.text = arguments.email;
+       _addresscontroller.text = arguments.address;
+       _experiencecontroller.text = arguments.experience;
+        joinDateController.text = arguments.joiningDate.toString().substring(0,10);
+       _emergencyconsultationfeecontroller.text = arguments.EmergencyConsultationFee.toString();
+      _consultationfeecontroller.text = arguments.ConsultationFee.toString();
+      _feesharecontroller.text = arguments.ShareInFee.toString();
+      Speciality=arguments.SpecialityType;
+      isLoading = false;
+    });
   }
 
   @override
@@ -792,7 +783,7 @@ class _EditDoctorState extends State<EditDoctor> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
-              controller: _contacnumbercontroller,
+              controller: _contactnumbercontroller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone),
                   border: OutlineInputBorder(),
@@ -1236,23 +1227,23 @@ class _EditDoctorState extends State<EditDoctor> {
           content: Text('Error: Some input fields are not filled')));
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines, width: MediaQuery.of(context).size.width-50);
-
+    sfpd = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+    await sfpd.show(
+        message: 'Updating ...',
+        type: SimpleFontelicoProgressDialogType.threelines,
+        width: MediaQuery.of(context).size.width - 20,
+        horizontal: true);
     DoctorModel doctorModel = DoctorModel(
-        id,
-        employeeId,
+        arguments.id,
+        arguments.employeeId,
         ConsultationFee,
         EmergencyConsultationFee,
         FeeShare,
         Speciality,
         EmployeeModelDetails(
-            employeeId,
+            arguments.employeeId,
             'Doctor',
             FirstName,
             LastName,
@@ -1271,13 +1262,13 @@ class _EditDoctorState extends State<EditDoctor> {
 
     bool hasUpdated = await doctorService.UpdateDoctor(doctorModel);
     if (hasUpdated) {
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Text('Success: Updated $FirstName')));
       Navigator.pushNamed(context, Strings.routeDoctorList);
     } else {
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Text('Error: Failed to update $FirstName')));

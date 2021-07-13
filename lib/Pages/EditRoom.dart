@@ -2,6 +2,7 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Service/RoomService.dart';
+import 'package:baby_doctor/ShareArguments/RoomArguments.dart';
 import 'package:flutter/material.dart';
 
 import 'package:baby_doctor/Models/Room.dart';
@@ -24,12 +25,12 @@ class _EditRoomState extends State<EditRoom> {
   bool loadingButtonProgressIndicator = false;
   RoomService roomservice;
   SimpleFontelicoProgressDialog _dialog;
-  TextEditingController _roomnocontroller;
-  TextEditingController _roomtypecontroller;
-  TextEditingController _roomcapacitycontroller;
-  TextEditingController _roomchargescontroller;
+  TextEditingController tecRoomNo;
+  TextEditingController tecRoomType;
+  TextEditingController tecRoomCapacity;
+  TextEditingController tecRoomCharges;
 
-  dynamic arguments;
+  RoomArguments arguments;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +82,7 @@ class _EditRoomState extends State<EditRoom> {
   @override
   void initState() {
     super.initState();
+    initVariablesAndClasses();
     _dialog = SimpleFontelicoProgressDialog(
         context: context, barrierDimisable: false);
   }
@@ -90,24 +92,26 @@ class _EditRoomState extends State<EditRoom> {
     setState(() {
       isLoading = true;
     });
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    roomservice = RoomService();
-    print(arguments["Id"]);
-    if (arguments != null) {
-      roomservice.getRoomById(arguments["Id"]).then((value) {
-        setState(() {
-          _roomnocontroller = new TextEditingController(text: value["roomNo"]);
-          RoomType = value["roomType"];
-          _roomcapacitycontroller =
-              new TextEditingController(text: value["roomCapacity"].toString());
-          _roomchargescontroller =
-              new TextEditingController(text: value["roomCharges"].toString());
-          isLoading = false;
-        });
-      });
-    }
+    arguments = ModalRoute.of(context).settings.arguments;
+    setValuesOfProcedures();
   }
 
+  void setValuesOfProcedures() {
+    setState(() {
+      tecRoomNo.text = arguments.RoomNo;
+      RoomType = arguments.RoomType;
+      tecRoomCapacity.text = arguments.RoomCapacity.toString();
+      tecRoomCharges.text = arguments.RoomCharges.toString();
+      isLoading = false;
+    });
+  }
+
+  void initVariablesAndClasses() {
+    tecRoomNo = new TextEditingController();
+    tecRoomCapacity = new TextEditingController();
+    tecRoomCharges = new TextEditingController();
+    roomservice = RoomService();
+  }
   Widget widgetRoomNo() {
     return Column(
       children: [
@@ -120,7 +124,7 @@ class _EditRoomState extends State<EditRoom> {
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
-            controller: _roomnocontroller,
+            controller: tecRoomNo,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
@@ -158,6 +162,7 @@ class _EditRoomState extends State<EditRoom> {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
                 isExpanded: true,
+
                 value: RoomType,
                 elevation: 16,
                 underline: Container(
@@ -200,7 +205,7 @@ class _EditRoomState extends State<EditRoom> {
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
-            controller: _roomcapacitycontroller,
+            controller: tecRoomCapacity,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
@@ -236,7 +241,7 @@ class _EditRoomState extends State<EditRoom> {
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
-            controller: _roomchargescontroller,
+            controller: tecRoomCharges,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
@@ -331,11 +336,11 @@ class _EditRoomState extends State<EditRoom> {
     formKey.currentState.save();
     _dialog.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,
+        type: SimpleFontelicoProgressDialogType.threelines,
         width: MediaQuery.of(context).size.width - 50);
 
-    Room obj = new Room(
-      id: arguments["Id"],
+    RoomData obj = new RoomData(
+      id: arguments.id,
       RoomNo: RoomNo,
       RoomType: RoomType,
       RoomCapacity: RoomCapacity,

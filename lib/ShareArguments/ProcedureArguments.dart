@@ -1,28 +1,16 @@
 import 'package:flutter/foundation.dart';
 
-class Procedures {
+class ProcedureArguments {
   final int id;
   final String name;
   final String performedBy;
   final double charges;
   final double performerShare;
 
-  Procedures(
+  ProcedureArguments(
       {this.id,
       @required this.name,
       @required this.performedBy,
       @required this.charges,
       @required this.performerShare});
-
-  factory Procedures.fromJson(Map<String, dynamic> json) {
-    return Procedures(
-      id: json['id'],
-      name: json['Name'],
-      performerShare: json['performerShare'],
-      performedBy: json['performedBy'],
-      charges: json['charges'],
-    );
-  }
-
-
 }

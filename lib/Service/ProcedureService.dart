@@ -1,34 +1,28 @@
 import 'dart:convert';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/ResponseData/ProcedureResponse.dart';
 import 'package:http/http.dart' as http;
 import '../Models/Procedures.dart';
 
 class ProcedureService {
-  Future<List<Procedures>> getProcedures() async {
-    final response =
-        await http.get(Uri.https(Strings.pathAPI, 'api/procedure'));
-    if (response.statusCode == 200) {
-      final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-      return parsed
-          .map<Procedures>((json) => Procedures.fromJson(json))
-          .toList();
-    } else {
-      throw Exception('Failed to load Procedure');
-    }
+  Future<Procedure> getProcedures() async {
+    final response = await http.get(Uri.https(Strings.pathAPI, 'api/procedure/get'));
+    final jsonResponse = jsonDecode(response.body);
+    return Procedure.fromJson(jsonResponse);
   }
 
-  Future<Procedures> getProceduresById(int Id) async {
+  Future<dynamic> getProceduresById(int Id) async {
     final response =
-        await http.get(Uri.https(Strings.pathAPI, 'api/procedure/${Id}'));
+        await http.get(Uri.https(Strings.pathAPI, 'api/procedure/get/${Id}'));
     if (response.statusCode == 200) {
-      final JsonResponse = jsonDecode(response.body);
-      return Procedures.fromJson(JsonResponse);
+      return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to load Procedure');
+      throw Exception('Failed to load Room');
     }
+
   }
 
-  Future<bool> InsertProcedure(Procedures procedures) async {
+  Future<bool> InsertProcedure(ProcedureData procedures) async {
     Map<String, dynamic> Obj = {
       'name': procedures.name,
       'performedBy': procedures.performedBy,
@@ -36,7 +30,7 @@ class ProcedureService {
       'performerShare': procedures.performerShare
     };
     final response =
-        await http.post(Uri.https(Strings.pathAPI, 'api/procedure'),
+        await http.post(Uri.https(Strings.pathAPI, 'api/procedure/insert'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
@@ -48,7 +42,7 @@ class ProcedureService {
     }
   }
 
-  Future<bool> UpdateProcedure(Procedures procedures) async {
+  Future<bool> UpdateProcedure(ProcedureData procedures) async {
     Map<String, dynamic> Obj = {
       'id': procedures.id,
       'name': procedures.name,
@@ -57,7 +51,7 @@ class ProcedureService {
       'performerShare': procedures.performerShare
     };
     final response = await http.put(
-        Uri.https(Strings.pathAPI, 'api/procedure/${procedures.id}'),
+        Uri.https(Strings.pathAPI, 'api/procedure/update/${procedures.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -71,7 +65,7 @@ class ProcedureService {
 
   Future<bool> DeleteProcedure(int id) async {
     final response = await http.delete(
-        Uri.https(Strings.pathAPI, 'api/procedure/${id}'),
+        Uri.https(Strings.pathAPI, 'api/procedure/delete/${id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });

@@ -3,9 +3,11 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
+import 'package:baby_doctor/ShareArguments/ReceptionistArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class ReceptionistList extends StatefulWidget {
@@ -26,13 +28,13 @@ class _ReceptionistListState extends State<ReceptionistList> {
   bool receptionistIsLoading;
   bool receptionistShowSelect;
   bool showSearchedList;
-
+  SimpleFontelicoProgressDialog sfpd;
   List<DatatableHeader> receptionistHeaders;
   List<int> receptionistPerPage;
   List<Map<String, dynamic>> receptionistIsSource;
   List<Map<String, dynamic>> receptionistIsSearched;
   List<Map<String, dynamic>> receptionistSelecteds;
-  List<Employee> listReceptionists;
+  List<EmployeeData> listReceptionists;
 
   ReceptionistService receptionistService;
 
@@ -90,7 +92,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, Strings.routeEditReceptionist);
+            Navigator.pushNamed(context, Strings.routeAddReceptionist);
           },
           child: const Icon(Icons.add),
           backgroundColor: Shade.fabGlobalButtonColor,
@@ -122,27 +124,31 @@ class _ReceptionistListState extends State<ReceptionistList> {
     setState(() => receptionistIsLoading = true);
     listReceptionists = [];
     receptionistIsSource = [];
-    listReceptionists = await receptionistService.getReceptionist();
+    Employee employeeResponse = await receptionistService.getReceptionist();
+    listReceptionists = employeeResponse.data;
     receptionistIsSource.addAll(generateReceptionistDataFromApi(listReceptionists));
     setState(() => receptionistIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateReceptionistDataFromApi(
-      List<Employee> listOfReceptionists) {
+      List<EmployeeData> listOfReceptionists) {
     List<Map<String, dynamic>> tempsreceptionist = [];
-    for (Employee receptionists in listOfReceptionists) {
+    for (EmployeeData receptionists in listOfReceptionists) {
       tempsreceptionist.add({
         "Id": receptionists.id,
-        "FirstName": receptionists.firstName,
-        "LastName":  receptionists.lastName,
-        "Gender":  receptionists.gender,
+        "firstName": receptionists.firstName,
+        "lastName": receptionists.lastName,
+        "fatherHusbandName": receptionists.fatherHusbandName,
+        "userName": receptionists.userName,
+        "password": receptionists.password,
+        "gender": receptionists.gender,
         // "DOB": receptionists.DOB,
         "CNIC": receptionists.CNIC,
-        "ContactNumber":  receptionists.contact,
-        "Email":  receptionists.email,
-        "Address": receptionists.address,
-        "FloorNo": receptionists.flourNo,
-        "JoiningDate":  receptionists.joiningDate.substring(0,10),
+        "contact": receptionists.contact,
+        "email": receptionists.email,
+        "address": receptionists.address,
+        "flourNo": receptionists.flourNo,
+        "joiningDate": receptionists.joiningDate.substring(0, 10),
         "Action": receptionists.id,
       });
     }
@@ -155,11 +161,11 @@ class _ReceptionistListState extends State<ReceptionistList> {
     for (var iterable in iterableList) {
       tempsreceptionist.add({
         "Id": iterable["Id"],
-        "FirstName": iterable["FirstName"],
-        "LastName": iterable["LastName"],
+        "firstName": iterable["firstName"],
+        "lastName": iterable["lastName"],
         "CNIC": iterable["CNIC"],
-        "Email": iterable["Email"],
-        "ContactNumber": iterable["ContactNumber"],
+        "email": iterable["email"],
+        "contact": iterable["contact"],
         "Action": iterable["Action"],
       });
     }
@@ -186,7 +192,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "FirstName",
+          value: "firstName",
           show: true,
           flex: 2,
           sortable: false,
@@ -203,7 +209,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "LastName",
+          value: "lastName",
           show: false,
           sortable: false,
           textAlign: TextAlign.center,
@@ -219,7 +225,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "Email",
+          value: "email",
           show: true,
           sortable: false,
           textAlign: TextAlign.center,
@@ -235,7 +241,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "Address",
+          value: "address",
           show: false,
           sortable: false,
           textAlign: TextAlign.center,
@@ -267,7 +273,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "EmergencyContact",
+          value: "emergencyContact",
           show: false,
           sortable: false,
           textAlign: TextAlign.center,
@@ -283,7 +289,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "Contact",
+          value: "contact",
           show: false,
           sortable: false,
           textAlign: TextAlign.center,
@@ -299,7 +305,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "FlourNo",
+          value: "flourNo",
           show: false,
           sortable: false,
           textAlign: TextAlign.center,
@@ -314,40 +320,9 @@ class _ReceptionistListState extends State<ReceptionistList> {
               ),
             );
           }),
+
       DatatableHeader(
-          value: "FlourNo",
-          show: false,
-          sortable: false,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Flour No",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "FlourNo",
-          show: false,
-          sortable: false,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Flour No",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "Gender",
+          value: "gender",
           show: true,
           sortable: false,
           textAlign: TextAlign.center,
@@ -363,7 +338,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
             );
           }),
       DatatableHeader(
-          value: "JoiningDate",
+          value: "joiningDate",
           show: true,
           sortable: false,
           textAlign: TextAlign.center,
@@ -398,38 +373,55 @@ class _ReceptionistListState extends State<ReceptionistList> {
           sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        onPressedEditFromTable(Id, row);
-                      },
-                      child: Text('Edit',
-                          style: TextStyle(
-                            color: Shade.actionButtonTextEdit,
-                          )),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          onPressedDeleteFromTable(Id, row);
-                        },
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(
-                            color: Shade.actionButtonTextDelete,
-                          ),
-                        )),
-                  ],
-                ));
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    onPressedEditFromTable(Id, row);
+                  },
+                  child: Text('Edit',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextEdit,
+                      )),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () {
+                      onPressedDeleteFromTable(Id, row);
+                    },
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
+                    )),
+              ],
+            ));
           }),
     ];
   }
 
   void onPressedEditFromTable(Id, row) {
-    Navigator.pushNamed(context, Strings.routeEditReceptionist,arguments:{'Id': Id});
+    Navigator.pushNamed(context, Strings.routeEditReceptionist,
+        arguments: ReceptionistArguments(
+            id: Id,
+            employeeType: row['employeeType'],
+            firstName: row['firstName'],
+            lastName: row['lastName'],
+            fatherHusbandName: row['fatherHusbandName'],
+            gender: row['gender'],
+            CNIC: row['CNIC'],
+            contact: row['contact'],
+            emergencyContact: row['emergencyContact'],
+            experience: row['experience'],
+            flourNo: row['flourNo'],
+            password: row['password'],
+            userName: row['userName'],
+            joiningDate: row['joiningDate'],
+            address: row['address'],
+            email: row['email']));
   }
 
   void onPressedDeleteFromTable(Id, row) {
@@ -448,30 +440,39 @@ class _ReceptionistListState extends State<ReceptionistList> {
           style: TextStyle(
               color: Shade.alertBoxButtonTextDelete,
               fontWeight: FontWeight.w900)),
-      onPressed: () {
+      onPressed: () async {
         Navigator.of(context).pop();
-        receptionistService.DeleteReceptionist(Id).then((response) {
+        sfpd = SimpleFontelicoProgressDialog(
+            context: context, barrierDimisable: false);
+        await sfpd.show(
+            message: 'Deleting ...',
+            type: SimpleFontelicoProgressDialogType.hurricane,
+            width: MediaQuery.of(context).size.width - 20,
+            horizontal: true);
+        receptionistService.DeleteReceptionist(Id).then((response) async {
           if (response == true) {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalSuccess,
                 content: Row(
                   children: [
                     Text('Success: Deleted Receptionist '),
                     Text(
-                      row['FirstName'],
+                      row['firstName'],
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 )));
             getReceptionistsFromApiAndLinkToTable();
           } else {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalFailed,
                 content: Row(
                   children: [
                     Text('Error: Try Again: Failed to delete Receptionist '),
                     Text(
-                      row['FirstName'],
+                      row['firstName'],
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -491,7 +492,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
         children: [
           Text(Strings.alertDialogTitleDeleteNote),
           Text(
-            row['FirstName'] + ' ?',
+            row['firstName'] + ' ?',
             style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
           )
         ],
@@ -522,10 +523,13 @@ class _ReceptionistListState extends State<ReceptionistList> {
         if (value.length >= 2) {
           var searchList = receptionistIsSource.where((element) {
             String searchById = element["Id"].toString().toLowerCase();
-            String searchByFirstName= element["FirstName"].toString().toLowerCase();
-            String searchByLastName = element["LastName"].toString().toLowerCase();
-            String searchByEmail = element["Email"].toString().toLowerCase();
-            String searchByContactNumber = element["ContactNumber"].toString().toLowerCase();
+            String searchByFirstName =
+                element["firstName"].toString().toLowerCase();
+            String searchByLastName =
+                element["lastName"].toString().toLowerCase();
+            String searchByEmail = element["email"].toString().toLowerCase();
+            String searchByContactNumber =
+                element["contactNumber"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByFirstName.contains(value.toLowerCase()) ||
                 searchByLastName.contains(value.toLowerCase()) ||
@@ -537,7 +541,8 @@ class _ReceptionistListState extends State<ReceptionistList> {
             }
           });
           receptionistIsSearched = [];
-          receptionistIsSearched.addAll(generateReceptionistSearchData(searchList));
+          receptionistIsSearched
+              .addAll(generateReceptionistSearchData(searchList));
           setState(() {
             showSearchedList = true;
           });
@@ -571,12 +576,12 @@ class _ReceptionistListState extends State<ReceptionistList> {
                   actions: [
                     Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.search_outlined),
-                              hintText: 'Search receptionist'),
-                          onChanged: (value) => onChangedSearchedValue(value),
-                        )),
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.search_outlined),
+                          hintText: 'Search receptionist'),
+                      onChanged: (value) => onChangedSearchedValue(value),
+                    )),
                   ],
                   headers: receptionistHeaders,
                   source: !showSearchedList
@@ -617,10 +622,11 @@ class _ReceptionistListState extends State<ReceptionistList> {
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => receptionistSelecteds = receptionistIsSource
-                          .map((entry) => entry)
-                          .toList()
-                          .cast());
+                      setState(() => receptionistSelecteds =
+                          receptionistIsSource
+                              .map((entry) => entry)
+                              .toList()
+                              .cast());
                     } else {
                       setState(() => receptionistSelecteds.clear());
                     }

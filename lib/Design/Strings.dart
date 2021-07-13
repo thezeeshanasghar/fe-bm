@@ -21,6 +21,7 @@ class Strings {
   static const String titleEditReceptionist = 'Edit Receptionist';
   static const String titleEditDoctor = 'Edit Doctor';
   static const String titleEditNurse = 'Edit Nurse';
+  static const String titleAccounts = 'Accounts';
 
   static const String routeHomePage = '/';
   static const String routeAddDoctor = '/AddDoctor';
@@ -42,6 +43,7 @@ class Strings {
   static const String routeEditRoom = '/EditRoom';
   static const String routeEditDoctor = '/EditDoctor';
   static const String routeEditNurse = '/EditNurse';
+  static const String routeAccounts = '/Accounts';
   static const String routeEditReceptionist = '/EditReceptionist';
   static const String alertDialogTitleDelete = 'Action';
   static const String alertDialogTitleEdit = 'Action';

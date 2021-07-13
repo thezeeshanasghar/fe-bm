@@ -6,21 +6,17 @@ import 'package:http/http.dart' as http;
 import '../Models/Room.dart';
 
 class RoomService {
-  Future<List<Room>> getRooms() async {
+
+  Future<Room> getRooms() async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/room'));
-    if (response.statusCode == 200) {
-      final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-      return parsed
-          .map<Room>((json) => Room.fromJson(json))
-          .toList();
-    } else {
-      throw Exception('Failed to load Room');
-    }
+    await http.get(Uri.https(Strings.pathAPI, 'api/room/get'));
+    final jsonResponse = jsonDecode(response.body);
+    return Room.fromJson(jsonResponse);
   }
+
   Future<dynamic> getRoomById(int Id) async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/room/${Id}'));
+    await http.get(Uri.https(Strings.pathAPI, 'api/room/get/${Id}'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
@@ -28,7 +24,7 @@ class RoomService {
     }
   }
 
-  Future<bool> InsertRoom(Room rooms) async {
+  Future<bool> InsertRoom(RoomData rooms) async {
     Map<String, dynamic> Obj = {
       'RoomNo': rooms.RoomNo,
       'RoomType': rooms.RoomType,
@@ -36,7 +32,7 @@ class RoomService {
       'RoomCharges': rooms.RoomCharges
     };
     final response =
-    await http.post(Uri.https(Strings.pathAPI, 'api/room'),
+    await http.post(Uri.https(Strings.pathAPI, 'api/room/insert'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -48,7 +44,7 @@ class RoomService {
     }
   }
 
-  Future<bool> UpdateRoom(Room rooms) async {
+  Future<bool> UpdateRoom(RoomData rooms) async {
     Map<String, dynamic> Obj = {
       'id':rooms.id,
       'RoomNo': rooms.RoomNo,
@@ -57,7 +53,7 @@ class RoomService {
       'RoomCharges': rooms.RoomCharges
     };
     final response =
-    await http.put(Uri.https(Strings.pathAPI, 'api/room/${rooms.id}'),
+    await http.put(Uri.https(Strings.pathAPI, 'api/room/update/${rooms.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -71,7 +67,7 @@ class RoomService {
 
   Future<bool> Deleteroom(int id) async {
     final response = await http.delete(
-        Uri.https(Strings.pathAPI, 'api/room/${id}'),
+        Uri.https(Strings.pathAPI, 'api/room/delete/${id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });

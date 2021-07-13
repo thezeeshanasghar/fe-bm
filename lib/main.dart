@@ -1,4 +1,5 @@
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Pages/Accounts.dart';
 import 'package:baby_doctor/Pages/AddDoctor.dart';
 import 'package:baby_doctor/Pages/AddNurse.dart';
 import 'package:baby_doctor/Pages/AddProcedures.dart';
@@ -59,6 +60,7 @@ void main() {
       Strings.routeEditReceptionist:(context)=>EditReceptionist(),
       Strings.routeEditDoctor:(context)=> EditDoctor(),
       Strings.routeEditNurse:(context)=> EditNurse(),
+      Strings.routeAccounts:(context)=> Accounts(),
     },
   ));
 }

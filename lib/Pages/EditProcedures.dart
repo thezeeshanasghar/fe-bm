@@ -1,9 +1,11 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Procedures.dart';
+import 'package:baby_doctor/Models/ResponseData/ProcedureResponse.dart';
+import 'package:baby_doctor/ShareArguments/ProcedureArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
-import 'package:baby_doctor/Models/Procedures.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditProcedures extends StatefulWidget {
@@ -12,44 +14,39 @@ class EditProcedures extends StatefulWidget {
 }
 
 class _EditProceduresState extends State<EditProcedures> {
-  @override
   final formKey = GlobalKey<FormState>();
   String Id;
   String ProcedureName;
   String PerformedBy;
-  double Charges;
-  double Share;
-  bool loadingButtonProgressIndicator = false;
+  int Charges;
+  int Share;
   bool isLoading = false;
-  SimpleFontelicoProgressDialog _dialog;
+  SimpleFontelicoProgressDialog sfpd;
   ProcedureService procedureService;
-  TextEditingController _namecontroller;
-  TextEditingController _performedbycontroller;
-  TextEditingController _chargescontroller;
-  TextEditingController _sharecontroller;
-  dynamic arguments;
+  TextEditingController tecName;
+  TextEditingController tecPerformedBy;
+  TextEditingController tecCharges;
+  TextEditingController tecShare;
+  ProcedureArguments arguments;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-    new Future.delayed(Duration.zero, () {});
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+  }
+
+  @override
+  void didChangeDependencies() async {
+    setState(() {
+      isLoading = true;
+    });
+    arguments = ModalRoute.of(context).settings.arguments;
+    setValuesOfProcedures();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  void initVariablesAndClasses() {
-    _namecontroller = new TextEditingController();
-    _performedbycontroller = new TextEditingController();
-    _chargescontroller = new TextEditingController();
-    _sharecontroller = new TextEditingController();
-
-    procedureService = ProcedureService();
   }
 
   Widget build(BuildContext context) {
@@ -99,24 +96,75 @@ class _EditProceduresState extends State<EditProcedures> {
     );
   }
 
-  @override
-  void didChangeDependencies() async {
+  void setValuesOfProcedures() {
     setState(() {
-      isLoading = true;
+      tecName.text = arguments.name;
+      tecShare.text = arguments.performerShare.toString();
+      tecPerformedBy.text = arguments.performedBy;
+      tecCharges.text = arguments.charges.toString();
+      isLoading = false;
     });
-    arguments = ModalRoute.of(context).settings.arguments as Map;
+  }
 
-    if (arguments != null) {
-      Procedures resp =
-          await procedureService.getProceduresById(arguments['Id']);
+  void initVariablesAndClasses() {
+    tecName = new TextEditingController();
+    tecShare = new TextEditingController();
+    tecPerformedBy = new TextEditingController();
+    tecCharges = new TextEditingController();
+    procedureService = ProcedureService();
+  }
 
-      setState(() {
-        _namecontroller.text = resp.name;
-        _performedbycontroller.text = resp.performedBy;
-        _chargescontroller.text = resp.charges.toString();
-        _sharecontroller.text = resp.performerShare.toString();
-        isLoading = false;
-      });
+  Future<void> onPressedSubmitButton()  async {
+    if (!formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Text('Error: Some input fields are not filled')));
+      return;
+    }
+    formKey.currentState.save();
+    sfpd = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+    await sfpd.show(
+        message: 'Updating ...',
+        type: SimpleFontelicoProgressDialogType.threelines,
+        width: MediaQuery.of(context).size.width - 20,
+        horizontal: true);
+    ProcedureData obj = new ProcedureData(
+        id: arguments.id,
+        name: ProcedureName,
+        performedBy: PerformedBy,
+        charges: Charges,
+        performerShare: Share);
+    var response = await procedureService.UpdateProcedure(obj);
+    print(response);
+    if (response == true) {
+      await sfpd.hide();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalSuccess,
+          content: Row(
+            children: [
+              Text('Success: Procedure Updated '),
+              Text(
+                ProcedureName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
+      formKey.currentState.reset();
+      Navigator.pushNamed(context, Strings.routeProcedureList);
+    } else {
+      await sfpd.hide();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Shade.snackGlobalFailed,
+          content: Row(
+            children: [
+              Text('Error: Try Again: Failed to edit '),
+              Text(
+                ProcedureName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          )));
     }
   }
 
@@ -156,7 +204,7 @@ class _EditProceduresState extends State<EditProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
-            controller: _namecontroller,
+            controller: tecName,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
@@ -188,7 +236,7 @@ class _EditProceduresState extends State<EditProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            controller: _performedbycontroller,
+            controller: tecPerformedBy,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
@@ -220,7 +268,7 @@ class _EditProceduresState extends State<EditProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
-            controller: _chargescontroller,
+            controller: tecCharges,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
@@ -236,7 +284,7 @@ class _EditProceduresState extends State<EditProcedures> {
               return null;
             },
             onSaved: (String value) {
-              Charges = double.parse(value);
+              Charges = int.parse(value);
             },
           ),
         ),
@@ -256,7 +304,7 @@ class _EditProceduresState extends State<EditProcedures> {
           child: TextFormField(
             autofocus: false,
             maxLength: 3,
-            controller: _sharecontroller,
+            controller: tecShare,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
@@ -266,13 +314,13 @@ class _EditProceduresState extends State<EditProcedures> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              //if(value>=0 || value<=100){
+              // if(value >= 0 || value<=100){
               // return 'This field cannot be empty';
-              //}
+              // }
               return null;
             },
             onSaved: (String value) {
-              Share = double.tryParse(value);
+              Share = int.tryParse(value);
             },
           ),
         ),
@@ -283,94 +331,29 @@ class _EditProceduresState extends State<EditProcedures> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        loadingButtonProgressIndicator == false
-            ? Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                      Dimens.globalInputFieldleft,
-                      Dimens.globalInputFieldTop,
-                      Dimens.globalInputFieldRight,
-                      Dimens.globalInputFieldBottom),
-                  child: ElevatedButton(
-                    autofocus: false,
-                    style: ElevatedButton.styleFrom(
-                      primary: Shade.submitButtonColor,
-                      minimumSize: Size(double.infinity, 45),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    ),
-                    child: Text(Strings.submitGlobal),
-                    onPressed: () {
-                      onPressedSubmitButton();
-                    },
-                  ),
-                ),
-              )
-            : Center(
-                child: CircularProgressIndicator(),
-              )
+        Align(
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
+            child: ElevatedButton(
+              autofocus: false,
+              style: ElevatedButton.styleFrom(
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              ),
+              child: Text(Strings.submitGlobal),
+              onPressed: () {
+                onPressedSubmitButton();
+              },
+            ),
+          ),
+        )
       ],
     );
-  }
-
-  onPressedSubmitButton() async {
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,
-        width: MediaQuery.of(context).size.width - 50);
-    Procedures obj = new Procedures(
-        id: arguments["Id"],
-        name: ProcedureName,
-        performedBy: PerformedBy,
-        charges: Charges,
-        performerShare: Share);
-    var response = await procedureService.UpdateProcedure(obj);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success:procedure Updated'),
-              Text(
-                ProcedureName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeProcedureList);
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to edit '),
-              Text(
-                ProcedureName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
   }
 }

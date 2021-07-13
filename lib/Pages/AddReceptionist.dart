@@ -36,14 +36,12 @@ class _AddReceptionistState extends State<AddReceptionist> {
   String Password;
   String UserName;
   String Experience;
-  SimpleFontelicoProgressDialog _dialog;
+  SimpleFontelicoProgressDialog sfpd;
   ReceptionistService receptionistService;
 
   @override
   void initState() {
     super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
   }
 
   @override
@@ -557,8 +555,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        loadingButtonProgressIndicator == false
-            ? Align(
+         Align(
                 alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
@@ -581,9 +578,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
                   ),
                 ),
               )
-            : Center(
-                child: CircularProgressIndicator(),
-              )
+
       ],
     );
   }
@@ -618,24 +613,21 @@ class _AddReceptionistState extends State<AddReceptionist> {
   }
 
   onPressedSubmitButton() async {
-    print(JoiningDate);
-    print(DOB);
-
-    if (!formKey.currentState.validate()) {
+     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Text('Error: Some input fields are not filled')));
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
-
-    Employee obj = new Employee(
+     sfpd = SimpleFontelicoProgressDialog(
+         context: context, barrierDimisable: false);
+     await sfpd.show(
+         message: 'Loading...',
+         type: SimpleFontelicoProgressDialogType.multilines,
+         width: MediaQuery.of(context).size.width - 20,
+         horizontal: true);
+    EmployeeData obj = new EmployeeData(
         employeeType: 'Receptionist',
         firstName: FirstName,
         lastName: LastName,
@@ -655,10 +647,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
     var response = await receptionistService.InsertReceptionist(obj);
     print(response);
     if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -673,7 +662,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
       formKey.currentState.reset();
       Navigator.pushNamed(context, Strings.routeReceptionistList);
     } else {
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(
@@ -685,9 +674,6 @@ class _AddReceptionistState extends State<AddReceptionist> {
               ),
             ],
           )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
     }
   }
 }

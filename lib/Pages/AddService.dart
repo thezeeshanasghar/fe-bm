@@ -18,7 +18,7 @@ class _AddServiceState extends State<AddService> {
   final formKey = GlobalKey<FormState>();
   String name;
   String description;
-  SimpleFontelicoProgressDialog _dialog;
+  SimpleFontelicoProgressDialog sfpd;
   bool loadingButtonProgressIndicator = false;
 
   Widget build(BuildContext context) {
@@ -95,12 +95,13 @@ class _AddServiceState extends State<AddService> {
       ],
     );
   }
+
   @override
   void initState() {
     super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+
   }
+
   Widget widgetDescription() {
     return Column(
       children: [
@@ -134,65 +135,62 @@ class _AddServiceState extends State<AddService> {
 
   Widget widgetSubmit() {
     return Column(
-
       children: [
         loadingButtonProgressIndicator == false
-        ? Align(
-          alignment: Alignment.center,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: ElevatedButton(
-              autofocus: false,
-              style: ElevatedButton.styleFrom(
-                primary: Shade.submitButtonColor,
-                minimumSize: Size(double.infinity, 45),
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              child: Text('Submit'),
-              onPressed: () {
-                onClickDataPost();
-              },
-            ),
-          ),
-        )
-                    :  Center(
-                          child: CircularProgressIndicator(),
-        )
+            ? Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      Dimens.globalInputFieldleft,
+                      Dimens.globalInputFieldTop,
+                      Dimens.globalInputFieldRight,
+                      Dimens.globalInputFieldBottom),
+                  child: ElevatedButton(
+                    autofocus: false,
+                    style: ElevatedButton.styleFrom(
+                      primary: Shade.submitButtonColor,
+                      minimumSize: Size(double.infinity, 45),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    ),
+                    child: Text('Submit'),
+                    onPressed: () {
+                      onClickDataPost();
+                    },
+                  ),
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              )
       ],
     );
   }
 
-
-  onClickDataPost()  async {
+  onClickDataPost() async {
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Text('Error: Some input fields are not filled')));
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
+    sfpd = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+    await sfpd.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 20,
+        horizontal: true);
     DAL.Service service = new DAL.Service();
-    Services obj = new Services(
-        name: name,
-        description: description,
-       );
+    ServiceData obj = new ServiceData(
+      name: name,
+      description: description,
+    );
     var response = await service.InsertServices(obj);
     print(response);
     if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -207,7 +205,7 @@ class _AddServiceState extends State<AddService> {
       formKey.currentState.reset();
       Navigator.pushNamed(context, Strings.routeServiceList);
     } else {
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(

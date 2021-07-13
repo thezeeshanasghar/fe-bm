@@ -1,6 +1,7 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/ResponseData/ProcedureResponse.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
 import 'package:baby_doctor/Models/Procedures.dart';
@@ -16,8 +17,8 @@ class _AddProceduresState extends State<AddProcedures> {
   final formKey = GlobalKey<FormState>();
   String ProcedureName;
   String PerformedBy;
-  double Charges;
-  double Share;
+  int Charges;
+  int Share;
   SimpleFontelicoProgressDialog _dialog;
   bool loadingButtonProgressIndicator = false;
 
@@ -162,7 +163,7 @@ class _AddProceduresState extends State<AddProcedures> {
               return null;
             },
             onSaved: (String value) {
-              Charges = double.parse(value);
+              Charges = int.parse(value);
             },
           ),
         ),
@@ -197,7 +198,7 @@ class _AddProceduresState extends State<AddProcedures> {
               return null;
             },
             onSaved: (String value) {
-              Share = double.tryParse(value);
+              Share = int.parse(value);
             },
           ),
         ),
@@ -255,7 +256,7 @@ class _AddProceduresState extends State<AddProcedures> {
         type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
     DAL.ProcedureService service = new DAL.ProcedureService();
-    Procedures obj = new Procedures(
+    ProcedureData obj = new ProcedureData(
         name: ProcedureName,
         performedBy: PerformedBy,
         charges: Charges,

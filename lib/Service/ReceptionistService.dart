@@ -4,22 +4,17 @@ import 'package:http/http.dart' as http;
 import '../Models/Employee.dart';
 
 class ReceptionistService {
-  Future<List<Employee>> getReceptionist() async {
+
+  Future <Employee> getReceptionist() async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/Employee'));
-    if (response.statusCode == 200) {
-      final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-      return parsed
-          .map<Employee>((json) => Employee.fromJson(json))
-          .toList();
-    } else {
-      throw Exception('Failed to load Employee');
-    }
+    await http.get(Uri.https(Strings.pathAPI, 'api/Employee/get'));
+    final jsonResponse = jsonDecode(response.body);
+    return Employee.fromJson(jsonResponse);
   }
 
   Future<Employee> getReceptionistById(int Id) async {
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/employee/${Id}'));
+    await http.get(Uri.https(Strings.pathAPI, 'api/employee/get/${Id}'));
     if (response.statusCode == 200) {
       final JsonResponse= jsonDecode(response.body);
       return Employee.fromJson(JsonResponse);
@@ -27,7 +22,7 @@ class ReceptionistService {
       throw Exception('Failed to load Receptionist');
     }
   }
-  Future<bool> InsertReceptionist(Employee employee) async {
+  Future<bool> InsertReceptionist(EmployeeData employee) async {
 
     Map<String, dynamic> Obj = {
     'employeeType':employee.employeeType,
@@ -47,7 +42,7 @@ class ReceptionistService {
       "email":employee.email,
     };
     final response =
-    await http.post(Uri.https(Strings.pathAPI, 'api/Employee'),
+    await http.post(Uri.https(Strings.pathAPI, 'api/Employee/insert'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -59,7 +54,7 @@ class ReceptionistService {
     }
   }
 
-  Future<bool> UpdateReceptionist(Employee employee) async {
+  Future<bool> UpdateReceptionist(EmployeeData employee) async {
     Map<String, dynamic> Obj = {
       'id':employee.id,
       'employeeType':employee.employeeType,
@@ -79,7 +74,7 @@ class ReceptionistService {
       "email":employee.email,
     };
     final response =
-    await http.put(Uri.https(Strings.pathAPI, 'api/Employee/${employee.id}'),
+    await http.put(Uri.https(Strings.pathAPI, 'api/Employee/update/${employee.id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -92,7 +87,7 @@ class ReceptionistService {
   }
   Future<bool> DeleteReceptionist(int id) async {
     final response = await http.delete(
-        Uri.https(Strings.pathAPI, 'api/Employee/${id}'),
+        Uri.https(Strings.pathAPI, 'api/Employee/Delete/${id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });

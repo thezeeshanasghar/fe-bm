@@ -4,8 +4,9 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
-import '../Models/Request/EmployeeModel.dart';
+import 'package:baby_doctor/Models/RequestData/EmployeeModel.dart';
 import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
@@ -48,11 +49,10 @@ class _EditNurseState extends State<EditNurse> {
   bool isLoading = false;
   NurseService nurseService;
   List<String> qualificationList = [''];
-  bool loadingButtonProgressIndicator = false;
-  dynamic arguments;
+  NurseArguments arguments;
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
-  SimpleFontelicoProgressDialog _dialog;
+  SimpleFontelicoProgressDialog sfpd;
   TextEditingController _firstnamecontroller;
   TextEditingController _lastnamecontroller;
   TextEditingController _fatherhusbandnamecontroller;
@@ -65,15 +65,12 @@ class _EditNurseState extends State<EditNurse> {
   TextEditingController _experiencecontroller;
   TextEditingController _dutydurationcontroller;
   TextEditingController _salerycontroller;
-  TextEditingController _proceduressharecontroller;
+  TextEditingController sharePercentageController;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-    new Future.delayed(Duration.zero, () {});
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
   }
 
   @override
@@ -86,32 +83,8 @@ class _EditNurseState extends State<EditNurse> {
     setState(() {
       isLoading = true;
     });
-
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    nurseService = NurseService();
-    id = arguments["Id"];
-    if (arguments != null) {
-      nurseService.getNurseById(arguments["Id"]).then((value) {
-        setState(() {
-          employeeId = value.employee.id;
-          _firstnamecontroller.text = value.employee.firstName;
-          _lastnamecontroller.text = value.employee.lastName;
-          _fatherhusbandnamecontroller.text = value.employee.fatherHusbandName;
-          _contacnumbercontroller.text = value.employee.contact;
-          _emergencycontactcontroller.text = value.employee.emergencyContact;
-          _addresscontroller.text = value.employee.address;
-          _emailcontroller.text = value.employee.email;
-          Gender = value.employee.gender;
-          _cniccontroller.text = value.employee.CNIC;
-          _experiencecontroller.text = value.employee.experience;
-          _dutydurationcontroller.text = value.DutyDuration.toString();
-          _proceduressharecontroller.text = value.SharePercentage.toString();
-          _salerycontroller.text = value.Salary.toString();
-          joinDateController.text = value.employee.joiningDate;
-          isLoading = false;
-        });
-      });
-    }
+    arguments = ModalRoute.of(context).settings.arguments;
+    setValuesOfNurse();
   }
 
   void initVariablesAndClasses() {
@@ -121,15 +94,35 @@ class _EditNurseState extends State<EditNurse> {
     _cniccontroller = new TextEditingController();
     _emailcontroller = new TextEditingController();
     _experiencecontroller = new TextEditingController();
-    _addresscontroller = new TextEditingController();
     _contacnumbercontroller = new TextEditingController();
     _emergencycontactcontroller = new TextEditingController();
     _fatherhusbandnamecontroller = new TextEditingController();
     _dutydurationcontroller = new TextEditingController();
-    _proceduressharecontroller = new TextEditingController();
+    sharePercentageController = new TextEditingController();
     _salerycontroller = new TextEditingController();
-
     nurseService = NurseService();
+  }
+
+  void setValuesOfNurse() {
+    setState(() {
+      id = arguments.id;
+      _firstnamecontroller.text = arguments.firstName;
+      _lastnamecontroller.text = arguments.lastName;
+      _addresscontroller.text = arguments.address;
+      _cniccontroller.text = arguments.CNIC;
+      _emailcontroller.text = arguments.email;
+      _experiencecontroller.text = arguments.experience;
+      _contacnumbercontroller.text = arguments.contact;
+      _emergencycontactcontroller.text = arguments.emergencyContact;
+      _fatherhusbandnamecontroller.text = arguments.fatherHusbandName;
+       Gender=arguments.gender;
+      _dutydurationcontroller.text = arguments.DutyDuration.toString();
+      joinDateController.text = arguments.joiningDate.toString().substring(0,10);
+      sharePercentageController.text = arguments.SharePercentage.toString();
+      _dutydurationcontroller.text = arguments.DutyDuration.toString();
+      _salerycontroller.text = arguments.Salary.toString();
+      isLoading = false;
+    });
   }
 
   @override
@@ -782,7 +775,7 @@ class _EditNurseState extends State<EditNurse> {
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
-              controller: _proceduressharecontroller,
+              controller: sharePercentageController,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -968,60 +961,58 @@ class _EditNurseState extends State<EditNurse> {
   }
 
   void onPressedSubmitButton() async {
-    List<dynamic> degrees = [];
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines, width: MediaQuery.of(context).size.width-50);
+      List<dynamic> degrees = [];
+      if (!formKey.currentState.validate()) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Shade.snackGlobalFailed,
+            content: Text('Error: Some input fields are not filled')));
+        return;
+      }
+      formKey.currentState.save();
+      sfpd = SimpleFontelicoProgressDialog(
+          context: context, barrierDimisable: false);
+      await sfpd.show(
+          message: 'Updating ...',
+          type: SimpleFontelicoProgressDialogType.threelines,
+          width: MediaQuery.of(context).size.width - 20,
+          horizontal: true);
+      NurseModel nurseData = NurseModel(
+          arguments.id,
+          arguments.employeeId,
+          DutyDuration,
+          ProceduresShare,
+          Salary,
+          EmployeeModelDetails(
+              arguments.employeeId,
+              'Nurse',
+              FirstName,
+              LastName,
+              FatherHusbandName,
+              Gender,
+              CNIC,
+              ContactNumber,
+              EmergencyContactNumber,
+              Email,
+              Address,
+              JoiningDate,
+              UserName,
+              'Password',
+              2,
+              Experience, []));
 
-    NurseModel nurseModel = NurseModel(
-        id,
-        employeeId,
-        DutyDuration,
-        ProceduresShare,
-        Salary,
-        EmployeeModelDetails(
-            employeeId,
-            'Nurse',
-            FirstName,
-            LastName,
-            FatherHusbandName,
-            Gender,
-            CNIC,
-            ContactNumber,
-            EmergencyContactNumber,
-            Email,
-            Address,
-            JoiningDate,
-            UserName,
-            'Password',
-            2,
-            Experience, []));
+      bool hasUpdated = await nurseService.UpdateNurse(nurseData);
+      if (hasUpdated) {
+        await sfpd.hide();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Shade.snackGlobalSuccess,
+            content: Text('Success: Updated $FirstName')));
 
-    print(nurseModel.employeeModelDetails.firstName);
-
-    bool hasUpdated = await nurseService.UpdateNurse(nurseModel);
-    if (hasUpdated) {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Text('Success: Updated $FirstName')));
-
-      Navigator.pushNamed(context, Strings.routeNurseList);
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Failed to update $FirstName')));
-    }
+        Navigator.pushNamed(context, Strings.routeNurseList);
+      } else {
+        await sfpd.hide();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Shade.snackGlobalFailed,
+            content: Text('Error: Failed to update $FirstName')));
+      }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/ShareArguments/ReceptionistArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
 import 'package:baby_doctor/Models/Employee.dart';
@@ -28,14 +29,13 @@ class _EditReceptionistState extends State<EditReceptionist> {
   int FlourNo;
   String JoiningDate;
   String DOB;
-  bool loadingButtonProgressIndicator = false;
   String FatherHusbandName;
   String Password;
   String UserName;
   String Experience;
   bool isLoading = false;
   ReceptionistService receptionistService;
-  SimpleFontelicoProgressDialog _dialog;
+  SimpleFontelicoProgressDialog sfpd;
   TextEditingController _firstnamecontroller;
   TextEditingController _lastnamecontroller;
   TextEditingController _usennamecontroller;
@@ -50,15 +50,12 @@ class _EditReceptionistState extends State<EditReceptionist> {
   TextEditingController _fatherhusbandnamecontroller;
   TextEditingController _dobcontroller;
 
-  dynamic arguments;
+  ReceptionistArguments arguments;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-    new Future.delayed(Duration.zero, () {});
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
   }
 
   @override
@@ -79,8 +76,29 @@ class _EditReceptionistState extends State<EditReceptionist> {
     _emergencycontactnumbercontroller = new TextEditingController();
     _fatherhusbandnamecontroller = new TextEditingController();
     _dobcontroller = new TextEditingController();
-
     receptionistService = ReceptionistService();
+  }
+
+  void setValuesOfReceptionist() {
+    setState(() {
+      _firstnamecontroller.text = arguments.firstName;
+      _lastnamecontroller.text = arguments.lastName;
+      _fatherhusbandnamecontroller.text = arguments.fatherHusbandName;
+      _usennamecontroller.text = arguments.userName;
+      joinDateController.text = arguments.joiningDate.toString().substring(0,10);
+      _cniccontroller.text = arguments.CNIC;
+
+      Gender = arguments.gender;
+
+      _flournocontroller.text = arguments.flourNo.toString();
+      _emailcontroller.text = arguments.email;
+      _passwwordcontroller.text = arguments.password;
+      _addresscontroller.text = arguments.address;
+      _contactnumbercontroller.text = arguments.contact;
+      _emergencycontactnumbercontroller.text = arguments.emergencyContact;
+
+      isLoading = false;
+    });
   }
 
   Widget build(BuildContext context) {
@@ -144,29 +162,10 @@ class _EditReceptionistState extends State<EditReceptionist> {
     setState(() {
       isLoading = true;
     });
-    arguments = ModalRoute.of(context).settings.arguments as Map;
-    receptionistService = ReceptionistService();
-    print(arguments["Id"]);
-    if (arguments != null) {
-      receptionistService.getReceptionistById(arguments["Id"]).then((value) {
-        setState(() {
-          _firstnamecontroller.text = value.firstName;
-          _lastnamecontroller.text = value.lastName;
-          _usennamecontroller.text = value.userName;
-          _cniccontroller.text = value.CNIC;
-          Gender = value.gender;
-          _flournocontroller.text = value.flourNo.toString();
-          _emailcontroller.text = value.email;
-          _passwwordcontroller.text = value.password;
-          _addresscontroller.text = value.address.toString();
-          _contactnumbercontroller.text = value.contact;
-          _emergencycontactnumbercontroller.text = value.emergencyContact;
-          _fatherhusbandnamecontroller.text = value.fatherHusbandName;
-          joinDateController.text = value.joiningDate;
-          isLoading = false;
-        });
-      });
-    }
+    arguments = ModalRoute.of(context).settings.arguments;
+    setValuesOfReceptionist();
+
+
   }
 
   Widget widgetFirstName() {
@@ -652,8 +651,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        loadingButtonProgressIndicator == false
-            ? Align(
+        Align(
                 alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
@@ -675,9 +673,6 @@ class _EditReceptionistState extends State<EditReceptionist> {
                     },
                   ),
                 ),
-              )
-            : Center(
-                child: CircularProgressIndicator(),
               )
       ],
     );
@@ -713,26 +708,24 @@ class _EditReceptionistState extends State<EditReceptionist> {
   }
 
   onPressedSubmitButton() async {
-    print(JoiningDate);
-    print(DOB);
-
     if (!formKey.currentState.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Text('Error: Some input fields are not filled')));
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+    sfpd = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+    await sfpd.show(
+        message: 'Updating ...',
+        type: SimpleFontelicoProgressDialogType.threelines,
+        width: MediaQuery.of(context).size.width - 20,
+        horizontal: true);
 
-    Employee obj = new Employee(
+    EmployeeData obj = new EmployeeData(
         employeeType: 'Receptionist',
-        id: arguments["Id"],
+        id: arguments.id,
         firstName: FirstName,
         lastName: LastName,
         fatherHusbandName: FatherHusbandName,
@@ -751,10 +744,8 @@ class _EditReceptionistState extends State<EditReceptionist> {
     var response = await receptionistService.UpdateReceptionist(obj);
     print(response);
     if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
+
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
@@ -769,7 +760,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
       formKey.currentState.reset();
       Navigator.pushNamed(context, Strings.routeReceptionistList);
     } else {
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(
@@ -781,9 +772,6 @@ class _EditReceptionistState extends State<EditReceptionist> {
               ),
             ],
           )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
     }
   }
 

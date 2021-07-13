@@ -2,13 +2,13 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Service/Service.dart';
+import 'package:baby_doctor/ShareArguments/ServiceArguments.dart';
 import 'package:flutter/material.dart';
 
 import 'package:baby_doctor/Models/Services.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditService extends StatefulWidget {
-
   @override
   _EditServiceState createState() => _EditServiceState();
 }
@@ -17,16 +17,16 @@ class _EditServiceState extends State<EditService> {
   @override
   final formKey = GlobalKey<FormState>();
   String Id;
-  String  ServiceName;
-  String  ServiceDescription;
+  String ServiceName;
+  String ServiceDescription;
   bool isLoading = false;
-  bool loadingButtonProgressIndicator = false;
   Service service;
-  SimpleFontelicoProgressDialog _dialog;
-  TextEditingController _servicenamecontroller;
-  TextEditingController _serviceDescriptioncontroller;
+  SimpleFontelicoProgressDialog sfpd;
+  TextEditingController TecServiceName;
+  TextEditingController TecServiceDescription;
 
-  dynamic arguments;
+  ServiceArguments arguments;
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
@@ -56,10 +56,10 @@ class _EditServiceState extends State<EditService> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        if (!isLoading)widgetServiceName(),
-                        if (!isLoading)widgetServiceDescription(),
+                        if (!isLoading) widgetServiceName(),
+                        if (!isLoading) widgetServiceDescription(),
                         if (!isLoading) widgetSubmit(),
-                        if (isLoading)  widgetCircularProgress(),
+                        if (isLoading) widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -75,28 +75,30 @@ class _EditServiceState extends State<EditService> {
   @override
   void initState() {
     super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+    initVariablesAndClasses();
   }
+
   @override
   void didChangeDependencies() async {
     setState(() {
       isLoading = true;
     });
-    arguments = ModalRoute
-        .of(context)
-        .settings
-        .arguments as Map;
+    arguments = ModalRoute.of(context).settings.arguments;
+    setValuesOfProcedures();
+  }
+
+  void initVariablesAndClasses() {
+    TecServiceName = new TextEditingController();
+    TecServiceDescription = new TextEditingController();
     service = Service();
-    if (arguments != null) {
-      service.getServicesById(arguments["Id"]).then((value) {
-        setState(() {
-          _servicenamecontroller = new TextEditingController(text: value["name"]);
-          _serviceDescriptioncontroller = new TextEditingController(text: value["description"]);
-          isLoading = false;
-        });
-      });
-    }
+  }
+
+  void setValuesOfProcedures() {
+    setState(() {
+      TecServiceName.text = arguments.name;
+      TecServiceDescription.text = arguments.description;
+      isLoading = false;
+    });
   }
 
   Widget widgetServiceName() {
@@ -111,7 +113,7 @@ class _EditServiceState extends State<EditService> {
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
-            controller: _servicenamecontroller,
+            controller: TecServiceName,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.fact_check),
                 border: OutlineInputBorder(),
@@ -123,7 +125,7 @@ class _EditServiceState extends State<EditService> {
               return null;
             },
             onSaved: (String value) {
-             ServiceName = value;
+              ServiceName = value;
             },
           ),
         ),
@@ -131,7 +133,7 @@ class _EditServiceState extends State<EditService> {
     );
   }
 
-  Widget widgetServiceDescription(){
+  Widget widgetServiceDescription() {
     return Column(
       children: [
         Padding(
@@ -143,7 +145,7 @@ class _EditServiceState extends State<EditService> {
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            controller: _serviceDescriptioncontroller,
+            controller: TecServiceDescription,
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.person),
                 border: OutlineInputBorder(),
@@ -155,13 +157,14 @@ class _EditServiceState extends State<EditService> {
               return null;
             },
             onSaved: (String value) {
-               ServiceDescription = value;
+              ServiceDescription = value;
             },
           ),
         ),
       ],
     );
   }
+
   Widget widgetCircularProgress() {
     return Container(
       height: MediaQuery.of(context).size.height - 100,
@@ -189,8 +192,7 @@ class _EditServiceState extends State<EditService> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        loadingButtonProgressIndicator == false
-            ? Align(
+        Align(
           alignment: Alignment.center,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
@@ -203,8 +205,7 @@ class _EditServiceState extends State<EditService> {
               style: ElevatedButton.styleFrom(
                 primary: Shade.submitButtonColor,
                 minimumSize: Size(double.infinity, 45),
-                padding:
-                EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text(Strings.submitGlobal),
               onPressed: () {
@@ -212,9 +213,6 @@ class _EditServiceState extends State<EditService> {
               },
             ),
           ),
-        )
-            : Center(
-          child: CircularProgressIndicator(),
         )
       ],
     );
@@ -227,33 +225,30 @@ class _EditServiceState extends State<EditService> {
           content: Text('Error: Some input fields are not filled')));
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
-
-    Services obj = new Services(
-        id:arguments["Id"],
-        name:  ServiceName,
-        description:  ServiceDescription,
-        );
-    var response = await service.InsertServices(obj);
+    sfpd = SimpleFontelicoProgressDialog(
+        context: context, barrierDimisable: false);
+    await sfpd.show(
+        message: 'Updating ...',
+        type: SimpleFontelicoProgressDialogType.threelines,
+        width: MediaQuery.of(context).size.width - 20,
+        horizontal: true);
+    ServiceData obj = new ServiceData(
+      id: arguments.id,
+      name: ServiceName,
+      description: ServiceDescription,
+    );
+    var response = await service.UpdateServices(obj);
     print(response);
     if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalSuccess,
           content: Row(
             children: [
               Text('Success:Service Updated'),
               Text(
-               ServiceName,
+                ServiceName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -261,21 +256,18 @@ class _EditServiceState extends State<EditService> {
       formKey.currentState.reset();
       Navigator.pushNamed(context, Strings.routeServiceList);
     } else {
-      _dialog.hide();
+      await sfpd.hide();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Shade.snackGlobalFailed,
           content: Row(
             children: [
               Text('Error: Try Again: Failed to edit '),
               Text(
-               ServiceName,
+                ServiceName,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
           )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
     }
   }
 }

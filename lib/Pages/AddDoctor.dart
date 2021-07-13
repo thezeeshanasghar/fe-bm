@@ -34,7 +34,7 @@ class _AddDoctorState extends State<AddDoctor> {
   String Email;
   String Address;
   String Gender = 'Choose Gender';
-  String Speciality;
+  String Speciality  = 'Select Speciality';
   SimpleFontelicoProgressDialog _dialog;
   int ConsultationFee = 10;
   int EmergencyConsultationFee = 10;
@@ -1136,7 +1136,7 @@ class _AddDoctorState extends State<AddDoctor> {
         message: 'Loading...',
         type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
-    Employee employee = new Employee(
+    EmployeeData employee = new EmployeeData(
         employeeType: 'Doctor',
         firstName: FirstName,
         lastName: LastName,
@@ -1157,7 +1157,7 @@ class _AddDoctorState extends State<AddDoctor> {
     var json = jsonEncode(employee.toJson());
     print(json);
 
-    Doctor doctor = new Doctor(
+    DoctorData doctor = new DoctorData(
         ConsultationFee: ConsultationFee,
         EmergencyConsultationFee: EmergencyConsultationFee,
         ShareInFee: FeeShare,

@@ -3,9 +3,11 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
+import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class NurseList extends StatefulWidget {
@@ -26,13 +28,13 @@ class _NurseListState extends State<NurseList> {
   bool nurseIsLoading;
   bool nurseShowSelect;
   bool showSearchedList;
-
+  SimpleFontelicoProgressDialog sfpd;
   List<DatatableHeader> nurseHeaders;
   List<int> nursePerPage;
   List<Map<String, dynamic>> nurseIsSource;
   List<Map<String, dynamic>> nurseIsSearched;
   List<Map<String, dynamic>> nurseSelecteds;
-  List<Nurse> listNurses;
+  List<NurseData> listNurses;
 
   NurseService nurseService;
 
@@ -122,27 +124,32 @@ class _NurseListState extends State<NurseList> {
     setState(() => nurseIsLoading = true);
     listNurses = [];
     nurseIsSource = [];
-    listNurses = await nurseService.getNurse();
+
+    Nurse nurseResponse = await nurseService.getNurse();
+    listNurses = nurseResponse.data;
     nurseIsSource.addAll(generateNurseDataFromApi(listNurses));
     setState(() => nurseIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateNurseDataFromApi(
-      List<Nurse> listOfNurses) {
+      List<NurseData> listOfNurses) {
     List<Map<String, dynamic>> tempsnurse = [];
-    for (Nurse nurses in listOfNurses) {
+    for (NurseData nurses in listOfNurses) {
       tempsnurse.add({
         "Id": nurses.id,
-        "FirstName": nurses.employee.firstName,
+        "firstName": nurses.employee.firstName,
         "lastName": nurses.employee.lastName,
-        "FatherName": nurses.employee.fatherHusbandName,
-        "ContactNumber": nurses.employee.contact,
-        "EmergencyContactNumber": nurses.employee.emergencyContact,
-        "Gender": nurses.employee.gender,
+        "fatherHusbandName": nurses.employee.fatherHusbandName,
+        "contact": nurses.employee.contact,
+        "emergencyContactNumber": nurses.employee.emergencyContact,
+        "gender": nurses.employee.gender,
+        "email": nurses.employee.email,
+        "experience": nurses.employee.experience,
+        "employeeId": nurses.employee.id,
         "CNIC": nurses.employee.CNIC,
         "DutyDuration": nurses.DutyDuration,
-        "Address": nurses.employee.address,
-        "JoiningDate": nurses.employee.joiningDate.substring(0,10),
+        "address": nurses.employee.address,
+        "joiningDate": nurses.employee.joiningDate.substring(0, 10),
         "DutyDuration": nurses.DutyDuration,
         "Salary": nurses.Salary,
         "ProcedureShare": nurses.SharePercentage,
@@ -171,7 +178,23 @@ class _NurseListState extends State<NurseList> {
   initializenurseListHeaders() {
     nurseHeaders = [
       DatatableHeader(
-          value: "FirstName",
+          value: "Id",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "firstName",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -187,7 +210,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "LastName",
+          value: "lastName",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -203,7 +226,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "FatherName",
+          value: "fatherHusbandName",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -219,7 +242,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "Gender",
+          value: "gender",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -251,7 +274,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "ContactNumber",
+          value: "contact",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -267,7 +290,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "EmergencyContactNumber",
+          value: "emergencyContactNumber",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -283,7 +306,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "Address",
+          value: "address",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -315,7 +338,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "JoiningDate",
+          value: "joiningDate",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -398,33 +421,54 @@ class _NurseListState extends State<NurseList> {
           sourceBuilder: (Id, row) {
             return Container(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          onPressedEditFromTable(Id, row);
-                        },
-                        child: Text('Edit')),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          onPressedDeleteFromTable(Id, row);
-                        },
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.red),
-                        )),
-                  ],
-                ));
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      onPressedEditFromTable(Id, row);
+                    },
+                    child: Text('Edit')),
+                SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () {
+                      onPressedDeleteFromTable(Id, row);
+                    },
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(color: Colors.red),
+                    )),
+              ],
+            ));
           }),
     ];
   }
 
   void onPressedEditFromTable(Id, row) {
     print(Id);
-    Navigator.pushNamed(context, Strings.routeEditNurse,arguments:{'Id': Id});
+    Navigator.pushNamed(context, Strings.routeEditNurse,
+        arguments: NurseArguments(
+            id:Id,
+            DutyDuration: row['DutyDuration'],
+            SharePercentage: row['ProcedureShare'],
+            Salary: row['Salary'],
+            firstName: row['firstName'],
+            employeeId: row['employeeId'],
+            lastName: row['lastName'],
+            fatherHusbandName: row['fatherHusbandName'],
+            gender: row['gender'],
+            CNIC: row['CNIC'],
+            contact: row['contact'],
+            emergencyContact: row['emergencyContactNumber'],
+            experience: row['experience'],
+            flourNo: row['flourNo'],
+            password: row['password'],
+            userName: row['userName'],
+            joiningDate: row['joiningDate'],
+            address: row['address'],
+            email: row['email']));
+
   }
 
   void onPressedDeleteFromTable(Id, row) {
@@ -443,30 +487,39 @@ class _NurseListState extends State<NurseList> {
           style: TextStyle(
               color: Shade.alertBoxButtonTextDelete,
               fontWeight: FontWeight.w900)),
-      onPressed: () {
+      onPressed: () async {
         Navigator.of(context).pop();
-        nurseService.DeleteNurse(Id).then((response) {
+        sfpd = SimpleFontelicoProgressDialog(
+            context: context, barrierDimisable: false);
+        await sfpd.show(
+            message: 'Deleting ...',
+            type: SimpleFontelicoProgressDialogType.hurricane,
+            width: MediaQuery.of(context).size.width - 20,
+            horizontal: true);
+        nurseService.DeleteNurse(Id).then((response) async {
           if (response == true) {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalSuccess,
                 content: Row(
                   children: [
                     Text('Success: Deleted Nurse '),
                     Text(
-                      row['FirstName'],
+                      row['firstName'],
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 )));
             getNursesFromApiAndLinkToTable();
           } else {
+            await sfpd.hide();
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 backgroundColor: Shade.snackGlobalFailed,
                 content: Row(
                   children: [
                     Text('Error: Try Again: Failed to delete Nurse '),
                     Text(
-                      row['FirstName'],
+                      row['firstName'],
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -486,7 +539,7 @@ class _NurseListState extends State<NurseList> {
         children: [
           Text(Strings.alertDialogTitleDeleteNote),
           Text(
-            row['FirstName'] + ' ?',
+            row['firstName'],
             style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
           )
         ],
@@ -519,9 +572,9 @@ class _NurseListState extends State<NurseList> {
             String searchById = element["Id"].toString().toLowerCase();
             String searchByName = element["Name"].toString().toLowerCase();
             String searchByPerformedBy =
-            element["PerformedBy"].toString().toLowerCase();
+                element["PerformedBy"].toString().toLowerCase();
             String searchByCharges =
-            element["Charges"].toString().toLowerCase();
+                element["Charges"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByName.contains(value.toLowerCase()) ||
                 searchByPerformedBy.contains(value.toLowerCase()) ||
@@ -566,17 +619,15 @@ class _NurseListState extends State<NurseList> {
                   actions: [
                     Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.search_outlined),
-                              hintText: 'Search nurse'),
-                          onChanged: (value) => onChangedSearchedValue(value),
-                        )),
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.search_outlined),
+                          hintText: 'Search nurse'),
+                      onChanged: (value) => onChangedSearchedValue(value),
+                    )),
                   ],
                   headers: nurseHeaders,
-                  source: !showSearchedList
-                      ? nurseIsSource
-                      : nurseIsSearched,
+                  source: !showSearchedList ? nurseIsSource : nurseIsSearched,
                   selecteds: nurseSelecteds,
                   showSelect: nurseShowSelect,
                   autoHeight: false,
@@ -588,13 +639,11 @@ class _NurseListState extends State<NurseList> {
                       nurseSortColumn = value;
                       nurseSortAscending = !nurseSortAscending;
                       if (nurseSortAscending) {
-                        nurseIsSource.sort((a, b) =>
-                            b["$nurseSortColumn"]
-                                .compareTo(a["$nurseSortColumn"]));
+                        nurseIsSource.sort((a, b) => b["$nurseSortColumn"]
+                            .compareTo(a["$nurseSortColumn"]));
                       } else {
-                        nurseIsSource.sort((a, b) =>
-                            a["$nurseSortColumn"]
-                                .compareTo(b["$nurseSortColumn"]));
+                        nurseIsSource.sort((a, b) => a["$nurseSortColumn"]
+                            .compareTo(b["$nurseSortColumn"]));
                       }
                     });
                   },
@@ -612,10 +661,8 @@ class _NurseListState extends State<NurseList> {
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => nurseSelecteds = nurseIsSource
-                          .map((entry) => entry)
-                          .toList()
-                          .cast());
+                      setState(() => nurseSelecteds =
+                          nurseIsSource.map((entry) => entry).toList().cast());
                     } else {
                       setState(() => nurseSelecteds.clear());
                     }

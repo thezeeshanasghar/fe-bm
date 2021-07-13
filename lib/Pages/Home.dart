@@ -315,7 +315,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       children: [
         widgetRoomListCard(),
         widgetServiceListCard(),
-        widgetDummySpaceCard(),
+        widgetAccountsCard(),
       ],
     );
   }
@@ -370,6 +370,58 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       'Click to view the list of doctors',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetAccountsCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeAccounts);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleAccounts,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Click to view the Accounts',
                     ),
                   ],
                 ),

@@ -4,47 +4,35 @@ import 'package:baby_doctor/Models/Services.dart';
 import 'package:http/http.dart' as http;
 
 class Service {
-  Future<List<Services>> getServices() async {
+  Future<ServiceResponse> getServices() async {
     final response =
-        await http.get(Uri.https(Strings.pathAPI, 'api/service'));
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List<Services> services = body
-          .map(
-            (dynamic item) => Services.fromJson(item),
-          )
-          .toList();
-
-      return services;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load Procedure');
-    }
+        await http.get(Uri.https(Strings.pathAPI, 'api/service/get'));
+    final jsonResponse = jsonDecode(response.body);
+    return ServiceResponse.fromJson(jsonResponse);
   }
 
   Future<dynamic> getServicesById(int Id) async {
-    final response = await http.get(Uri.https(Strings.pathAPI, 'api/service/${Id}'));
+    final response =
+        await http.get(Uri.https(Strings.pathAPI, 'api/service/get/${Id}'));
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to load Procedure');
+      throw Exception('Failed to load Service');
     }
   }
 
-  Future<bool> InsertServices(Services services) async{
+  Future<bool> InsertServices(ServiceData services) async {
     Map<String, dynamic> Obj = {
       'name': services.name,
       'description': services.description,
-
     };
 
     final response =
-        await http.post(Uri.https(Strings.pathAPI, 'api/service'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(Obj));
+        await http.post(Uri.https(Strings.pathAPI, 'api/service/insert'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(Obj));
 
     if (response.statusCode == 201) {
       // If the server did return a 201 CREATED response,
@@ -57,20 +45,28 @@ class Service {
     }
   }
 
-  Future<http.Response> UpdateServices(Services services) {
-    return http.put(
-      Uri.https(Strings.pathAPI, 'api/room/${services.id}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(services),
-    );
-  }
+  Future<bool> UpdateServices(ServiceData services) async{
+      Map<String, dynamic> Obj = {
+        'id':services.id,
+        'name': services.name,
+        'description': services.description,
+      };
+      final response = await http.put(Uri.https(Strings.pathAPI, 'api/service/update/${services.id}'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(Obj));
+      if (response.statusCode ==204) {
+        return true;
+      } else {
+        return false;
+      }
+    }
 
-  Future<bool> DeleteServices(int id) async{
 
+    Future<bool> DeleteServices(int id) async {
     final response = await http.delete(
-        Uri.https(Strings.pathAPI, 'api/service/${id}'),
+        Uri.https(Strings.pathAPI, 'api/service/delete/${id}'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });
@@ -80,5 +76,4 @@ class Service {
       return false;
     }
   }
-
 }

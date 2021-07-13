@@ -264,7 +264,7 @@ class _AddRoomState extends State<AddRoom> {
 
     //perform your task after save
     DAL.RoomService service = new DAL.RoomService();
-    Room obj = new Room(
+    RoomData obj = new RoomData(
       RoomNo: RoomNo,
       RoomType: RoomType,
       RoomCharges: RoomCharges,

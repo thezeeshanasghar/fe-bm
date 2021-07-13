@@ -2,6 +2,27 @@ import 'package:flutter/foundation.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';
 
 class Employee {
+  final bool isSuccess;
+  final String message;
+  final List<EmployeeData> data;
+
+  Employee({
+    @required this.isSuccess,
+    @required this.message,
+    @required this.data,
+  });
+
+  factory Employee.fromJson(Map<String, dynamic> json) {
+    var list = json['data'] as List;
+    List<EmployeeData> dataList =
+    list.map((i) => EmployeeData.fromJson(i)).toList();
+    return Employee(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+  }
+}
+
+
+class EmployeeData {
   final int id;
   final String employeeType;
   final String firstName;
@@ -20,7 +41,7 @@ class Employee {
   final String email;
   final List<dynamic> qualifications;
 
-  Employee(
+  EmployeeData(
       {this.id,
       @required this.employeeType,
       @required this.firstName,
@@ -39,8 +60,8 @@ class Employee {
       @required this.email,
       this.qualifications});
 
-  factory Employee.fromJson(Map<String, dynamic> json) {
-    return Employee(
+  factory EmployeeData.fromJson(Map<String, dynamic> json) {
+    return EmployeeData(
         id: json['id'],
         employeeType: json['employeeType'],
         firstName: json['firstName'],
