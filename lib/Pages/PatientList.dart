@@ -107,25 +107,30 @@ class _PatientListState extends State<PatientList> {
   void getWalkInPatientsFromApiAndLinkToTable() async {
     setState(() => walkInIsLoading = true);
     var listwalkindata = [];
-    listwalkindata = await patientService.getPatientsInvoices();
+    Patient patientResponse = await patientService.getPatientsInvoices('WalkIn');
+    listwalkindata = patientResponse.data;
     walkInIsSource.addAll(generateWalkinPatientsDataFromApi(listwalkindata));
+
     setState(() => walkInIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateWalkinPatientsDataFromApi(
-      List<Patient> listOfPatients) {
+      List<PatientData> listOfPatients) {
     List<Map<String, dynamic>> tempspatient = [];
-    for (Patient patient in listOfPatients) {
+    for (PatientData patient in listOfPatients) {
       tempspatient.add({
         "Id": patient.id,
+        "Invoice": patient.id,
         "Name": patient.Name,
         "DOB": patient.DOB.substring(0,10),
         "PatientId": patient.PatientId,
         "FatherHusbandName": patient.FatherHusbandName,
         "Sex": patient.Sex,
         "Discount": patient.Discount,
-        "NetAmount": patient.NetAmount,
+        "NetTotal": patient.NetAmount,
+        "Total": patient.NetAmount- patient.Discount,
         "Category": patient.Category,
+        "appointmentId": patient.AppointmentId,
         "Action": patient.id,
       });
     }
@@ -135,40 +140,45 @@ class _PatientListState extends State<PatientList> {
   void getOnCallPatientsFromApiAndLinkToTable() async {
     setState(() => onlineIsLoading = true);
     var listonlineindata = [];
-    listonlineindata = await patientService.getPatientsInvoices();
+    Patient patientResponse = await patientService.getPatientsInvoices('Oncall');
+    listonlineindata = patientResponse.data;
     onlineIsSource.addAll(generateWalkinPatientsDataFromApi(listonlineindata));
     setState(() => onlineIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateOnCallPatientsDataFromApi(
-      List<Patient> listOfPatients) {
+      List<PatientData> listOfPatients) {
     List<Map<String, dynamic>> tempspatient = [];
-    for (Patient patient in listOfPatients) {
+    for (PatientData patient in listOfPatients) {
       tempspatient.add({
         "Id": patient.id,
         "Name": patient.Name,
         "DOB": patient.DOB.substring(0,10),
         "PatientId": patient.PatientId,
         "FatherHusbandName": patient.FatherHusbandName,
+        "Category": patient.Category,
         "AppointmentId": patient.AppointmentId,
         "Action": patient.id,
       });
+
     }
+
     return tempspatient;
   }
 
   void getAdmittedPatientsFromApiAndLinkToTable() async {
     setState(() => admittedIsLoading = true);
     var listadmitteddata = [];
-    listadmitteddata = await patientService.getPatientsInvoices();
-    admittedIsSource.addAll(generateAdmittedPatientsDataFromApi(listadmitteddata));
+    Patient patientResponse = await patientService.getPatientsInvoices('Admitted');
+    listadmitteddata = patientResponse.data;
+    admittedIsSource.addAll(generateWalkinPatientsDataFromApi(listadmitteddata));
     setState(() => admittedIsLoading = false);
   }
 
   List<Map<String, dynamic>> generateAdmittedPatientsDataFromApi(
-      List<Patient> listOfPatients) {
+      List<PatientData> listOfPatients) {
     List<Map<String, dynamic>> tempspatient = [];
-    for (Patient patient in listOfPatients) {
+    for (PatientData patient in listOfPatients) {
       tempspatient.add({
         "Id": patient.id,
         "Name": patient.Name,
@@ -450,6 +460,22 @@ class _PatientListState extends State<PatientList> {
             );
           }),
       DatatableHeader(
+          value: "appointmentId",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Appointment Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
           value: "DOB",
           show: true,
           sortable: true,
@@ -466,23 +492,7 @@ class _PatientListState extends State<PatientList> {
             );
           }),
       DatatableHeader(
-          value: "CheckupType",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Checkup Type",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "AppointmentId",
+          value: "Category",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -491,7 +501,7 @@ class _PatientListState extends State<PatientList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Appointment No",
+                  "Checkup Type",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -727,7 +737,7 @@ class _PatientListState extends State<PatientList> {
   }
 
   @override
-   Widget build(BuildContext context) {
+   Widget build(BuildContext context )  {
 
     return MaterialApp(
       // Define a controller for TabBar and TabBarViews

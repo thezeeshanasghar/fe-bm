@@ -1,18 +1,39 @@
 import 'package:flutter/foundation.dart';
 
+
 class Patient {
+  final bool isSuccess;
+  final String message;
+  final List<PatientData> data;
+
+  Patient({
+    @required this.isSuccess,
+    @required this.message,
+    @required this.data,
+  });
+
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    var list = json['data'] as List;
+    List<PatientData> dataList =
+    list.map((i) => PatientData.fromJson(i)).toList();
+    return Patient(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+  }
+}
+
+class PatientData {
   final int id;
   final String Name;
   final String DOB;
-  final PatientId;
+  final int PatientId;
   final String FatherHusbandName;
-  final String AppointmentId;
+  final int AppointmentId;
   final String Sex;
   final int Discount;
   final int NetAmount;
   final String Category;
 
-  Patient(
+  PatientData(
       {this.id,
         @required this.Name,
         @required this.DOB,
@@ -25,8 +46,8 @@ class Patient {
         @required this.Category
        });
 
-  factory Patient.fromJson(Map<String, dynamic> json) {
-    return Patient(
+  factory PatientData.fromJson(Map<String, dynamic> json) {
+    return PatientData(
         id: json['id'],
         Name: json['name'],
         DOB: json['dob'],

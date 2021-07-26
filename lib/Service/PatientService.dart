@@ -6,16 +6,14 @@ import 'package:http/http.dart' as http;
 
 class PatientService {
 
-  Future<List<Patient>> getPatientsInvoices() async {
+  Future<Patient> getPatientsInvoices(String Category) async {
+    final queryParameters = {
+      'Category': Category,
+    };
     final response =
-    await http.get(Uri.https(Strings.pathAPI, 'api/Patient/Invoices'));
-    if (response.statusCode == 200) {
-      //print(response.body ['data'] as List);
-      final parsed = (jsonDecode(response.body)['data'] as List).cast<Map<String, dynamic>>();
-      return parsed.map<Patient>((json) => Patient.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load Employee');
-    }
+    await http.get(Uri.https(Strings.pathAPI, 'api/Patient/Invoices', queryParameters));
+    final jsonResponse = jsonDecode(response.body);
+    return Patient.fromJson(jsonResponse);
   }
 
   Future<Patient> getPatientById(int Id) async {
