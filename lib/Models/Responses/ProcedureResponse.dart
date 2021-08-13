@@ -6,9 +6,9 @@ class Procedure {
   final List<ProcedureData> data;
 
   Procedure({
-    @required this.isSuccess,
-    @required this.message,
-    @required this.data,
+    this.isSuccess,
+    this.message,
+    this.data,
   });
 
   factory Procedure.fromJson(Map<String, dynamic> json) {
@@ -29,10 +29,10 @@ class ProcedureData {
 
   ProcedureData(
       {this.id,
-      @required this.name,
-      @required this.performedBy,
-      @required this.charges,
-      @required this.performerShare});
+      this.name,
+      this.performedBy,
+      this.charges,
+      this.performerShare});
 
   factory ProcedureData.fromJson(Map<String, dynamic> json) {
     return ProcedureData(

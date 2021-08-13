@@ -1,6 +1,6 @@
 import 'package:baby_doctor/Models/Sample/ReceiptSample.dart';
 
-class ServiceSample {
+class RefundSample {
   final int id;
   final int receiptId;
 
@@ -9,7 +9,7 @@ class ServiceSample {
 
   final ReceiptSample receipt;
 
-  ServiceSample({
+  RefundSample({
     this.id,
     this.receiptId,
     this.refundAmount,
@@ -17,8 +17,8 @@ class ServiceSample {
     this.receipt,
   });
 
-  factory ServiceSample.fromJson(Map<String, dynamic> json) {
-    return ServiceSample(
+  factory RefundSample.fromJson(Map<String, dynamic> json) {
+    return RefundSample(
       id: json['id'],
       receiptId: json['receiptId'],
       refundAmount: json['refundAmount'],
