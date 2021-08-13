@@ -1,3 +1,5 @@
+import 'package:baby_doctor/Models/Sample/UserSample.dart';
+
 class QualificationSample {
   final int id;
   final int userId;
@@ -6,12 +8,15 @@ class QualificationSample {
   final String description;
   final String qualificationType;
 
+  final UserSample user;
+
   QualificationSample({
     this.id,
     this.userId,
     this.certificate,
     this.description,
     this.qualificationType,
+    this.user,
   });
 
   factory QualificationSample.fromJson(Map<String, dynamic> json) {
@@ -21,6 +26,7 @@ class QualificationSample {
       certificate: json['certificate'],
       description: json['description'],
       qualificationType: json['qualificationType'],
+      user: json['user'],
     );
   }
 }

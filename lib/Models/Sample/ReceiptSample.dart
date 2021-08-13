@@ -1,3 +1,6 @@
+import 'package:baby_doctor/Models/Sample/DoctorSample.dart';
+import 'package:baby_doctor/Models/Sample/PatientSample.dart';
+
 class ReceiptSample {
   final int id;
   final int patientId;
@@ -11,6 +14,9 @@ class ReceiptSample {
   final int pendingAmount;
   final int paidAmount;
 
+  final DoctorSample doctor;
+  final PatientSample patient;
+
   ReceiptSample({
     this.id,
     this.patientId,
@@ -22,6 +28,8 @@ class ReceiptSample {
     this.totalAmount,
     this.pendingAmount,
     this.paidAmount,
+    this.doctor,
+    this.patient,
   });
 
   factory ReceiptSample.fromJson(Map<String, dynamic> json) {
@@ -36,6 +44,8 @@ class ReceiptSample {
       totalAmount: json['totalAmount'],
       pendingAmount: json['pendingAmount'],
       paidAmount: json['paidAmount'],
+      doctor: json['doctor'],
+      patient: json['patient'],
     );
   }
 }

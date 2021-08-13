@@ -1,3 +1,5 @@
+import 'package:baby_doctor/Models/Sample/UserSample.dart';
+
 class DoctorSample {
   final int id;
   final int userId;
@@ -7,6 +9,8 @@ class DoctorSample {
   final int shareInFee;
   final String specialityType;
 
+  final UserSample user;
+
   DoctorSample({
     this.id,
     this.userId,
@@ -14,6 +18,7 @@ class DoctorSample {
     this.emergencyConsultationFee,
     this.shareInFee,
     this.specialityType,
+    this.user,
   });
 
   factory DoctorSample.fromJson(Map<String, dynamic> json) {
@@ -24,6 +29,7 @@ class DoctorSample {
       emergencyConsultationFee: json['emergencyConsultationFee'],
       shareInFee: json['shareInFee'],
       specialityType: json['specialityType'],
+      user: json['user'],
     );
   }
 }

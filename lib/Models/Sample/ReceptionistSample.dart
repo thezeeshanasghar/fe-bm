@@ -7,14 +7,14 @@ class ReceptionistSample {
   final String jobType;
   final String shiftTime;
 
-  final UserSample userSample;
+  final UserSample user;
 
   ReceptionistSample({
     this.id,
     this.userId,
     this.jobType,
     this.shiftTime,
-    this.userSample,
+    this.user,
   });
 
   factory ReceptionistSample.fromJson(Map<String, dynamic> json) {
@@ -23,6 +23,7 @@ class ReceptionistSample {
       userId: json['userId'],
       jobType: json['jobType'],
       shiftTime: json['shiftTime'],
+      user: json['user'],
     );
   }
 }
