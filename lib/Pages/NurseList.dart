@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _NurseListState extends State<NurseList> {
   List<Map<String, dynamic>> nurseIsSource;
   List<Map<String, dynamic>> nurseIsSearched;
   List<Map<String, dynamic>> nurseSelecteds;
-  List<NurseData> listNurses;
+  //List<NurseData> listNurses;
 
   NurseService nurseService;
 
@@ -114,7 +113,7 @@ class _NurseListState extends State<NurseList> {
     nurseSortAscending = true;
     nurseIsLoading = true;
     nurseShowSelect = false;
-    listNurses = [];
+   // listNurses = [];
     showSearchedList = false;
 
     nurseService = NurseService();
@@ -122,42 +121,42 @@ class _NurseListState extends State<NurseList> {
 
   void getNursesFromApiAndLinkToTable() async {
     setState(() => nurseIsLoading = true);
-    listNurses = [];
+   // listNurses = [];
     nurseIsSource = [];
 
-    Nurse nurseResponse = await nurseService.getNurse();
-    listNurses = nurseResponse.data;
-    nurseIsSource.addAll(generateNurseDataFromApi(listNurses));
+    // Nurse nurseResponse = await nurseService.getNurse();
+    // listNurses = nurseResponse.data;
+    // nurseIsSource.addAll(generateNurseDataFromApi(listNurses));
     setState(() => nurseIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateNurseDataFromApi(
-      List<NurseData> listOfNurses) {
-    List<Map<String, dynamic>> tempsnurse = [];
-    for (NurseData nurses in listOfNurses) {
-      tempsnurse.add({
-        "Id": nurses.id,
-        "firstName": nurses.employee.firstName,
-        "lastName": nurses.employee.lastName,
-        "fatherHusbandName": nurses.employee.fatherHusbandName,
-        "contact": nurses.employee.contact,
-        "emergencyContactNumber": nurses.employee.emergencyContact,
-        "gender": nurses.employee.gender,
-        "email": nurses.employee.email,
-        "experience": nurses.employee.experience,
-        "employeeId": nurses.employee.id,
-        "CNIC": nurses.employee.CNIC,
-        "DutyDuration": nurses.DutyDuration,
-        "address": nurses.employee.address,
-        "joiningDate": nurses.employee.joiningDate.substring(0, 10),
-        "DutyDuration": nurses.DutyDuration,
-        "Salary": nurses.Salary,
-        "ProcedureShare": nurses.SharePercentage,
-        "Action": nurses.id,
-      });
-    }
-    return tempsnurse;
-  }
+  // List<Map<String, dynamic>> generateNurseDataFromApi(
+  //     List<NurseData> listOfNurses) {
+  //   List<Map<String, dynamic>> tempsnurse = [];
+  //   for (NurseData nurses in listOfNurses) {
+  //     tempsnurse.add({
+  //       "Id": nurses.id,
+  //       "firstName": nurses.employee.firstName,
+  //       "lastName": nurses.employee.lastName,
+  //       "fatherHusbandName": nurses.employee.fatherHusbandName,
+  //       "contact": nurses.employee.contact,
+  //       "emergencyContactNumber": nurses.employee.emergencyContact,
+  //       "gender": nurses.employee.gender,
+  //       "email": nurses.employee.email,
+  //       "experience": nurses.employee.experience,
+  //       "employeeId": nurses.employee.id,
+  //       "CNIC": nurses.employee.CNIC,
+  //       "DutyDuration": nurses.DutyDuration,
+  //       "address": nurses.employee.address,
+  //       "joiningDate": nurses.employee.joiningDate.substring(0, 10),
+  //       "DutyDuration": nurses.DutyDuration,
+  //       "Salary": nurses.Salary,
+  //       "ProcedureShare": nurses.SharePercentage,
+  //       "Action": nurses.id,
+  //     });
+  //   }
+  //   return tempsnurse;
+  // }
 
   List<Map<String, dynamic>> generateNurseSearchData(
       Iterable<Map<String, dynamic>> iterableList) {
@@ -496,36 +495,36 @@ class _NurseListState extends State<NurseList> {
             type: SimpleFontelicoProgressDialogType.hurricane,
             width: MediaQuery.of(context).size.width - 20,
             horizontal: true);
-        nurseService.DeleteNurse(Id).then((response) async {
-          if (response == true) {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalSuccess,
-                content: Row(
-                  children: [
-                    Text('Success: Deleted Nurse '),
-                    Text(
-                      row['firstName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-            getNursesFromApiAndLinkToTable();
-          } else {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalFailed,
-                content: Row(
-                  children: [
-                    Text('Error: Try Again: Failed to delete Nurse '),
-                    Text(
-                      row['firstName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-          }
-        });
+        // nurseService.DeleteNurse(Id).then((response) async {
+        //   if (response == true) {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalSuccess,
+        //         content: Row(
+        //           children: [
+        //             Text('Success: Deleted Nurse '),
+        //             Text(
+        //               row['firstName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //     getNursesFromApiAndLinkToTable();
+        //   } else {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalFailed,
+        //         content: Row(
+        //           children: [
+        //             Text('Error: Try Again: Failed to delete Nurse '),
+        //             Text(
+        //               row['firstName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //   }
+        // });
       },
     );
 

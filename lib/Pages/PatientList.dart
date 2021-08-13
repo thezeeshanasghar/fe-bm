@@ -7,7 +7,6 @@ import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
 import 'dart:math';
 import 'package:baby_doctor/Service/PatientService.dart';
-import 'package:baby_doctor/Models/Patient.dart';
 
 class PatientList extends StatefulWidget {
   @override
@@ -107,90 +106,90 @@ class _PatientListState extends State<PatientList> {
   void getWalkInPatientsFromApiAndLinkToTable() async {
     setState(() => walkInIsLoading = true);
     var listwalkindata = [];
-    Patient patientResponse = await patientService.getPatientsInvoices('WalkIn');
-    listwalkindata = patientResponse.data;
-    walkInIsSource.addAll(generateWalkinPatientsDataFromApi(listwalkindata));
+    // Patient patientResponse = await patientService.getPatientsInvoices('WalkIn');
+    // listwalkindata = patientResponse.data;
+    // walkInIsSource.addAll(generateWalkinPatientsDataFromApi(listwalkindata));
 
     setState(() => walkInIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateWalkinPatientsDataFromApi(
-      List<PatientData> listOfPatients) {
-    List<Map<String, dynamic>> tempspatient = [];
-    for (PatientData patient in listOfPatients) {
-      tempspatient.add({
-        "Id": patient.id,
-        "Invoice": patient.id,
-        "Name": patient.Name,
-        "DOB": patient.DOB.substring(0,10),
-        "PatientId": patient.PatientId,
-        "FatherHusbandName": patient.FatherHusbandName,
-        "Sex": patient.Sex,
-        "Discount": patient.Discount,
-        "NetTotal": patient.NetAmount,
-        "Total": patient.NetAmount- patient.Discount,
-        "Category": patient.Category,
-        "appointmentId": patient.AppointmentId,
-        "Action": patient.id,
-      });
-    }
-    return tempspatient;
-  }
+  // List<Map<String, dynamic>> generateWalkinPatientsDataFromApi(
+  //     List<PatientData> listOfPatients) {
+  //   List<Map<String, dynamic>> tempspatient = [];
+  //   for (PatientData patient in listOfPatients) {
+  //     tempspatient.add({
+  //       "Id": patient.id,
+  //       "Invoice": patient.id,
+  //       "Name": patient.Name,
+  //       "DOB": patient.DOB.substring(0,10),
+  //       "PatientId": patient.PatientId,
+  //       "FatherHusbandName": patient.FatherHusbandName,
+  //       "Sex": patient.Sex,
+  //       "Discount": patient.Discount,
+  //       "NetTotal": patient.NetAmount,
+  //       "Total": patient.NetAmount- patient.Discount,
+  //       "Category": patient.Category,
+  //       "appointmentId": patient.AppointmentId,
+  //       "Action": patient.id,
+  //     });
+  //   }
+  //   return tempspatient;
+  // }
 
   void getOnCallPatientsFromApiAndLinkToTable() async {
     setState(() => onlineIsLoading = true);
     var listonlineindata = [];
-    Patient patientResponse = await patientService.getPatientsInvoices('Oncall');
-    listonlineindata = patientResponse.data;
-    onlineIsSource.addAll(generateWalkinPatientsDataFromApi(listonlineindata));
+    // Patient patientResponse = await patientService.getPatientsInvoices('Oncall');
+    // listonlineindata = patientResponse.data;
+    // onlineIsSource.addAll(generateWalkinPatientsDataFromApi(listonlineindata));
     setState(() => onlineIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateOnCallPatientsDataFromApi(
-      List<PatientData> listOfPatients) {
-    List<Map<String, dynamic>> tempspatient = [];
-    for (PatientData patient in listOfPatients) {
-      tempspatient.add({
-        "Id": patient.id,
-        "Name": patient.Name,
-        "DOB": patient.DOB.substring(0,10),
-        "PatientId": patient.PatientId,
-        "FatherHusbandName": patient.FatherHusbandName,
-        "Category": patient.Category,
-        "AppointmentId": patient.AppointmentId,
-        "Action": patient.id,
-      });
-
-    }
-
-    return tempspatient;
-  }
+  // List<Map<String, dynamic>> generateOnCallPatientsDataFromApi(
+  //     List<PatientData> listOfPatients) {
+  //   List<Map<String, dynamic>> tempspatient = [];
+  //   for (PatientData patient in listOfPatients) {
+  //     tempspatient.add({
+  //       "Id": patient.id,
+  //       "Name": patient.Name,
+  //       "DOB": patient.DOB.substring(0,10),
+  //       "PatientId": patient.PatientId,
+  //       "FatherHusbandName": patient.FatherHusbandName,
+  //       "Category": patient.Category,
+  //       "AppointmentId": patient.AppointmentId,
+  //       "Action": patient.id,
+  //     });
+  //
+  //   }
+  //
+  //   return tempspatient;
+  // }
 
   void getAdmittedPatientsFromApiAndLinkToTable() async {
     setState(() => admittedIsLoading = true);
     var listadmitteddata = [];
-    Patient patientResponse = await patientService.getPatientsInvoices('Admitted');
-    listadmitteddata = patientResponse.data;
-    admittedIsSource.addAll(generateWalkinPatientsDataFromApi(listadmitteddata));
+    // Patient patientResponse = await patientService.getPatientsInvoices('Admitted');
+    // listadmitteddata = patientResponse.data;
+    // admittedIsSource.addAll(generateWalkinPatientsDataFromApi(listadmitteddata));
     setState(() => admittedIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateAdmittedPatientsDataFromApi(
-      List<PatientData> listOfPatients) {
-    List<Map<String, dynamic>> tempspatient = [];
-    for (PatientData patient in listOfPatients) {
-      tempspatient.add({
-        "Id": patient.id,
-        "Name": patient.Name,
-        "DOB": patient.DOB.substring(0,10),
-        "PatientId": patient.PatientId,
-        "FatherHusbandName": patient.FatherHusbandName,
-        "AppointmentId": patient.AppointmentId,
-        "Action": patient.id,
-      });
-    }
-    return tempspatient;
-  }
+  // List<Map<String, dynamic>> generateAdmittedPatientsDataFromApi(
+  //     List<PatientData> listOfPatients) {
+  //   List<Map<String, dynamic>> tempspatient = [];
+  //   for (PatientData patient in listOfPatients) {
+  //     tempspatient.add({
+  //       "Id": patient.id,
+  //       "Name": patient.Name,
+  //       "DOB": patient.DOB.substring(0,10),
+  //       "PatientId": patient.PatientId,
+  //       "FatherHusbandName": patient.FatherHusbandName,
+  //       "AppointmentId": patient.AppointmentId,
+  //       "Action": patient.id,
+  //     });
+  //   }
+  //   return tempspatient;
+  // }
 
   initializeWalkInHeaders() {
     walkInHeaders = [

@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Room.dart';
 import 'package:baby_doctor/Service/RoomService.dart';
 import 'package:baby_doctor/ShareArguments/RoomArguments.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _RoomListState extends State<RoomList> {
   List<Map<String, dynamic>> roomIsSource;
   List<Map<String, dynamic>> roomIsSearched;
   List<Map<String, dynamic>> roomSelecteds;
-  List<RoomData> listrooms;
+ // List<RoomData> listrooms;
 
   RoomService roomService;
 
@@ -114,7 +113,7 @@ class _RoomListState extends State<RoomList> {
     roomSortAscending = true;
     roomIsLoading = true;
     roomShowSelect = false;
-    listrooms = [];
+    //listrooms = [];
     showSearchedList = false;
 
     roomService = RoomService();
@@ -122,29 +121,29 @@ class _RoomListState extends State<RoomList> {
 
   void getroomsFromApiAndLinkToTable() async {
     setState(() => roomIsLoading = true);
-    listrooms = [];
-    roomIsSource = [];
-    Room roomdata = await roomService.getRooms();
-    listrooms = roomdata.data;
-    roomIsSource.addAll(generateRoomDataFromApi(listrooms));
+    // listrooms = [];
+    // roomIsSource = [];
+    // Room roomdata = await roomService.getRooms();
+    // listrooms = roomdata.data;
+    // roomIsSource.addAll(generateRoomDataFromApi(listrooms));
     setState(() => roomIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateRoomDataFromApi(
-      List<RoomData> listOfRooms) {
-    List<Map<String, dynamic>> tempsroom = [];
-    for (RoomData rooms in listOfRooms) {
-      tempsroom.add({
-        "Id": rooms.id,
-        "RoomNo": rooms.RoomNo,
-        "RoomType": rooms.RoomType,
-        "RoomCapacity": rooms.RoomCapacity,
-        "RoomCharges": rooms.RoomCharges,
-        "Action": rooms.id,
-      });
-    }
-    return tempsroom;
-  }
+  // List<Map<String, dynamic>> generateRoomDataFromApi(
+  //     List<RoomData> listOfRooms) {
+  //   List<Map<String, dynamic>> tempsroom = [];
+  //   for (RoomData rooms in listOfRooms) {
+  //     tempsroom.add({
+  //       "Id": rooms.id,
+  //       "RoomNo": rooms.RoomNo,
+  //       "RoomType": rooms.RoomType,
+  //       "RoomCapacity": rooms.RoomCapacity,
+  //       "RoomCharges": rooms.RoomCharges,
+  //       "Action": rooms.id,
+  //     });
+  //   }
+  //   return tempsroom;
+  // }
 
   List<Map<String, dynamic>> generateRoomSearchData(
       Iterable<Map<String, dynamic>> iterableList) {
@@ -333,36 +332,36 @@ class _RoomListState extends State<RoomList> {
             type: SimpleFontelicoProgressDialogType.hurricane,
             width: MediaQuery.of(context).size.width - 20,
             horizontal: true);
-        roomService.Deleteroom(Id).then((response) async {
-          if (response == true) {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalSuccess,
-                content: Row(
-                  children: [
-                    Text('Success: Deleted room '),
-                    Text(
-                      row['RoomNo'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-            getroomsFromApiAndLinkToTable();
-          } else {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalFailed,
-                content: Row(
-                  children: [
-                    Text('Error: Try Again: Failed to delete Room '),
-                    Text(
-                      row['RoomNo'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-          }
-        });
+        // roomService.Deleteroom(Id).then((response) async {
+        //   if (response == true) {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalSuccess,
+        //         content: Row(
+        //           children: [
+        //             Text('Success: Deleted room '),
+        //             Text(
+        //               row['RoomNo'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //     getroomsFromApiAndLinkToTable();
+        //   } else {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalFailed,
+        //         content: Row(
+        //           children: [
+        //             Text('Error: Try Again: Failed to delete Room '),
+        //             Text(
+        //               row['RoomNo'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //   }
+        // });
       },
     );
 

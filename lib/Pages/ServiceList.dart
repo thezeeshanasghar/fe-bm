@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Services.dart';
 import 'package:baby_doctor/Service/Service.dart';
 import 'package:baby_doctor/ShareArguments/ServiceArguments.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _ServiceListState extends State<ServiceList> {
   List<Map<String, dynamic>> serviceIsSource;
   List<Map<String, dynamic>> serviceIsSearched;
   List<Map<String, dynamic>> serviceSelecteds;
-  List<ServiceData> listservices;
+ // List<ServiceData> listservices;
 
   Service service;
 
@@ -114,7 +113,7 @@ class _ServiceListState extends State<ServiceList> {
     serviceSortAscending = true;
     serviceIsLoading = true;
     serviceShowSelect = false;
-    listservices = [];
+    //listservices = [];
     showSearchedList = false;
 
     service = Service();
@@ -122,27 +121,27 @@ class _ServiceListState extends State<ServiceList> {
 
   void getServicesFromApiAndLinkToTable() async {
     setState(() => serviceIsLoading = true);
-    listservices = [];
-    serviceIsSource = [];
-    ServiceResponse serviceResponse = await service.getServices();
-    listservices = serviceResponse.data;
-    serviceIsSource.addAll(generateServiceDataFromApi(listservices));
+    // listservices = [];
+    // serviceIsSource = [];
+    // ServiceResponse serviceResponse = await service.getServices();
+    // listservices = serviceResponse.data;
+    // serviceIsSource.addAll(generateServiceDataFromApi(listservices));
     setState(() => serviceIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateServiceDataFromApi(
-      List<ServiceData> listOfServices) {
-    List<Map<String, dynamic>> tempsService = [];
-    for (ServiceData services in listOfServices) {
-      tempsService.add({
-        "Id": services.id,
-        "ServiceName": services.name,
-        "ServiceDescription": services.description,
-        "Action": services.id,
-      });
-    }
-    return tempsService;
-  }
+  // List<Map<String, dynamic>> generateServiceDataFromApi(
+  //     List<ServiceData> listOfServices) {
+  //   List<Map<String, dynamic>> tempsService = [];
+  //   for (ServiceData services in listOfServices) {
+  //     tempsService.add({
+  //       "Id": services.id,
+  //       "ServiceName": services.name,
+  //       "ServiceDescription": services.description,
+  //       "Action": services.id,
+  //     });
+  //   }
+  //   return tempsService;
+  // }
 
   List<Map<String, dynamic>> generateServiceSearchData(
       Iterable<Map<String, dynamic>> iterableList) {
@@ -294,36 +293,36 @@ class _ServiceListState extends State<ServiceList> {
             type: SimpleFontelicoProgressDialogType.hurricane,
             width: MediaQuery.of(context).size.width - 20,
             horizontal: true);
-        service.DeleteServices(Id).then((response) async {
-          if (response == true) {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalSuccess,
-                content: Row(
-                  children: [
-                    Text('Success: Deleted Service '),
-                    Text(
-                      row['ServiceName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-            getServicesFromApiAndLinkToTable();
-          } else {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalFailed,
-                content: Row(
-                  children: [
-                    Text('Error: Try Again: Failed to delete Service '),
-                    Text(
-                      row['ServiceName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-          }
-        });
+        // service.DeleteServices(Id).then((response) async {
+        //   if (response == true) {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalSuccess,
+        //         content: Row(
+        //           children: [
+        //             Text('Success: Deleted Service '),
+        //             Text(
+        //               row['ServiceName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //     getServicesFromApiAndLinkToTable();
+        //   } else {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalFailed,
+        //         content: Row(
+        //           children: [
+        //             Text('Error: Try Again: Failed to delete Service '),
+        //             Text(
+        //               row['ServiceName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //   }
+        // });
       },
     );
 

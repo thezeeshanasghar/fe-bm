@@ -4,7 +4,6 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/Models/Services.dart';
 import 'package:baby_doctor/Service/Service.dart' as DAL;
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
@@ -168,58 +167,6 @@ class _AddServiceState extends State<AddService> {
   }
 
   onClickDataPost() async {
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    formKey.currentState.save();
-    sfpd = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-    await sfpd.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,
-        width: MediaQuery.of(context).size.width - 20,
-        horizontal: true);
-    DAL.Service service = new DAL.Service();
-    ServiceData obj = new ServiceData(
-      name: name,
-      description: description,
-    );
-    var response = await service.InsertServices(obj);
-    print(response);
-    if (response == true) {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Service '),
-              Text(
-                name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeServiceList);
-    } else {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
+
   }
 }

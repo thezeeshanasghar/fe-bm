@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Doctor.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:baby_doctor/ShareArguments/DoctorArguments.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _DoctorListState extends State<DoctorList> {
   List<Map<String, dynamic>> doctorIsSource;
   List<Map<String, dynamic>> doctorIsSearched;
   List<Map<String, dynamic>> doctorSelecteds;
-  List<DoctorData> listDoctors;
+  // List<DoctorData> listDoctors;
 
   DoctorService doctorService;
 
@@ -81,7 +80,7 @@ class _DoctorListState extends State<DoctorList> {
                         key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[widgetdoctorPatients()],
+                          // children: <Widget>[widgetdoctorPatients()],
                         ),
                       )),
                 ),
@@ -114,49 +113,49 @@ class _DoctorListState extends State<DoctorList> {
     doctorSortAscending = true;
     doctorIsLoading = true;
     doctorShowSelect = false;
-    listDoctors = [];
+  //  listDoctors = [];
     showSearchedList = false;
     doctorService = DoctorService();
   }
 
   void getDoctorsFromApiAndLinkToTable() async {
     setState(() => doctorIsLoading = true);
-    listDoctors = [];
+    //listDoctors = [];
     doctorIsSource = [];
-    Doctor doctorResponse = await doctorService.getDoctor();
-    listDoctors = doctorResponse.data;
-    doctorIsSource.addAll(generateDoctorDataFromApi(listDoctors));
+    // Doctor doctorResponse = await doctorService.getDoctor();
+    // listDoctors = doctorResponse.data;
+    // doctorIsSource.addAll(generateDoctorDataFromApi(listDoctors));
 
     setState(() => doctorIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateDoctorDataFromApi(
-      List<DoctorData> listOfDoctors) {
-    List<Map<String, dynamic>> tempsdoctor = [];
-    for (DoctorData doctors in listOfDoctors) {
-      tempsdoctor.add({
-        "id": doctors.id,
-        "firstName": doctors.employee.firstName,
-        "lastName": doctors.employee.lastName,
-        "fatherHusbandName": doctors.employee.fatherHusbandName,
-        "gender": doctors.employee.gender,
-        "CNIC": doctors.employee.CNIC,
-        "contact": doctors.employee.contact,
-        "emergencyContactNumber": doctors.employee.emergencyContact,
-        "email": doctors.employee.email,
-        "address": doctors.employee.address,
-        "employeeId": doctors.employee.id,
-        "joiningDate": doctors.employee.joiningDate.substring(0,10),
-        "experience": doctors.employee.experience,
-        "SpecialityType": doctors.SpecialityType,
-        "ConsultationFee": doctors.ConsultationFee,
-        "EmergencyConsultationFee": doctors.EmergencyConsultationFee,
-        "FeeShare": doctors.ShareInFee,
-        "Action": doctors.id,
-      });
-    }
-    return tempsdoctor;
-  }
+  // List<Map<String, dynamic>> generateDoctorDataFromApi(
+  //     List<DoctorData> listOfDoctors) {
+  //   List<Map<String, dynamic>> tempsdoctor = [];
+  //   for (DoctorData doctors in listOfDoctors) {
+  //     tempsdoctor.add({
+  //       "id": doctors.id,
+  //       "firstName": doctors.employee.firstName,
+  //       "lastName": doctors.employee.lastName,
+  //       "fatherHusbandName": doctors.employee.fatherHusbandName,
+  //       "gender": doctors.employee.gender,
+  //       "CNIC": doctors.employee.CNIC,
+  //       "contact": doctors.employee.contact,
+  //       "emergencyContactNumber": doctors.employee.emergencyContact,
+  //       "email": doctors.employee.email,
+  //       "address": doctors.employee.address,
+  //       "employeeId": doctors.employee.id,
+  //       "joiningDate": doctors.employee.joiningDate.substring(0,10),
+  //       "experience": doctors.employee.experience,
+  //       "SpecialityType": doctors.SpecialityType,
+  //       "ConsultationFee": doctors.ConsultationFee,
+  //       "EmergencyConsultationFee": doctors.EmergencyConsultationFee,
+  //       "FeeShare": doctors.ShareInFee,
+  //       "Action": doctors.id,
+  //     });
+  //   }
+  //   return tempsdoctor;
+  // }
 
   List<Map<String, dynamic>> generateDoctorSearchData(
       Iterable<Map<String, dynamic>> iterableList) {
@@ -550,36 +549,36 @@ class _DoctorListState extends State<DoctorList> {
             type: SimpleFontelicoProgressDialogType.hurricane,
             width: MediaQuery.of(context).size.width - 20,
             horizontal: true);
-        doctorService.DeleteDoctor(Id).then((response) async {
-          if (response == true) {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalSuccess,
-                content: Row(
-                  children: [
-                    Text('Success: Deleted doctor '),
-                    Text(
-                      row['firstName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-            getDoctorsFromApiAndLinkToTable();
-          } else {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalFailed,
-                content: Row(
-                  children: [
-                    Text('Error: Try Again: Failed to delete Doctor '),
-                    Text(
-                      row['FirstName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-          }
-        });
+        // doctorService.DeleteDoctor(Id).then((response) async {
+        //   if (response == true) {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalSuccess,
+        //         content: Row(
+        //           children: [
+        //             Text('Success: Deleted doctor '),
+        //             Text(
+        //               row['firstName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //     getDoctorsFromApiAndLinkToTable();
+        //   } else {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalFailed,
+        //         content: Row(
+        //           children: [
+        //             Text('Error: Try Again: Failed to delete Doctor '),
+        //             Text(
+        //               row['FirstName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //   }
+        // });
       },
     );
 

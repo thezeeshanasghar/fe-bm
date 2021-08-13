@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Doctor.dart';
-import 'package:baby_doctor/Models/Employee.dart';
-import 'package:baby_doctor/Models/Qualifications.dart';
+import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -44,13 +42,13 @@ class _AddDoctorState extends State<AddDoctor> {
   String Password = "222222";
   String UserName;
   DoctorService doctorService;
-  List<Qualifications> qualificationList = [
-    new Qualifications(
-        employeeId: "", certificate: "", description: "", qualificationType: "")
+  List<QualificationSample> qualificationList = [
+    new QualificationSample(
+        userId: 0, certificate: "", description: "", qualificationType: "")
   ];
-  List<Qualifications> diplomaList = [
-    new Qualifications(
-        employeeId: "", certificate: "", description: "", qualificationType: "")
+  List<QualificationSample> diplomaList = [
+    new QualificationSample(
+        userId: 0, certificate: "", description: "", qualificationType: "")
   ];
 
   PickedFile _imageFile;
@@ -303,7 +301,7 @@ class _AddDoctorState extends State<AddDoctor> {
                             },
                             onSaved: (String value) {
                               setState(() {
-                                qualificationList[i] = new Qualifications(
+                                qualificationList[i] = new QualificationSample(
                                     certificate: "",
                                     description: value,
                                     qualificationType: "Qualification");
@@ -327,7 +325,7 @@ class _AddDoctorState extends State<AddDoctor> {
     return qualificationWidgetList;
   }
 
-  Widget _addRemoveButton(bool add, int index, List<Qualifications> list) {
+  Widget _addRemoveButton(bool add, int index, List<QualificationSample> list) {
     return InkWell(
       onTap: () {
         if (add) {
@@ -1116,94 +1114,5 @@ class _AddDoctorState extends State<AddDoctor> {
   }
 
   onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
-    List<dynamic> degrees = [];
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,
-        width: MediaQuery.of(context).size.width - 50);
-
-    EmployeeData employee = new EmployeeData(
-        employeeType: 'Doctor',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: 0,
-        password: "222222",
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
-
-    var json = jsonEncode(employee.toJson());
-    print(json);
-
-    DoctorData doctor = new DoctorData(
-        ConsultationFee: ConsultationFee,
-        EmergencyConsultationFee: EmergencyConsultationFee,
-        ShareInFee: FeeShare,
-        SpecialityType: Speciality,
-        employee: employee);
-
-    var response = await doctorService.InsertDoctor(doctor);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Doctor '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      Navigator.pushNamed(context, Strings.routeDoctorList);
-      formKey.currentState.reset();
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
   }
-// void takePhotoFromWeb() async {
-//   final pickedFile = await FlutterWebImagePicker.getImage;
-//   setState(() {
-//     image = pickedFile;
-//   });
-// }
 }

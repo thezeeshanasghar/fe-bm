@@ -4,7 +4,6 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
-import 'package:baby_doctor/Models/Procedures.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class AddProcedures extends StatefulWidget {

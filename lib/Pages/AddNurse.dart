@@ -4,9 +4,6 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Nurse.dart';
-import 'package:baby_doctor/Models/Employee.dart';
-import 'package:baby_doctor/Models/Qualifications.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -861,89 +858,6 @@ class _AddNurseState extends State<AddNurse> {
   }
 
   onPressedSubmitButton() async {
-    // print(qualificationList);
-    // print(diplomaList);
-    List<dynamic> degrees = [];
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    formKey.currentState.save();
 
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
-
-    EmployeeData employee = new EmployeeData(
-        employeeType: 'Nurse',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: 0,
-        password: "222222",
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
-
-    NurseData nurse = new NurseData(
-        DutyDuration: DutyDuration,
-        Salary: Salary,
-        SharePercentage: ProceduresShare,
-        employee: employee);
-
-    var json = jsonEncode(employee.toJson());
-    print(json);
-
-    var response = await nurseService.InsertNurse(nurse);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Nurse '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-
-          )));
-      formKey.currentState.reset();
-
-      Navigator.pushNamed(context, Strings.routeNurseList);
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
   }
 }

@@ -4,7 +4,6 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/ShareArguments/ReceptionistArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
-import 'package:baby_doctor/Models/Employee.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditReceptionist extends StatefulWidget {
@@ -708,71 +707,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
   }
 
   onPressedSubmitButton() async {
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    formKey.currentState.save();
-    sfpd = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-    await sfpd.show(
-        message: 'Updating ...',
-        type: SimpleFontelicoProgressDialogType.threelines,
-        width: MediaQuery.of(context).size.width - 20,
-        horizontal: true);
 
-    EmployeeData obj = new EmployeeData(
-        employeeType: 'Receptionist',
-        id: arguments.id,
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: FlourNo,
-        password: Password,
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
-    var response = await receptionistService.UpdateReceptionist(obj);
-    print(response);
-    if (response == true) {
-
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Updated Receptionist '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeReceptionistList);
-    } else {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-    }
   }
 
 }

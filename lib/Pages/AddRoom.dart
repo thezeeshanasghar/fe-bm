@@ -3,7 +3,6 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
-import 'package:baby_doctor/Models/Room.dart';
 import 'package:baby_doctor/Service/RoomService.dart' as DAL;
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
@@ -248,46 +247,6 @@ class _AddRoomState extends State<AddRoom> {
   }
 
   onClickDataPost() async {
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Some input fields are not filled.')));
-      return;
-    }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,
-        width: MediaQuery.of(context).size.width - 50);
 
-    //perform your task after save
-    DAL.RoomService service = new DAL.RoomService();
-    RoomData obj = new RoomData(
-      RoomNo: RoomNo,
-      RoomType: RoomType,
-      RoomCharges: RoomCharges,
-      RoomCapacity: RoomCapacity,
-    );
-    var response = await service.InsertRoom(obj);
-    print(response);
-    if (response == true) {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Success: Record Added Successfully.')));
-      formKey.currentState.reset();
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      Navigator.pushNamed(context, Strings.routeRoomList);
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Operation Unsuccessfull.')));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
   }
 }

@@ -4,8 +4,6 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Service/Service.dart';
 import 'package:baby_doctor/ShareArguments/ServiceArguments.dart';
 import 'package:flutter/material.dart';
-
-import 'package:baby_doctor/Models/Services.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditService extends StatefulWidget {
@@ -219,55 +217,6 @@ class _EditServiceState extends State<EditService> {
   }
 
   onPressedSubmitButton() async {
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    formKey.currentState.save();
-    sfpd = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-    await sfpd.show(
-        message: 'Updating ...',
-        type: SimpleFontelicoProgressDialogType.threelines,
-        width: MediaQuery.of(context).size.width - 20,
-        horizontal: true);
-    ServiceData obj = new ServiceData(
-      id: arguments.id,
-      name: ServiceName,
-      description: ServiceDescription,
-    );
-    var response = await service.UpdateServices(obj);
-    print(response);
-    if (response == true) {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success:Service Updated'),
-              Text(
-                ServiceName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeServiceList);
-    } else {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to edit '),
-              Text(
-                ServiceName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-    }
+
   }
 }

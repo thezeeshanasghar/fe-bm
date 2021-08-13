@@ -4,8 +4,6 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Service/RoomService.dart';
 import 'package:baby_doctor/ShareArguments/RoomArguments.dart';
 import 'package:flutter/material.dart';
-
-import 'package:baby_doctor/Models/Room.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditRoom extends StatefulWidget {
@@ -324,66 +322,6 @@ class _EditRoomState extends State<EditRoom> {
   }
 
   onPressedSubmitButton() async {
-    if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
-    formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.threelines,
-        width: MediaQuery.of(context).size.width - 50);
 
-    RoomData obj = new RoomData(
-      id: arguments.id,
-      RoomNo: RoomNo,
-      RoomType: RoomType,
-      RoomCapacity: RoomCapacity,
-      RoomCharges: RoomCharges,
-    );
-    var response = await roomservice.UpdateRoom(obj);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success:Room Updated'),
-              Text(
-                RoomNo,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeRoomList,
-          arguments: {'Id': Id});
-      Navigator.pushNamed(context, Strings.routeRoomList);
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to edit '),
-              Text(
-                RoomNo,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
   }
 }

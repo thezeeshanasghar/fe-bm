@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
 import 'package:http/http.dart' as http;
-import '../Models/Procedures.dart';
 
 class ProcedureService {
   Future<Procedure> getProcedures() async {

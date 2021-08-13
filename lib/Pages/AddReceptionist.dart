@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Employee.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -613,67 +612,6 @@ class _AddReceptionistState extends State<AddReceptionist> {
   }
 
   onPressedSubmitButton() async {
-     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
-      return;
-    }
-    formKey.currentState.save();
-     sfpd = SimpleFontelicoProgressDialog(
-         context: context, barrierDimisable: false);
-     await sfpd.show(
-         message: 'Loading...',
-         type: SimpleFontelicoProgressDialogType.multilines,
-         width: MediaQuery.of(context).size.width - 20,
-         horizontal: true);
-    EmployeeData obj = new EmployeeData(
-        employeeType: 'Receptionist',
-        firstName: FirstName,
-        lastName: LastName,
-        fatherHusbandName: FatherHusbandName,
-        gender: Gender,
-        CNIC: CNIC,
-        contact: ContactNumber,
-        emergencyContact: EmergencyContactNumber,
-        experience: Experience,
-        flourNo: FlourNo,
-        password: Password,
-        userName: UserName,
-        joiningDate: JoiningDate,
-        // DOB: DOB,
-        address: Address,
-        email: Email);
-    var response = await receptionistService.InsertReceptionist(obj);
-    print(response);
-    if (response == true) {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created Receptionist '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeReceptionistList);
-    } else {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                FirstName + ' ' + LastName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-    }
+
   }
 }

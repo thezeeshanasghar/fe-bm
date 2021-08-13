@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Doctor.dart';
-import 'package:baby_doctor/Models/Employee.dart';
-import 'package:baby_doctor/Models/Qualifications.dart';
 import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
+import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:baby_doctor/ShareArguments/DoctorArguments.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
@@ -63,13 +61,13 @@ class _EditDoctorState extends State<EditDoctor> {
   DoctorArguments arguments;
   SimpleFontelicoProgressDialog sfpd;
 
-  List<Qualifications> qualificationList = [
-    new Qualifications(
-        employeeId: "", certificate: "", description: "", qualificationType: "")
+  List<QualificationSample> qualificationList = [
+    new QualificationSample(
+        userId: 0, certificate: "", description: "", qualificationType: "")
   ];
-  List<Qualifications> diplomaList = [
-    new Qualifications(
-        employeeId: "", certificate: "", description: "", qualificationType: "")
+  List<QualificationSample> diplomaList = [
+    new QualificationSample(
+        userId: 0, certificate: "", description: "", qualificationType: "")
   ];
 
   PickedFile _imageFile;
@@ -395,7 +393,7 @@ class _EditDoctorState extends State<EditDoctor> {
                             },
                             onSaved: (String value) {
                               setState(() {
-                                qualificationList[i] = new Qualifications(
+                                qualificationList[i] = new QualificationSample(
                                     certificate: "",
                                     description: value,
                                     qualificationType: "Qualification");
@@ -419,7 +417,7 @@ class _EditDoctorState extends State<EditDoctor> {
     return qualificationWidgetList;
   }
 
-  Widget _addRemoveButton(bool add, int index, List<Qualifications> list) {
+  Widget _addRemoveButton(bool add, int index, List<QualificationSample> list) {
     return InkWell(
       onTap: () {
         if (add) {
@@ -1260,18 +1258,18 @@ class _EditDoctorState extends State<EditDoctor> {
             2,
             Experience, []));
 
-    bool hasUpdated = await doctorService.UpdateDoctor(doctorModel);
-    if (hasUpdated) {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Text('Success: Updated $FirstName')));
-      Navigator.pushNamed(context, Strings.routeDoctorList);
-    } else {
-      await sfpd.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Failed to update $FirstName')));
-    }
+    // bool hasUpdated = await doctorService.UpdateDoctor(doctorModel);
+    // if (hasUpdated) {
+    //   await sfpd.hide();
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       backgroundColor: Shade.snackGlobalSuccess,
+    //       content: Text('Success: Updated $FirstName')));
+    //   Navigator.pushNamed(context, Strings.routeDoctorList);
+    // } else {
+    //   await sfpd.hide();
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       backgroundColor: Shade.snackGlobalFailed,
+    //       content: Text('Error: Failed to update $FirstName')));
+    // }
   }
 }

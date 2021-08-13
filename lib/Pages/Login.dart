@@ -178,14 +178,13 @@ class _LoginState extends State<Login> {
         width: MediaQuery.of(context).size.width - 20,
         horizontal: true);
 
-    authenticationService = AuthenticationService();
-    AuthenticateResponse authenticateResponse = await authenticationService
-        .authenticateLogin(AuthenticateLoginRequest('basit', 'basit'));
-    if (!authenticateResponse.isSuccess) {
-      showMessageUsingSnackBar(
-          Shade.snackGlobalFailed, authenticateResponse.message);
-      return;
-    }
+    // authenticationService = AuthenticationService();
+    // AuthenticateResponse authenticateResponse = await authenticationService.authenticateLogin(AuthenticateLoginRequest('basit', 'basit'));
+    // if (!authenticateResponse.isSuccess) {
+    //   showMessageUsingSnackBar(
+    //       Shade.snackGlobalFailed, authenticateResponse.message);
+    //   return;
+    // }
 
     await simpleFontelicoProgressDialog.hide();
     Navigator.pop(context);

@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
 import 'package:baby_doctor/ShareArguments/ReceptionistArguments.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
   List<Map<String, dynamic>> receptionistIsSource;
   List<Map<String, dynamic>> receptionistIsSearched;
   List<Map<String, dynamic>> receptionistSelecteds;
-  List<EmployeeData> listReceptionists;
+  //List<EmployeeData> listReceptionists;
 
   ReceptionistService receptionistService;
 
@@ -114,7 +113,7 @@ class _ReceptionistListState extends State<ReceptionistList> {
     receptionistSortAscending = true;
     receptionistIsLoading = true;
     receptionistShowSelect = false;
-    listReceptionists = [];
+   // listReceptionists = [];
     showSearchedList = false;
 
     receptionistService = ReceptionistService();
@@ -122,38 +121,38 @@ class _ReceptionistListState extends State<ReceptionistList> {
 
   void getReceptionistsFromApiAndLinkToTable() async {
     setState(() => receptionistIsLoading = true);
-    listReceptionists = [];
-    receptionistIsSource = [];
-    Employee employeeResponse = await receptionistService.getReceptionist();
-    listReceptionists = employeeResponse.data;
-    receptionistIsSource.addAll(generateReceptionistDataFromApi(listReceptionists));
+    // listReceptionists = [];
+    // receptionistIsSource = [];
+    // Employee employeeResponse = await receptionistService.getReceptionist();
+    // listReceptionists = employeeResponse.data;
+    // receptionistIsSource.addAll(generateReceptionistDataFromApi(listReceptionists));
     setState(() => receptionistIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateReceptionistDataFromApi(
-      List<EmployeeData> listOfReceptionists) {
-    List<Map<String, dynamic>> tempsreceptionist = [];
-    for (EmployeeData receptionists in listOfReceptionists) {
-      tempsreceptionist.add({
-        "Id": receptionists.id,
-        "firstName": receptionists.firstName,
-        "lastName": receptionists.lastName,
-        "fatherHusbandName": receptionists.fatherHusbandName,
-        "userName": receptionists.userName,
-        "password": receptionists.password,
-        "gender": receptionists.gender,
-        // "DOB": receptionists.DOB,
-        "CNIC": receptionists.CNIC,
-        "contact": receptionists.contact,
-        "email": receptionists.email,
-        "address": receptionists.address,
-        "flourNo": receptionists.flourNo,
-        "joiningDate": receptionists.joiningDate.substring(0, 10),
-        "Action": receptionists.id,
-      });
-    }
-    return tempsreceptionist;
-  }
+  // List<Map<String, dynamic>> generateReceptionistDataFromApi(
+  //     List<EmployeeData> listOfReceptionists) {
+  //   List<Map<String, dynamic>> tempsreceptionist = [];
+  //   for (EmployeeData receptionists in listOfReceptionists) {
+  //     tempsreceptionist.add({
+  //       "Id": receptionists.id,
+  //       "firstName": receptionists.firstName,
+  //       "lastName": receptionists.lastName,
+  //       "fatherHusbandName": receptionists.fatherHusbandName,
+  //       "userName": receptionists.userName,
+  //       "password": receptionists.password,
+  //       "gender": receptionists.gender,
+  //       // "DOB": receptionists.DOB,
+  //       "CNIC": receptionists.CNIC,
+  //       "contact": receptionists.contact,
+  //       "email": receptionists.email,
+  //       "address": receptionists.address,
+  //       "flourNo": receptionists.flourNo,
+  //       "joiningDate": receptionists.joiningDate.substring(0, 10),
+  //       "Action": receptionists.id,
+  //     });
+  //   }
+  //   return tempsreceptionist;
+  // }
 
   List<Map<String, dynamic>> generateReceptionistSearchData(
       Iterable<Map<String, dynamic>> iterableList) {
@@ -449,36 +448,36 @@ class _ReceptionistListState extends State<ReceptionistList> {
             type: SimpleFontelicoProgressDialogType.hurricane,
             width: MediaQuery.of(context).size.width - 20,
             horizontal: true);
-        receptionistService.DeleteReceptionist(Id).then((response) async {
-          if (response == true) {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalSuccess,
-                content: Row(
-                  children: [
-                    Text('Success: Deleted Receptionist '),
-                    Text(
-                      row['firstName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-            getReceptionistsFromApiAndLinkToTable();
-          } else {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalFailed,
-                content: Row(
-                  children: [
-                    Text('Error: Try Again: Failed to delete Receptionist '),
-                    Text(
-                      row['firstName'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-          }
-        });
+        // receptionistService.DeleteReceptionist(Id).then((response) async {
+        //   if (response == true) {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalSuccess,
+        //         content: Row(
+        //           children: [
+        //             Text('Success: Deleted Receptionist '),
+        //             Text(
+        //               row['firstName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //     getReceptionistsFromApiAndLinkToTable();
+        //   } else {
+        //     await sfpd.hide();
+        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //         backgroundColor: Shade.snackGlobalFailed,
+        //         content: Row(
+        //           children: [
+        //             Text('Error: Try Again: Failed to delete Receptionist '),
+        //             Text(
+        //               row['firstName'],
+        //               style: TextStyle(fontWeight: FontWeight.bold),
+        //             ),
+        //           ],
+        //         )));
+        //   }
+        // });
       },
     );
 

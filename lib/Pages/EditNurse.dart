@@ -7,9 +7,6 @@ import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
-import 'package:baby_doctor/Models/Nurse.dart';
-import 'package:baby_doctor/Models/Employee.dart';
-import 'package:baby_doctor/Models/Qualifications.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -999,20 +996,20 @@ class _EditNurseState extends State<EditNurse> {
               'Password',
               2,
               Experience, []));
-
-      bool hasUpdated = await nurseService.UpdateNurse(nurseData);
-      if (hasUpdated) {
-        await sfpd.hide();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Shade.snackGlobalSuccess,
-            content: Text('Success: Updated $FirstName')));
-
-        Navigator.pushNamed(context, Strings.routeNurseList);
-      } else {
-        await sfpd.hide();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Shade.snackGlobalFailed,
-            content: Text('Error: Failed to update $FirstName')));
-      }
+      //
+      // bool hasUpdated = await nurseService.UpdateNurse(nurseData);
+      // if (hasUpdated) {
+      //   await sfpd.hide();
+      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //       backgroundColor: Shade.snackGlobalSuccess,
+      //       content: Text('Success: Updated $FirstName')));
+      //
+      //   Navigator.pushNamed(context, Strings.routeNurseList);
+      // } else {
+      //   await sfpd.hide();
+      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //       backgroundColor: Shade.snackGlobalFailed,
+      //       content: Text('Error: Failed to update $FirstName')));
+      // }
   }
 }
