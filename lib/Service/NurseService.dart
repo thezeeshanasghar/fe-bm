@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/RequestData/EmployeeModel.dart';
+import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
 import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:http/http.dart' as http;
 
 class NurseService {
   Future<Nurse> getNurse() async {
-    final response = await http.get(Uri.https(Strings.pathAPI, 'api/Nurse/get'));
+    final response =
+        await http.get(Uri.https(Strings.pathAPI, 'api/Nurse/get'));
     final jsonResponse = jsonDecode(response.body);
     return Nurse.fromJson(jsonResponse);
   }
@@ -29,11 +30,12 @@ class NurseService {
       "salary": nurse.Salary,
       "employee": nurse.employee
     };
-    final response = await http.post(Uri.https(Strings.pathAPI, 'api/Nurse/insert'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(Obj));
+    final response =
+        await http.post(Uri.https(Strings.pathAPI, 'api/Nurse/insert'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(Obj));
     if (response.statusCode == 201) {
       return true;
     } else {

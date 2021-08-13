@@ -6,7 +6,7 @@ import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
-import 'package:baby_doctor/Models/RequestData/EmployeeModel.dart';
+import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
 import 'package:baby_doctor/Models/Nurse.dart';
 import 'package:baby_doctor/Models/Employee.dart';
 import 'package:baby_doctor/Models/Qualifications.dart';

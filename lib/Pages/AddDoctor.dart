@@ -34,7 +34,7 @@ class _AddDoctorState extends State<AddDoctor> {
   String Email;
   String Address;
   String Gender = 'Choose Gender';
-  String Speciality  = 'Select Speciality';
+  String Speciality = 'Select Speciality';
   SimpleFontelicoProgressDialog _dialog;
   int ConsultationFee = 10;
   int EmergencyConsultationFee = 10;
@@ -1093,9 +1093,6 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-
-
-
   // functions required for working
   pickDate() async {
     DateTime date = await showDatePicker(
@@ -1134,7 +1131,8 @@ class _AddDoctorState extends State<AddDoctor> {
     formKey.currentState.save();
     _dialog.show(
         message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+        type: SimpleFontelicoProgressDialogType.multilines,
+        width: MediaQuery.of(context).size.width - 50);
 
     EmployeeData employee = new EmployeeData(
         employeeType: 'Doctor',

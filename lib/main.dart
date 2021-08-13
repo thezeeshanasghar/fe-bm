@@ -13,6 +13,7 @@ import 'package:baby_doctor/Pages/EditRoom.dart';
 import 'package:baby_doctor/Pages/EditService.dart';
 import 'package:baby_doctor/Pages/Home.dart';
 import 'package:baby_doctor/Pages/AddReceptionist.dart';
+import 'package:baby_doctor/Pages/Login.dart';
 import 'package:baby_doctor/Pages/Nurse%20Share.dart';
 import 'package:baby_doctor/Pages/NurseList.dart';
 import 'package:baby_doctor/Pages/NurseMedication.dart';
@@ -31,7 +32,7 @@ import 'Pages/MonthlyShare.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: Strings.routeHomePage,
+    initialRoute: Strings.routeLogin,
     routes: {
       Strings.routeAddRoom: (context) => AddRoom(),
       Strings.routeAddService: (context) => AddService(),
@@ -54,13 +55,14 @@ void main() {
       '/NurseShare': (context) => NurseShare(),
       '/MonthlyShare': (context) => MonthlyShare(),
       '/AdminPatient': (context) => AdminPatient(),
-      Strings.routeEditProcedure:(context)=>EditProcedures(),
-      Strings.routeEditService:(context)=>EditService(),
-      Strings.routeEditRoom:(context)=>EditRoom(),
-      Strings.routeEditReceptionist:(context)=>EditReceptionist(),
-      Strings.routeEditDoctor:(context)=> EditDoctor(),
-      Strings.routeEditNurse:(context)=> EditNurse(),
-      Strings.routeAccounts:(context)=> Accounts(),
+      Strings.routeEditProcedure: (context) => EditProcedures(),
+      Strings.routeEditService: (context) => EditService(),
+      Strings.routeEditRoom: (context) => EditRoom(),
+      Strings.routeEditReceptionist: (context) => EditReceptionist(),
+      Strings.routeEditDoctor: (context) => EditDoctor(),
+      Strings.routeEditNurse: (context) => EditNurse(),
+      Strings.routeAccounts: (context) => Accounts(),
+      Strings.routeLogin: (context) => Login(),
     },
   ));
 }
