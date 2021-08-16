@@ -3,11 +3,11 @@ class ServiceRequest {
   final String Name;
   final String Description;
 
-  ServiceRequest(
+  ServiceRequest({
     this.Id,
     this.Name,
     this.Description,
-  );
+  });
 
   Map<String, dynamic> toJson() => {
         "Id": Id,

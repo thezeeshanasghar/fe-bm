@@ -2,8 +2,11 @@ import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Requests/AuthenticateRequest.dart';
+import 'package:baby_doctor/Models/Requests/ServiceRequest.dart';
 import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
+import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
 import 'package:baby_doctor/Service/AuthenticationService.dart';
+import 'package:baby_doctor/Service/Service.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
@@ -46,15 +49,11 @@ class _LoginState extends State<Login> {
           builder: (BuildContext context, BoxConstraints viewportConstraints) {
             return SingleChildScrollView(
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                    minHeight: viewportConstraints.minHeight,
-                    minWidth: viewportConstraints.minWidth),
+                constraints:
+                    BoxConstraints(minHeight: viewportConstraints.minHeight, minWidth: viewportConstraints.minWidth),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
+                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                     child: Form(
                       key: formKey,
                       child: Column(
@@ -82,18 +81,13 @@ class _LoginState extends State<Login> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.supervised_user_circle),
-                  border: OutlineInputBorder(),
-                  labelText: 'User Name'),
+                  prefixIcon: Icon(Icons.supervised_user_circle), border: OutlineInputBorder(), labelText: 'User Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -112,18 +106,13 @@ class _LoginState extends State<Login> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline_rounded),
-                  border: OutlineInputBorder(),
-                  labelText: 'Password'),
+                  prefixIcon: Icon(Icons.lock_outline_rounded), border: OutlineInputBorder(), labelText: 'Password'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -144,11 +133,8 @@ class _LoginState extends State<Login> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -166,32 +152,11 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> onPressedSubmitButton() async {
-    // if (!formKey.currentState.validate()) {
-    //   return;
-    // }
+    if (!formKey.currentState.validate()) {
+      return;
+    }
+    formKey.currentState.save();
 
-    simpleFontelicoProgressDialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-    await simpleFontelicoProgressDialog.show(
-        message: 'Logging in...',
-        type: SimpleFontelicoProgressDialogType.multilines,
-        width: MediaQuery.of(context).size.width - 20,
-        horizontal: true);
-
-    // authenticationService = AuthenticationService();
-    // AuthenticateResponse authenticateResponse = await authenticationService.authenticateLogin(AuthenticateLoginRequest('basit', 'basit'));
-    // if (!authenticateResponse.isSuccess) {
-    //   showMessageUsingSnackBar(
-    //       Shade.snackGlobalFailed, authenticateResponse.message);
-    //   return;
-    // }
-
-    await simpleFontelicoProgressDialog.hide();
-    Navigator.pop(context);
-    Navigator.pushNamed(
-      context,
-      Strings.routeHomePage,
-    );
   }
 
   void showMessageUsingSnackBar(Color snackColor, String snackText) {

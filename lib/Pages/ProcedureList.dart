@@ -1,7 +1,7 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
+import 'package:baby_doctor/Models/Responses/ProcedureData.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
 import 'package:baby_doctor/ShareArguments/ProcedureArguments.dart';
 import 'package:flutter/material.dart';

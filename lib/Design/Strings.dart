@@ -48,8 +48,9 @@ class Strings {
   static const String routeEditReceptionist = '/EditReceptionist';
   static const String routeLogin = '/Login';
 
-  // static const String pathAPI = 'babymedics.fernflowers.com';
-  static const String pathAPI = 'localhost:5001';
+  static const String pathAPI = 'babymedics.fernflowers.com';
+
+  // static const String pathAPI = 'localhost:5001';
   static const String apiContentType = 'Content-Type';
   static const String apiApplicationJson = 'application/json; charset=UTF-8';
   static const String apiAuthenticationLogin = 'api/authentication/login';
@@ -57,8 +58,7 @@ class Strings {
 
   static const String alertDialogTitleDelete = 'Action';
   static const String alertDialogTitleEdit = 'Action';
-  static const String alertDialogTitleDeleteNote =
-      'Are you sure you want to delete ';
+  static const String alertDialogTitleDeleteNote = 'Are you sure you want to delete ';
 
   static const String submitGlobal = 'Submit';
 }

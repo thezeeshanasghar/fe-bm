@@ -24,7 +24,7 @@ class DoctorRequest {
   final int ShareInFee;
   final String SpecialityType;
 
-  DoctorRequest(
+  DoctorRequest({
     this.Id,
     this.UserId,
     this.UserType,
@@ -47,7 +47,7 @@ class DoctorRequest {
     this.EmergencyConsultationFee,
     this.ShareInFee,
     this.SpecialityType,
-  );
+  });
 
   Map<String, dynamic> toJson() => {
         "Id": Id,

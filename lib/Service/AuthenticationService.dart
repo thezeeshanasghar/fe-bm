@@ -7,16 +7,14 @@ import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
 import 'package:http/http.dart' as http;
 
 class AuthenticationService {
-  // Future<AuthenticateResponse> authenticateLogin(
-  //     AuthenticateLoginRequest loginRequest) async {
-  //   final response = await http.post(
-  //       Uri.https(Strings.pathAPI, Strings.apiAuthenticationLogin),
-  //       headers: <String, String>{
-  //         Strings.apiContentType: Strings.apiApplicationJson,
-  //       },
-  //       body: jsonEncode(loginRequest.toJson()));
-  //
-  //   final JsonResponse = jsonDecode(response.body);
-  //   return AuthenticateResponse.fromJson(JsonResponse);
-  // }
+  Future<AuthenticateResponse> authenticateLogin(AuthenticateLoginRequest loginRequest) async {
+    final response = await http.post(Uri.https(Strings.pathAPI, Strings.apiAuthenticationLogin),
+        headers: <String, String>{
+          Strings.apiContentType: Strings.apiApplicationJson,
+        },
+        body: jsonEncode(loginRequest.toJson()));
+
+    final jsonResponse = jsonDecode(response.body);
+    return AuthenticateResponse.fromJson(jsonResponse);
+  }
 }

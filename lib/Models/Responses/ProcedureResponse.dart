@@ -1,54 +1,35 @@
-import 'package:flutter/foundation.dart';
+import 'package:baby_doctor/Models/Sample/ProcedureSample.dart';
 
-class Procedure {
+class ProcedureResponse {
   final bool isSuccess;
   final String message;
-  final List<ProcedureData> data;
+  final ProcedureSample data;
 
-  Procedure({
+  ProcedureResponse({
     this.isSuccess,
     this.message,
     this.data,
   });
 
-  factory Procedure.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<ProcedureData> dataList =
-        list.map((i) => ProcedureData.fromJson(i)).toList();
-    return Procedure(
-        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+  factory ProcedureResponse.fromJson(Map<String, dynamic> json) {
+    return ProcedureResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
   }
 }
 
-class ProcedureData {
-  final int id;
-  final String name;
-  final String performedBy;
-  final int charges;
-  final int performerShare;
+class ProcedureResponseList {
+  final bool isSuccess;
+  final String message;
+  final List<ProcedureSample> data;
 
-  ProcedureData(
-      {this.id,
-      this.name,
-      this.performedBy,
-      this.charges,
-      this.performerShare});
+  ProcedureResponseList({
+    this.isSuccess,
+    this.message,
+    this.data,
+  });
 
-  factory ProcedureData.fromJson(Map<String, dynamic> json) {
-    return ProcedureData(
-      id: json['id'],
-      name: json['name'],
-      performerShare: json['performerShare'],
-      performedBy: json['performedBy'],
-      charges: json['charges'],
-    );
+  factory ProcedureResponseList.fromJson(Map<String, dynamic> json) {
+    var list = json['data'] as List;
+    List<ProcedureSample> dataList = list.map((i) => ProcedureSample.fromJson(i)).toList();
+    return ProcedureResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "performerShare": performerShare,
-        "performedBy": performedBy,
-        "charges": charges
-      };
 }
