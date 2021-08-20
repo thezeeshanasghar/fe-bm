@@ -5,65 +5,74 @@ import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
 import 'package:http/http.dart' as http;
 
 class Service {
-  Future<ServiceResponse> getServices() async {
-    final response =
-        await http.get(Uri.https(Strings.pathAPI, 'api/service/get'));
-    final jsonResponse = jsonDecode(response.body);
-    return ServiceResponse.fromJson(jsonResponse);
+  Future<ServiceResponseList> getServices(String token) async {
+    final response = await http.get(
+      Uri.https(Strings.pathAPI, Strings.apiServiceGet),
+      headers: <String, String>{
+        Strings.apiContentType: Strings.apiApplicationJson,
+        Strings.apiAuthorization: '${Strings.apiBearer} $token',
+      },
+    );
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return ServiceResponseList.fromJson(jsonResponse);
+    }
+    return null;
   }
 
-//
-// Future<dynamic> getServicesById(int Id) async {
-//   final response =
-//       await http.get(Uri.https(Strings.pathAPI, 'api/service/get/${Id}'));
-//   if (response.statusCode == 200) {
-//     return jsonDecode(response.body);
-//   } else {
-//     throw Exception('Failed to load Service');
-//   }
-// }
-//
-  Future<ServiceResponse> InsertServices(ServiceRequest serviceRequest, String token) async {
-    final response =
-        await http.post(Uri.https(Strings.pathAPI, 'api/service/insert'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode(serviceRequest.toJson()));
-    final jsonResponse = jsonDecode(response.body);
-    return ServiceResponse.fromJson(jsonResponse);
+  Future<ServiceResponse> getServicesById(int id, String token) async {
+    final response = await http.get(
+      Uri.https(Strings.pathAPI, '${Strings.apiServiceGet}/$id'),
+      headers: <String, String>{
+        Strings.apiContentType: Strings.apiApplicationJson,
+        Strings.apiAuthorization: '${Strings.apiBearer} $token',
+      },
+    );
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return ServiceResponse.fromJson(jsonResponse);
+    }
+    return null;
   }
-//
-// Future<bool> UpdateServices(ServiceData services) async{
-//     Map<String, dynamic> Obj = {
-//       'id':services.id,
-//       'name': services.name,
-//       'description': services.description,
-//     };
-//     final response = await http.put(Uri.https(Strings.pathAPI, 'api/service/update/${services.id}'),
-//         headers: <String, String>{
-//           'Content-Type': 'application/json; charset=UTF-8',
-//         },
-//         body: jsonEncode(Obj));
-//     if (response.statusCode ==204) {
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   }
-//
-//
-//   Future<bool> DeleteServices(int id) async {
-//   final response = await http.delete(
-//       Uri.https(Strings.pathAPI, 'api/service/delete/${id}'),
-//       headers: <String, String>{
-//         'Content-Type': 'application/json; charset=UTF-8',
-//       });
-//   if (response.statusCode == 204) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
+
+  Future<ServiceResponse> insertService(ServiceRequest serviceRequest, String token) async {
+    final response = await http.post(Uri.https(Strings.pathAPI, Strings.apiServiceInsert),
+        headers: <String, String>{
+          Strings.apiContentType: Strings.apiApplicationJson,
+          Strings.apiAuthorization: '${Strings.apiBearer} $token',
+        },
+        body: jsonEncode(serviceRequest.toJson()));
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return ServiceResponse.fromJson(jsonResponse);
+    }
+    return null;
+  }
+
+  Future<ServiceResponse> updateService(ServiceRequest serviceRequest, String token) async {
+    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiServiceUpdate}/${serviceRequest.Id}'),
+        headers: <String, String>{
+          Strings.apiContentType: Strings.apiApplicationJson,
+          Strings.apiAuthorization: '${Strings.apiBearer} $token',
+        },
+        body: jsonEncode(serviceRequest.toJson()));
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return ServiceResponse.fromJson(jsonResponse);
+    }
+    return null;
+  }
+
+  Future<ServiceResponse> deleteService(int id, String token) async {
+    final response =
+        await http.delete(Uri.https(Strings.pathAPI, '${Strings.apiServiceDelete}/$id'), headers: <String, String>{
+      Strings.apiContentType: Strings.apiApplicationJson,
+      Strings.apiAuthorization: '${Strings.apiBearer} $token',
+    });
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return ServiceResponse.fromJson(jsonResponse);
+    }
+    return null;
+  }
 }

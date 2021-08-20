@@ -160,14 +160,17 @@ class _LoginState extends State<Login> {
     AuthenticationService authenticationService = AuthenticationService();
     AuthenticateResponse authenticateResponse = await authenticationService
         .authenticateLogin(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
-    if (authenticateResponse.isSuccess) {
-      print(authenticateResponse.token.jwtToken);
-      Service service = Service();
-      ServiceResponse serviceResponse = await service.InsertServices(
-          ServiceRequest(Id: 0, Name: 'Name', Description: 'Description'), authenticateResponse.token.jwtToken);
-      print(serviceResponse.message);
-    } else {
-      print(authenticateResponse.message);
+    if (authenticateResponse != null) {
+      if (authenticateResponse.isSuccess) {
+        Service service = Service();
+        ServiceResponseList serviceResponse = await service.getServices(authenticateResponse.token.refreshToken);
+        if (serviceResponse != null)
+          print(serviceResponse.message);
+        else
+          print('null');
+      } else {
+        print(authenticateResponse.message);
+      }
     }
   }
 

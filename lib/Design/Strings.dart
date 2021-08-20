@@ -49,11 +49,18 @@ class Strings {
   static const String routeLogin = '/Login';
 
   static const String pathAPI = 'babymedics.fernflowers.com';
-  // static const String pathAPI = 'localhost:5001';
   static const String apiContentType = 'Content-Type';
   static const String apiApplicationJson = 'application/json; charset=UTF-8';
+  static const String apiAuthorization = 'Authorization';
+  static const String apiBearer = 'Bearer';
+
   static const String apiAuthenticationLogin = 'api/authentication/login';
   static const String apiAuthenticationRefresh = 'api/authentication/refresh';
+
+  static const String apiServiceGet = 'api/service/get';
+  static const String apiServiceInsert = 'api/service/insert';
+  static const String apiServiceUpdate = 'api/service/update';
+  static const String apiServiceDelete = 'api/service/delete';
 
   static const String alertDialogTitleDelete = 'Action';
   static const String alertDialogTitleEdit = 'Action';
