@@ -16,6 +16,10 @@ class AuthenticateResponse {
 
   factory AuthenticateResponse.fromJson(Map<String, dynamic> json) {
     return AuthenticateResponse(
-        isSuccess: json['isSuccess'], message: json['message'], token: json['token'], data: json['data']);
+      isSuccess: json['isSuccess'],
+      message: json['message'],
+      token: TokenSample.fromJson(json['token']),
+      data: LoginSample.fromJson(json['data']),
+    );
   }
 }

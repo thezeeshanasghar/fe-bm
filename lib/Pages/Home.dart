@@ -1,6 +1,7 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Sample/TokenSample.dart';
 import 'package:baby_doctor/Pages/AddDoctor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +25,21 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   final formKey = GlobalKey<FormState>();
+  bool hasChangeDependencies = false;
+  TokenSample args;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      args = ModalRoute.of(context).settings.arguments;
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -75,7 +87,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 title: Text(Strings.titleAddDoctor),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, Strings.routeAddDoctor);
+                  Navigator.pushNamed(context, Strings.routeAddDoctor, arguments: args);
                 },
               ),
               ListTile(
@@ -146,19 +158,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
           body: DefaultTextStyle(
             style: Theme.of(context).textTheme.bodyText2,
             child: LayoutBuilder(
-              builder:
-                  (BuildContext context, BoxConstraints viewportConstraints) {
+              builder: (BuildContext context, BoxConstraints viewportConstraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                        minHeight: viewportConstraints.minHeight,
-                        minWidth: viewportConstraints.minWidth),
+                        minHeight: viewportConstraints.minHeight, minWidth: viewportConstraints.minWidth),
                     child: Padding(
-                        padding: EdgeInsets.fromLTRB(
-                            Dimens.globalPaddingLeft,
-                            Dimens.globalPaddingTop,
-                            Dimens.globalPaddingRight,
-                            Dimens.globalPaddingBottom),
+                        padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                            Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                         child: Form(
                           key: formKey,
                           child: Column(
@@ -344,10 +351,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -396,10 +400,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -448,10 +449,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -500,10 +498,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -552,10 +547,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -604,10 +596,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -656,10 +645,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -708,10 +694,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.add_circle_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -760,10 +743,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.add_circle_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -812,10 +792,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.add_circle_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -864,10 +841,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.add_circle_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -916,10 +890,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.add_circle_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -968,10 +939,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.add_circle_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -1020,10 +988,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -1072,9 +1037,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.king_bed), fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.king_bed), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -1123,10 +1086,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -1175,10 +1135,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(
-                    child: FittedBox(
-                        child: Icon(Icons.list_alt_outlined),
-                        fit: BoxFit.fill)),
+                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),

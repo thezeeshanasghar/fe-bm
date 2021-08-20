@@ -7,6 +7,7 @@ import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
 import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
 import 'package:baby_doctor/Service/AuthenticationService.dart';
 import 'package:baby_doctor/Service/Service.dart';
+import 'package:baby_doctor/ShareArguments/GlobalArgs.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
@@ -82,10 +83,9 @@ class _LoginState extends State<Login> {
       children: [
         Padding(
             padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
             child: TextFormField(
               autofocus: false,
-              maxLength: 15,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.supervised_user_circle), border: OutlineInputBorder(), labelText: 'User Name'),
               validator: (String value) {
@@ -107,10 +107,10 @@ class _LoginState extends State<Login> {
       children: [
         Padding(
             padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
             child: TextFormField(
               autofocus: false,
-              maxLength: 15,
+              obscureText: true,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.lock_outline_rounded), border: OutlineInputBorder(), labelText: 'Password'),
               validator: (String value) {
@@ -152,11 +152,27 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> onPressedSubmitButton() async {
-    if (!formKey.currentState.validate()) {
-      return;
-    }
-    formKey.currentState.save();
+    // if (!formKey.currentState.validate()) {
+    //   return;
+    // }
+    // formKey.currentState.save();
 
+    AuthenticationService authenticationService = AuthenticationService();
+    AuthenticateResponse authenticateResponse = await authenticationService
+        .authenticateLogin(AuthenticateLoginRequest(UserName: 'strange@gmail.com', Password: '123456'));
+    if (authenticateResponse.isSuccess) {
+      GlobalArgs.jwtToken = authenticateResponse.token.jwtToken;
+      GlobalArgs.refreshToken = authenticateResponse.token.refreshToken;
+      GlobalArgs.createdDate = authenticateResponse.token.createdDate;
+      GlobalArgs.expiryDate = authenticateResponse.token.expiryDate;
+      Navigator.pop(context);
+      Navigator.pushNamed(
+        context,
+        Strings.routeHomePage,
+      );
+    } else {
+      showMessageUsingSnackBar(Shade.snackGlobalFailed, authenticateResponse.message);
+    }
   }
 
   void showMessageUsingSnackBar(Color snackColor, String snackText) {

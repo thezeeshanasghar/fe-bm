@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/DoctorRequest.dart';
+import 'package:baby_doctor/Models/Responses/DoctorResponse.dart';
 import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
+import 'package:baby_doctor/Models/Sample/TokenSample.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -42,14 +44,15 @@ class _AddDoctorState extends State<AddDoctor> {
   String Password = "222222";
   String UserName;
   DoctorService doctorService;
+  bool hasChangeDependencies = false;
   List<QualificationSample> qualificationList = [
-    new QualificationSample(
-        userId: 0, certificate: "", description: "", qualificationType: "")
+    new QualificationSample(userId: 0, certificate: "", description: "", qualificationType: "")
   ];
   List<QualificationSample> diplomaList = [
-    new QualificationSample(
-        userId: 0, certificate: "", description: "", qualificationType: "")
+    new QualificationSample(userId: 0, certificate: "", description: "", qualificationType: "")
   ];
+
+  TokenSample args;
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
@@ -59,8 +62,16 @@ class _AddDoctorState extends State<AddDoctor> {
   @override
   void initState() {
     super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+    _dialog = SimpleFontelicoProgressDialog(context: context, barrierDimisable: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      args = ModalRoute.of(context).settings.arguments;
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -89,11 +100,8 @@ class _AddDoctorState extends State<AddDoctor> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
+                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                     child: Form(
                       key: formKey,
                       child: Column(
@@ -134,18 +142,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.supervised_user_circle),
-                  border: OutlineInputBorder(),
-                  labelText: 'User Name'),
+                  prefixIcon: Icon(Icons.supervised_user_circle), border: OutlineInputBorder(), labelText: 'User Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -164,18 +167,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline_rounded),
-                  border: OutlineInputBorder(),
-                  labelText: 'Password'),
+                  prefixIcon: Icon(Icons.lock_outline_rounded), border: OutlineInputBorder(), labelText: 'Password'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -195,11 +193,8 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: DOBController,
             decoration: InputDecoration(
@@ -269,10 +264,7 @@ class _AddDoctorState extends State<AddDoctor> {
                                     right: 10.0,
                                     child: InkWell(
                                       onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
+                                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                                       },
                                       child: Icon(
                                         Icons.camera_alt,
@@ -290,9 +282,7 @@ class _AddDoctorState extends State<AddDoctor> {
                         Expanded(
                           child: TextFormField(
                             autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Qualification'),
+                            decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'Qualification'),
                             validator: (String value) {
                               if (value == null || value.isEmpty) {
                                 return 'This field cannot be empty';
@@ -302,9 +292,7 @@ class _AddDoctorState extends State<AddDoctor> {
                             onSaved: (String value) {
                               setState(() {
                                 qualificationList[i] = new QualificationSample(
-                                    certificate: "",
-                                    description: value,
-                                    qualificationType: "Qualification");
+                                    certificate: "", description: value, qualificationType: "Qualification");
                               });
                             },
                           ),
@@ -312,8 +300,7 @@ class _AddDoctorState extends State<AddDoctor> {
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(i == qualificationList.length - 1, i,
-                            qualificationList)
+                        _addRemoveButton(i == qualificationList.length - 1, i, qualificationList)
                       ],
                     ),
                   ],
@@ -381,10 +368,7 @@ class _AddDoctorState extends State<AddDoctor> {
                                     right: 10.0,
                                     child: InkWell(
                                       onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
+                                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                                       },
                                       child: Icon(
                                         Icons.camera_alt,
@@ -402,9 +386,7 @@ class _AddDoctorState extends State<AddDoctor> {
                         Expanded(
                           child: TextFormField(
                             autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Diplomas'),
+                            decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'Diplomas'),
                             validator: (String value) {
                               if (value == null || value.isEmpty) {
                                 return 'This field cannot be empty';
@@ -421,8 +403,7 @@ class _AddDoctorState extends State<AddDoctor> {
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(
-                            i == diplomaList.length - 1, i, diplomaList)
+                        _addRemoveButton(i == diplomaList.length - 1, i, diplomaList)
                       ],
                     ),
                   ],
@@ -438,17 +419,12 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.date_range_sharp),
-                border: OutlineInputBorder(),
-                labelText: 'Experience'),
+                prefixIcon: Icon(Icons.date_range_sharp), border: OutlineInputBorder(), labelText: 'Experience'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -472,18 +448,15 @@ class _AddDoctorState extends State<AddDoctor> {
             children: <Widget>[
               CircleAvatar(
                 radius: 90,
-                backgroundImage: _imageFile != null
-                    ? FileImage(File(_imageFile.path))
-                    : AssetImage('assets/doctordp.jpg'),
+                backgroundImage:
+                    _imageFile != null ? FileImage(File(_imageFile.path)) : AssetImage('assets/doctordp.jpg'),
               ),
               Positioned(
                   bottom: 30.0,
                   right: 30.0,
                   child: InkWell(
                     onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: ((builder) => bottomSheet()));
+                      showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                     },
                     child: Icon(
                       Icons.camera_alt,
@@ -502,15 +475,10 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
@@ -549,18 +517,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'First Name'),
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'First Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -580,18 +543,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Last Name'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Last Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -610,11 +568,8 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
@@ -640,18 +595,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'CNIC Number'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'CNIC Number'),
             validator: (String value) {
               int _cnic = int.tryParse(value);
               if (value == null || value.isEmpty) {
@@ -676,18 +626,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -713,18 +658,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Emergency Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -750,22 +690,16 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.email), border: OutlineInputBorder(), labelText: 'Email'),
               validator: (String value) {
-                bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                bool emailValid =
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
                 }
@@ -786,18 +720,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.home),
-                  border: OutlineInputBorder(),
-                  labelText: 'Address'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.home), border: OutlineInputBorder(), labelText: 'Address'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -817,15 +746,10 @@ class _AddDoctorState extends State<AddDoctor> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
@@ -864,18 +788,13 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on),
-                  border: OutlineInputBorder(),
-                  labelText: 'Consultation Fee'),
+                  prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'Consultation Fee'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
@@ -901,11 +820,8 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
@@ -938,11 +854,8 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
@@ -978,11 +891,8 @@ class _AddDoctorState extends State<AddDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
@@ -1019,11 +929,8 @@ class _AddDoctorState extends State<AddDoctor> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -1032,9 +939,7 @@ class _AddDoctorState extends State<AddDoctor> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
+              onPressed: () => onPressedSubmitButton(),
             ),
           ),
         ),
@@ -1113,6 +1018,33 @@ class _AddDoctorState extends State<AddDoctor> {
     });
   }
 
-  onPressedSubmitButton() async {
+  Future<void> onPressedSubmitButton() async {
+    print(args.jwtToken);
+    if (!formKey.currentState.validate()) {
+      return;
+    }
+    formKey.currentState.save();
+
+    DoctorService doctorService = DoctorService();
+    DoctorResponse doctorResponse = await doctorService.InsertDoctor(
+        DoctorRequest(
+          FirstName: FirstName,
+          LastName: LastName,
+          FatherHusbandName: FatherHusbandName,
+          Gender: Gender,
+          Cnic: CNIC,
+          Contact: ContactNumber,
+          EmergencyContact: EmergencyContactNumber,
+          Email: Email,
+          Address: Address,
+          SpecialityType: Speciality,
+          Experience: Experience,
+          ConsultationFee: ConsultationFee,
+          EmergencyConsultationFee: EmergencyConsultationFee,
+          ShareInFee: FeeShare,
+        ),
+        args.jwtToken);
+    if (doctorResponse.isSuccess) {
+    } else {}
   }
 }

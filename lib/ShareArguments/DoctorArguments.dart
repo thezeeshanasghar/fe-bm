@@ -25,8 +25,7 @@ class DoctorArguments {
   final List<String> qualifications;
 
   DoctorArguments(
-      {
-        this.id,
+      {this.id,
       this.ConsultationFee,
       this.EmergencyConsultationFee,
       this.ShareInFee,

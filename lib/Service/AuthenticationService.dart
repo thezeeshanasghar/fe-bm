@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:baby_doctor/Design/Strings.dart';
 
 import 'package:baby_doctor/Models/Requests/AuthenticateRequest.dart';
-import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
 import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
 import 'package:http/http.dart' as http;
 

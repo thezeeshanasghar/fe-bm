@@ -1,6 +1,6 @@
 import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
 
-class DoctorRequest {
+class NurseRequest {
   final int Id;
   final int UserId;
 
@@ -26,7 +26,7 @@ class DoctorRequest {
   final int Salary;
   final List<QualificationRequest> QualificationList;
 
-  DoctorRequest({
+  NurseRequest({
     this.Id,
     this.UserId,
     this.UserType,
