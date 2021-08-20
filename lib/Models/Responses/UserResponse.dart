@@ -12,7 +12,8 @@ class UserResponse {
   });
 
   factory UserResponse.fromJson(Map<String, dynamic> json) {
-    return UserResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return UserResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: UserSample.fromJson(json['data']));
   }
 }
 

@@ -12,7 +12,8 @@ class ServiceResponse {
   });
 
   factory ServiceResponse.fromJson(Map<String, dynamic> json) {
-    return ServiceResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return ServiceResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: ServiceSample.fromJson(json['data']));
   }
 }
 

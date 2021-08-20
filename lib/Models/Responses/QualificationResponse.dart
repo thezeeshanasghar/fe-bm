@@ -12,7 +12,8 @@ class QualificationResponse {
   });
 
   factory QualificationResponse.fromJson(Map<String, dynamic> json) {
-    return QualificationResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return QualificationResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: QualificationSample.fromJson(json['data']));
   }
 }
 

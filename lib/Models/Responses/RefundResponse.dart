@@ -12,7 +12,8 @@ class RefundResponse {
   });
 
   factory RefundResponse.fromJson(Map<String, dynamic> json) {
-    return RefundResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return RefundResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: RefundSample.fromJson(json['data']));
   }
 }
 

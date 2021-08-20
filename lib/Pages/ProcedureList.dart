@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Responses/ProcedureData.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
 import 'package:baby_doctor/ShareArguments/ProcedureArguments.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _ProcedureListState extends State<ProcedureList> {
   List<Map<String, dynamic>> procedureIsSource;
   List<Map<String, dynamic>> procedureIsSearched;
   List<Map<String, dynamic>> procedureSelecteds;
-  List<ProcedureData> listProcedures;
+  // List<ProcedureData> listProcedures;
 
   ProcedureService procedureService;
 
@@ -114,7 +113,7 @@ class _ProcedureListState extends State<ProcedureList> {
     procedureSortAscending = true;
     procedureIsLoading = true;
     procedureShowSelect = false;
-    listProcedures = [];
+    // listProcedures = [];
     showSearchedList = false;
 
     procedureService = ProcedureService();
@@ -122,30 +121,30 @@ class _ProcedureListState extends State<ProcedureList> {
 
   void getProceduresFromApiAndLinkToTable() async {
     setState(() => procedureIsLoading = true);
-    listProcedures = [];
-    procedureIsSource = [];
-    Procedure procedureResponse = await procedureService.getProcedures();
-    listProcedures = procedureResponse.data;
-    procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
-
-    setState(() => procedureIsLoading = false);
+    // listProcedures = [];
+    // procedureIsSource = [];
+    // Procedure procedureResponse = await procedureService.getProcedures();
+    // listProcedures = procedureResponse.data;
+    // procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
+    //
+    // setState(() => procedureIsLoading = false);
   }
 
-  List<Map<String, dynamic>> generateProcedureDataFromApi(
-      List<ProcedureData> listOfProcedures) {
-    List<Map<String, dynamic>> tempsprocedure = [];
-    for (ProcedureData procedures in listOfProcedures) {
-      tempsprocedure.add({
-        "Id": procedures.id,
-        "Name": procedures.name,
-        "PerformedBy": procedures.performedBy,
-        "Charges": procedures.charges,
-        "Share": procedures.performerShare,
-        "Action": procedures.id,
-      });
-    }
-    return tempsprocedure;
-  }
+  // List<Map<String, dynamic>> generateProcedureDataFromApi(
+  //     List<ProcedureData> listOfProcedures) {
+  //   List<Map<String, dynamic>> tempsprocedure = [];
+  //   for (ProcedureData procedures in listOfProcedures) {
+  //     tempsprocedure.add({
+  //       "Id": procedures.id,
+  //       "Name": procedures.name,
+  //       "PerformedBy": procedures.performedBy,
+  //       "Charges": procedures.charges,
+  //       "Share": procedures.performerShare,
+  //       "Action": procedures.id,
+  //     });
+  //   }
+  //   return tempsprocedure;
+  // }
 
   List<Map<String, dynamic>> generateProcedureSearchData(
       Iterable<Map<String, dynamic>> iterableList) {
@@ -308,96 +307,96 @@ class _ProcedureListState extends State<ProcedureList> {
   }
 
   void onPressedDeleteFromTable(Id, row) {
-    Widget cancelButton = TextButton(
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-      child: Text("Cancel",
-          style: TextStyle(
-              color: Shade.alertBoxButtonTextCancel,
-              fontWeight: FontWeight.w900)),
-    );
-
-    Widget deleteButton = TextButton(
-      child: Text("Delete",
-          style: TextStyle(
-              color: Shade.alertBoxButtonTextDelete,
-              fontWeight: FontWeight.w900)),
-      onPressed: ()  async{
-        Navigator.of(context).pop();
-        sfpd = SimpleFontelicoProgressDialog(
-            context: context, barrierDimisable: false);
-       await sfpd.show(
-            message: 'Deleting ...',
-            type: SimpleFontelicoProgressDialogType.hurricane,
-            width: MediaQuery.of(context).size.width - 20,
-            horizontal: true);
-        procedureService.DeleteProcedure(Id).then((response) async {
-          if (response == true) {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalSuccess,
-                content: Row(
-                  children: [
-                    Text('Success: Deleted procedure '),
-                    Text(
-                      row['Name'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-            getProceduresFromApiAndLinkToTable();
-          } else {
-            await sfpd.hide();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: Shade.snackGlobalFailed,
-                content: Row(
-                  children: [
-                    Text('Error: Try Again: Failed to delete procedure '),
-                    Text(
-                      row['Name'],
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )));
-          }
-        });
-      },
-    );
-
-    AlertDialog alert = AlertDialog(
-      title: Row(
-        children: [
-          Text(Strings.alertDialogTitleDelete),
-        ],
-      ),
-      content: Row(
-        children: [
-          Text(Strings.alertDialogTitleDeleteNote),
-          Text(
-            row['Name'] + ' ?',
-            style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
-          )
-        ],
-      ),
-      actions: [
-        cancelButton,
-        deleteButton,
-      ],
-      actionsPadding: EdgeInsets.fromLTRB(
-          Dimens.actionsGlobalButtonLeft,
-          Dimens.actionsGlobalButtonTop,
-          Dimens.actionsGlobalButtonRight,
-          Dimens.actionsGlobalButtonBottom),
-    );
-
-    showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
+    // Widget cancelButton = TextButton(
+    //   onPressed: () {
+    //     Navigator.of(context).pop();
+    //   },
+    //   child: Text("Cancel",
+    //       style: TextStyle(
+    //           color: Shade.alertBoxButtonTextCancel,
+    //           fontWeight: FontWeight.w900)),
+    // );
+    //
+    // Widget deleteButton = TextButton(
+    //   child: Text("Delete",
+    //       style: TextStyle(
+    //           color: Shade.alertBoxButtonTextDelete,
+    //           fontWeight: FontWeight.w900)),
+    //   onPressed: ()  async{
+    //     Navigator.of(context).pop();
+    //     sfpd = SimpleFontelicoProgressDialog(
+    //         context: context, barrierDimisable: false);
+    //    await sfpd.show(
+    //         message: 'Deleting ...',
+    //         type: SimpleFontelicoProgressDialogType.hurricane,
+    //         width: MediaQuery.of(context).size.width - 20,
+    //         horizontal: true);
+    //     procedureService.DeleteProcedure(Id).then((response) async {
+    //       if (response == true) {
+    //         await sfpd.hide();
+    //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //             backgroundColor: Shade.snackGlobalSuccess,
+    //             content: Row(
+    //               children: [
+    //                 Text('Success: Deleted procedure '),
+    //                 Text(
+    //                   row['Name'],
+    //                   style: TextStyle(fontWeight: FontWeight.bold),
+    //                 ),
+    //               ],
+    //             )));
+    //         getProceduresFromApiAndLinkToTable();
+    //       } else {
+    //         await sfpd.hide();
+    //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //             backgroundColor: Shade.snackGlobalFailed,
+    //             content: Row(
+    //               children: [
+    //                 Text('Error: Try Again: Failed to delete procedure '),
+    //                 Text(
+    //                   row['Name'],
+    //                   style: TextStyle(fontWeight: FontWeight.bold),
+    //                 ),
+    //               ],
+    //             )));
+    //       }
+    //     });
+    //   },
+    // );
+    //
+    // AlertDialog alert = AlertDialog(
+    //   title: Row(
+    //     children: [
+    //       Text(Strings.alertDialogTitleDelete),
+    //     ],
+    //   ),
+    //   content: Row(
+    //     children: [
+    //       Text(Strings.alertDialogTitleDeleteNote),
+    //       Text(
+    //         row['Name'] + ' ?',
+    //         style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
+    //       )
+    //     ],
+    //   ),
+    //   actions: [
+    //     cancelButton,
+    //     deleteButton,
+    //   ],
+    //   actionsPadding: EdgeInsets.fromLTRB(
+    //       Dimens.actionsGlobalButtonLeft,
+    //       Dimens.actionsGlobalButtonTop,
+    //       Dimens.actionsGlobalButtonRight,
+    //       Dimens.actionsGlobalButtonBottom),
+    // );
+    //
+    // showDialog(
+    //   barrierDismissible: true,
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return alert;
+    //   },
+    // );
   }
 
   void onChangedSearchedValue(value) {

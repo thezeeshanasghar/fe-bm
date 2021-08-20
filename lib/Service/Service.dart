@@ -23,11 +23,12 @@ class Service {
 //   }
 // }
 //
-  Future<ServiceResponse> InsertServices(ServiceRequest serviceRequest) async {
+  Future<ServiceResponse> InsertServices(ServiceRequest serviceRequest, String token) async {
     final response =
         await http.post(Uri.https(Strings.pathAPI, 'api/service/insert'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': 'Bearer $token',
             },
             body: jsonEncode(serviceRequest.toJson()));
     final jsonResponse = jsonDecode(response.body);

@@ -12,7 +12,8 @@ class ProcedureResponse {
   });
 
   factory ProcedureResponse.fromJson(Map<String, dynamic> json) {
-    return ProcedureResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return ProcedureResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: ProcedureSample.fromJson(json['data']));
   }
 }
 

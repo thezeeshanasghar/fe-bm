@@ -159,19 +159,15 @@ class _LoginState extends State<Login> {
 
     AuthenticationService authenticationService = AuthenticationService();
     AuthenticateResponse authenticateResponse = await authenticationService
-        .authenticateLogin(AuthenticateLoginRequest(UserName: 'strange@gmail.com', Password: '123456'));
+        .authenticateLogin(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
     if (authenticateResponse.isSuccess) {
-      GlobalArgs.jwtToken = authenticateResponse.token.jwtToken;
-      GlobalArgs.refreshToken = authenticateResponse.token.refreshToken;
-      GlobalArgs.createdDate = authenticateResponse.token.createdDate;
-      GlobalArgs.expiryDate = authenticateResponse.token.expiryDate;
-      Navigator.pop(context);
-      Navigator.pushNamed(
-        context,
-        Strings.routeHomePage,
-      );
+      print(authenticateResponse.token.jwtToken);
+      Service service = Service();
+      ServiceResponse serviceResponse = await service.InsertServices(
+          ServiceRequest(Id: 0, Name: 'Name', Description: 'Description'), authenticateResponse.token.jwtToken);
+      print(serviceResponse.message);
     } else {
-      showMessageUsingSnackBar(Shade.snackGlobalFailed, authenticateResponse.message);
+      print(authenticateResponse.message);
     }
   }
 

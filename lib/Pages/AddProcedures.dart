@@ -1,7 +1,6 @@
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Responses/ProcedureData.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
@@ -254,48 +253,48 @@ class _AddProceduresState extends State<AddProcedures> {
         message: 'Loading...',
         type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
-    DAL.ProcedureService service = new DAL.ProcedureService();
-    ProcedureData obj = new ProcedureData(
-        name: ProcedureName,
-        performedBy: PerformedBy,
-        charges: Charges,
-        performerShare: Share);
-    var response = await service.InsertProcedure(obj);
-    print(response);
-    if (response == true) {
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalSuccess,
-          content: Row(
-            children: [
-              Text('Success: Created procedure '),
-              Text(
-                ProcedureName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      formKey.currentState.reset();
-      Navigator.pushNamed(context, Strings.routeProcedureList);
-    } else {
-      _dialog.hide();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Row(
-            children: [
-              Text('Error: Try Again: Failed to add '),
-              Text(
-                ProcedureName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-      setState(() {
-        loadingButtonProgressIndicator = false;
-      });
-    }
+    // DAL.ProcedureService service = new DAL.ProcedureService();
+    // ProcedureData obj = new ProcedureData(
+    //     name: ProcedureName,
+    //     performedBy: PerformedBy,
+    //     charges: Charges,
+    //     performerShare: Share);
+    // var response = await service.InsertProcedure(obj);
+    // print(response);
+    // if (response == true) {
+    //   setState(() {
+    //     loadingButtonProgressIndicator = false;
+    //   });
+    //   _dialog.hide();
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       backgroundColor: Shade.snackGlobalSuccess,
+    //       content: Row(
+    //         children: [
+    //           Text('Success: Created procedure '),
+    //           Text(
+    //             ProcedureName,
+    //             style: TextStyle(fontWeight: FontWeight.bold),
+    //           ),
+    //         ],
+    //       )));
+    //   formKey.currentState.reset();
+    //   Navigator.pushNamed(context, Strings.routeProcedureList);
+    // } else {
+    //   _dialog.hide();
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       backgroundColor: Shade.snackGlobalFailed,
+    //       content: Row(
+    //         children: [
+    //           Text('Error: Try Again: Failed to add '),
+    //           Text(
+    //             ProcedureName,
+    //             style: TextStyle(fontWeight: FontWeight.bold),
+    //           ),
+    //         ],
+    //       )));
+    //   setState(() {
+    //     loadingButtonProgressIndicator = false;
+    //   });
+    // }
   }
 }

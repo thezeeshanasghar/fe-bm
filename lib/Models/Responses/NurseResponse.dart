@@ -12,7 +12,8 @@ class NurseResponse {
   });
 
   factory NurseResponse.fromJson(Map<String, dynamic> json) {
-    return NurseResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return NurseResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: NurseSample.fromJson(json['data']));
   }
 }
 

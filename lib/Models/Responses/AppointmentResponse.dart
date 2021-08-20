@@ -12,7 +12,8 @@ class AppointmentResponse {
   });
 
   factory AppointmentResponse.fromJson(Map<String, dynamic> json) {
-    return AppointmentResponse(isSuccess: json['isSuccess'], message: json['message'], data: json['data']);
+    return AppointmentResponse(
+        isSuccess: json['isSuccess'], message: json['message'], data: AppointmentSample.fromJson(json['data']));
   }
 }
 
