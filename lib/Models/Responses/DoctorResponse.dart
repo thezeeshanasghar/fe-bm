@@ -31,8 +31,11 @@ class DoctorResponseList {
   });
 
   factory DoctorResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<DoctorSample> dataList = list.map((i) => DoctorSample.fromJson(i)).toList();
+    List<DoctorSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => DoctorSample.fromJson(i)).toList();
+    }
     return DoctorResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

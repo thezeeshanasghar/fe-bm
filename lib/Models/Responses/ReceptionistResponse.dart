@@ -31,8 +31,11 @@ class ReceptionistResponseList {
   });
 
   factory ReceptionistResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<ReceptionistSample> dataList = list.map((i) => ReceptionistSample.fromJson(i)).toList();
+    List<ReceptionistSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => ReceptionistSample.fromJson(i)).toList();
+    }
     return ReceptionistResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

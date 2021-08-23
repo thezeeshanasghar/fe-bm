@@ -31,8 +31,11 @@ class RefundResponseList {
   });
 
   factory RefundResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<RefundSample> dataList = list.map((i) => RefundSample.fromJson(i)).toList();
+    List<RefundSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => RefundSample.fromJson(i)).toList();
+    }
     return RefundResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

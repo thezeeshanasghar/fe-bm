@@ -31,8 +31,11 @@ class LoginResponseList {
   });
 
   factory LoginResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<LoginSample> dataList = list.map((i) => LoginSample.fromJson(i)).toList();
+    List<LoginSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => LoginSample.fromJson(i)).toList();
+    }
     return LoginResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

@@ -31,8 +31,11 @@ class InvoiceResponseList {
   });
 
   factory InvoiceResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<InvoiceSample> dataList = list.map((i) => InvoiceSample.fromJson(i)).toList();
+    List<InvoiceSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => InvoiceSample.fromJson(i)).toList();
+    }
     return InvoiceResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

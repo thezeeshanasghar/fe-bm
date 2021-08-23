@@ -31,8 +31,11 @@ class ExpenseResponseList {
   });
 
   factory ExpenseResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<ExpenseSample> dataList = list.map((i) => ExpenseSample.fromJson(i)).toList();
+    List<ExpenseSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => ExpenseSample.fromJson(i)).toList();
+    }
     return ExpenseResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

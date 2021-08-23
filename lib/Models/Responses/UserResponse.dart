@@ -31,8 +31,11 @@ class UserResponseList {
   });
 
   factory UserResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<UserSample> dataList = list.map((i) => UserSample.fromJson(i)).toList();
+    List<UserSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => UserSample.fromJson(i)).toList();
+    }
     return UserResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

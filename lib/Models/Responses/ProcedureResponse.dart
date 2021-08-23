@@ -31,8 +31,11 @@ class ProcedureResponseList {
   });
 
   factory ProcedureResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<ProcedureSample> dataList = list.map((i) => ProcedureSample.fromJson(i)).toList();
+    List<ProcedureSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => ProcedureSample.fromJson(i)).toList();
+    }
     return ProcedureResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

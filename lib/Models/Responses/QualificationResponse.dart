@@ -31,8 +31,11 @@ class QualificationResponseList {
   });
 
   factory QualificationResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<QualificationSample> dataList = list.map((i) => QualificationSample.fromJson(i)).toList();
+    List<QualificationSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => QualificationSample.fromJson(i)).toList();
+    }
     return QualificationResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

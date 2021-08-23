@@ -31,8 +31,11 @@ class ServiceResponseList {
   });
 
   factory ServiceResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<ServiceSample> dataList = list.map((i) => ServiceSample.fromJson(i)).toList();
+    List<ServiceSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => ServiceSample.fromJson(i)).toList();
+    }
     return ServiceResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

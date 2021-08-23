@@ -31,8 +31,11 @@ class AppointmentResponseList {
   });
 
   factory AppointmentResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<AppointmentSample> dataList = list.map((i) => AppointmentSample.fromJson(i)).toList();
+    List<AppointmentSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => AppointmentSample.fromJson(i)).toList();
+    }
     return AppointmentResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

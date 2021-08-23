@@ -31,8 +31,11 @@ class ReceiptResponseList {
   });
 
   factory ReceiptResponseList.fromJson(Map<String, dynamic> json) {
-    var list = json['data'] as List;
-    List<ReceiptSample> dataList = list.map((i) => ReceiptSample.fromJson(i)).toList();
+    List<ReceiptSample> dataList;
+    if (json['data'] != null) {
+      var list = json['data'] as List;
+      dataList = list.map((i) => ReceiptSample.fromJson(i)).toList();
+    }
     return ReceiptResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }
