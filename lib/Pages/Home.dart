@@ -1,4 +1,4 @@
-import 'package:baby_doctor/Common/GlobalClass.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
 import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
@@ -708,14 +708,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () async {
-          // Navigator.pushNamed(context, Strings.routeAddDoctor);
-
-          bool hasRefreshToken = await GlobalClass.hasRefreshedToken(context);
-          if (hasRefreshToken) {
-            getServices();
-          } else {
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
-          }
+          Navigator.pushNamed(context, Strings.routeAddDoctor);
         },
         child: Card(
           child: Column(

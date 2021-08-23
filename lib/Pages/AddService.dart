@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:baby_doctor/Common/GlobalClass.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
 import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
 import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
@@ -174,7 +174,7 @@ class _AddServiceState extends State<AddService> {
     formKey.currentState.save();
     globalProgressDialog.showSimpleFontellicoProgressDialog(
         false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
-    bool hasRefreshToken = await GlobalClass.hasRefreshedToken(context);
+    bool hasRefreshToken = await GlobalRefreshToken.hasRefreshedToken(context);
     if (hasRefreshToken) {
       onInsertService();
     } else {

@@ -5,7 +5,7 @@ import 'package:baby_doctor/Service/AuthenticationService.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-class GlobalClass {
+class GlobalRefreshToken {
   static bool checkTokenValidity(BuildContext context) {
     DateTime expiryDate = DateTime.parse(context.read<TokenProvider>().tokenSample.expiryDate);
     DateTime newExpiryDate = expiryDate.subtract(Duration(seconds: 5));
