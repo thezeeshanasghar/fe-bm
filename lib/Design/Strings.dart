@@ -108,5 +108,7 @@ class Strings {
 
   static const String submitGlobal = 'Submit';
 
-  static const String errorToken = 'Token Error: Try Again';
+  static const String errorToken = 'Token Error: Try Again.';
+  static const String errorNull = 'Null Error: Failed to call server.';
+
 }

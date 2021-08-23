@@ -693,7 +693,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
     ServiceResponseList serviceResponseList =
         await service.getServices(context.read<TokenProvider>().tokenSample.jwtToken);
     if (serviceResponseList != null) {
-      print(serviceResponseList.message);
+      if (serviceResponseList.isSuccess) {
+        // successful so move to next screen
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, serviceResponseList.message, context);
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponseList.message, context);
+      }
+    } else {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
     }
   }
 
