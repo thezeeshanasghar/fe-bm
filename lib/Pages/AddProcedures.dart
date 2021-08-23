@@ -253,7 +253,7 @@ class _AddProceduresState extends State<AddProcedures> {
         message: 'Loading...',
         type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
 
-    // DAL.ProcedureService service = new DAL.ProcedureService();
+     DAL.ProcedureService service = new DAL.ProcedureService();
     // ProcedureData obj = new ProcedureData(
     //     name: ProcedureName,
     //     performedBy: PerformedBy,

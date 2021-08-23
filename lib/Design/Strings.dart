@@ -110,5 +110,11 @@ class Strings {
 
   static const String errorToken = 'Token Error: Try Again.';
   static const String errorNull = 'Null Error: Failed to call server.';
+  static const String errorInputValidation = 'Error: Some input fields are not filled.';
 
+  static const String dialogLoading = 'Loading...';
+  static const String dialogPleaseWait = 'Please wait...';
+  static const String dialogSubmitting = 'Submitting...';
+  static const String dialogUpdating = 'Updating...';
+  static const String dialogDeleting = 'Deleting...';
 }
