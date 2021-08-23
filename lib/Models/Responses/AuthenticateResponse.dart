@@ -18,8 +18,8 @@ class AuthenticateResponse {
     return AuthenticateResponse(
       isSuccess: json['isSuccess'],
       message: json['message'],
-      token: TokenSample.fromJson(json['token']),
-      data: LoginSample.fromJson(json['data']),
+      token: json['token'] != null ? TokenSample.fromJson(json['token']) : null,
+      data: json['data'] != null ? LoginSample.fromJson(json['data']) : null,
     );
   }
 }

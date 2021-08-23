@@ -107,4 +107,6 @@ class Strings {
   static const String alertDialogTitleDeleteNote = 'Are you sure you want to delete ';
 
   static const String submitGlobal = 'Submit';
+
+  static const String errorToken = 'Token Error: Try Again';
 }

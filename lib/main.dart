@@ -21,41 +21,57 @@ import 'package:baby_doctor/Pages/NurseAppointment.dart';
 import 'package:baby_doctor/Pages/ProcedureList.dart';
 import 'package:baby_doctor/Pages/ReceptionistList.dart';
 import 'package:baby_doctor/Pages/ServiceList.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Pages/AddService.dart';
 import 'package:baby_doctor/Pages/EditProcedures.dart';
+import 'package:provider/provider.dart';
 
 import 'Pages/MonthlyShare.dart';
 
 void main() {
-  runApp(MaterialApp(
-    initialRoute: Strings.routeLogin,
-    routes: {
-      Strings.routeAddService: (context) => AddService(),
-      Strings.routeAddDoctor: (context) => AddDoctor(),
-      Strings.routeAddNurse: (context) => AddNurse(),
-      Strings.routeAddProcedures: (context) => AddProcedures(),
-      Strings.routeAddReceptionist: (context) => AddReceptionist(),
-      Strings.routePatientList: (context) => PatientList(),
-      Strings.routeNurseAppointment: (context) => NurseAppointment(),
-      Strings.routeDoctorList: (context) => DoctorList(),
-      Strings.routeNurseList: (context) => NurseList(),
-      Strings.routeReceptionistList: (context) => ReceptionistList(),
-      Strings.routeProcedureList: (context) => ProcedureList(),
-      Strings.routeServiceList: (context) => ServiceList(),
-      Strings.routeHomePage: (context) => Home(),
-      '/NurseMedication': (context) => NurseMedication(),
-      '/BedTime': (context) => BedTime(),
-      '/NurseShare': (context) => NurseShare(),
-      '/MonthlyShare': (context) => MonthlyShare(),
-      '/AdminPatient': (context) => AdminPatient(),
-      Strings.routeEditProcedure: (context) => EditProcedures(),
-      Strings.routeEditService: (context) => EditService(),
-      Strings.routeEditReceptionist: (context) => EditReceptionist(),
-      Strings.routeEditDoctor: (context) => EditDoctor(),
-      Strings.routeEditNurse: (context) => EditNurse(),
-      Strings.routeAccounts: (context) => Accounts(),
-      Strings.routeLogin: (context) => Login(),
-    },
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TokenProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      initialRoute: Strings.routeLogin,
+      routes: {
+        Strings.routeAddService: (context) => AddService(),
+        Strings.routeAddDoctor: (context) => AddDoctor(),
+        Strings.routeAddNurse: (context) => AddNurse(),
+        Strings.routeAddProcedures: (context) => AddProcedures(),
+        Strings.routeAddReceptionist: (context) => AddReceptionist(),
+        Strings.routePatientList: (context) => PatientList(),
+        Strings.routeNurseAppointment: (context) => NurseAppointment(),
+        Strings.routeDoctorList: (context) => DoctorList(),
+        Strings.routeNurseList: (context) => NurseList(),
+        Strings.routeReceptionistList: (context) => ReceptionistList(),
+        Strings.routeProcedureList: (context) => ProcedureList(),
+        Strings.routeServiceList: (context) => ServiceList(),
+        Strings.routeHomePage: (context) => Home(),
+        '/NurseMedication': (context) => NurseMedication(),
+        '/BedTime': (context) => BedTime(),
+        '/NurseShare': (context) => NurseShare(),
+        '/MonthlyShare': (context) => MonthlyShare(),
+        '/AdminPatient': (context) => AdminPatient(),
+        Strings.routeEditProcedure: (context) => EditProcedures(),
+        Strings.routeEditService: (context) => EditService(),
+        Strings.routeEditReceptionist: (context) => EditReceptionist(),
+        Strings.routeEditDoctor: (context) => EditDoctor(),
+        Strings.routeEditNurse: (context) => EditNurse(),
+        Strings.routeAccounts: (context) => Accounts(),
+        Strings.routeLogin: (context) => Login(),
+      },
+    );
+  }
 }

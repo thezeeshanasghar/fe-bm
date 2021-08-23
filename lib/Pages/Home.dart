@@ -1,10 +1,19 @@
+import 'package:baby_doctor/Common/GlobalClass.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/AuthenticateRequest.dart';
+import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
+import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
 import 'package:baby_doctor/Models/Sample/TokenSample.dart';
 import 'package:baby_doctor/Pages/AddDoctor.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
+import 'package:baby_doctor/Service/AuthenticationService.dart';
+import 'package:baby_doctor/Service/Service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -679,11 +688,27 @@ class _HomeDrawerState extends State<HomeDrawer> {
     );
   }
 
+  Future<void> getServices() async {
+    Service service = Service();
+    ServiceResponseList serviceResponseList =
+        await service.getServices(context.read<TokenProvider>().tokenSample.jwtToken);
+    if (serviceResponseList != null) {
+      print(serviceResponseList.message);
+    }
+  }
+
   Widget widgetAddDoctorCard() {
     return Expanded(
       child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, Strings.routeAddDoctor);
+        onTap: () async {
+          // Navigator.pushNamed(context, Strings.routeAddDoctor);
+
+          bool hasRefreshToken = await GlobalClass.hasRefreshedToken(context);
+          if (hasRefreshToken) {
+            getServices();
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+          }
         },
         child: Card(
           child: Column(

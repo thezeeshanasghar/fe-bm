@@ -14,16 +14,16 @@ class AuthenticateLoginRequest {
 }
 
 class AuthenticateRefreshRequest {
-  final String JwtToken;
-  final String RefreshToken;
+  final String jwtToken;
+  final String refreshToken;
 
   AuthenticateRefreshRequest({
-    this.JwtToken,
-    this.RefreshToken,
+    this.jwtToken,
+    this.refreshToken,
   });
 
   Map<String, dynamic> toJson() => {
-        "UserName": JwtToken,
-        "Password": RefreshToken,
+        "JwtToken": jwtToken,
+        "RefreshToken": refreshToken,
       };
 }

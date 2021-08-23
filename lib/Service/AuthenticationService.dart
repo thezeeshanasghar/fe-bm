@@ -12,8 +12,23 @@ class AuthenticationService {
           Strings.apiContentType: Strings.apiApplicationJson,
         },
         body: jsonEncode(loginRequest.toJson()));
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return AuthenticateResponse.fromJson(jsonResponse);
+    }
+    return null;
+  }
 
-    final jsonResponse = jsonDecode(response.body);
-    return AuthenticateResponse.fromJson(jsonResponse);
+  Future<AuthenticateResponse> authenticateRefresh(AuthenticateRefreshRequest refreshRequest) async {
+    final response = await http.post(Uri.https(Strings.pathAPI, Strings.apiAuthenticationRefresh),
+        headers: <String, String>{
+          Strings.apiContentType: Strings.apiApplicationJson,
+        },
+        body: jsonEncode(refreshRequest.toJson()));
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return AuthenticateResponse.fromJson(jsonResponse);
+    }
+    return null;
   }
 }

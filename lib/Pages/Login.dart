@@ -5,11 +5,13 @@ import 'package:baby_doctor/Models/Requests/AuthenticateRequest.dart';
 import 'package:baby_doctor/Models/Requests/ServiceRequest.dart';
 import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
 import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/AuthenticationService.dart';
 import 'package:baby_doctor/Service/Service.dart';
 import 'package:baby_doctor/ShareArguments/GlobalArgs.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -162,15 +164,14 @@ class _LoginState extends State<Login> {
         .authenticateLogin(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
     if (authenticateResponse != null) {
       if (authenticateResponse.isSuccess) {
-        Service service = Service();
-        ServiceResponseList serviceResponse = await service.getServices(authenticateResponse.token.refreshToken);
-        if (serviceResponse != null)
-          print(serviceResponse.message);
-        else
-          print('null');
+        context.read<TokenProvider>().setToken(authenticateResponse.token);
+        Navigator.pop(context);
+        Navigator.pushNamed(context, Strings.routeHomePage);
       } else {
         print(authenticateResponse.message);
       }
+    }else{
+      showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Error: failed to call server');
     }
   }
 
