@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Requests/ProcedureRequest.dart';
-import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
+import 'package:baby_doctor/Models/Requests/ExpenseRequest.dart';
+import 'package:baby_doctor/Models/Responses/ExpenseResponse.dart';
 import 'package:http/http.dart' as http;
 
-class ProcedureService {
-  Future<ProcedureResponseList> getProcedures(String token) async {
+class ExpenseService {
+  Future<ExpenseResponseList> getExpenses(String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, Strings.apiProcedureGet),
+      Uri.https(Strings.pathAPI, Strings.apiExpenseGet),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',
@@ -15,14 +15,14 @@ class ProcedureService {
     );
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
-      return ProcedureResponseList.fromJson(jsonResponse);
+      return ExpenseResponseList.fromJson(jsonResponse);
     }
     return null;
   }
 
-  Future<ProcedureResponse> getProcedureById(int id, String token) async {
+  Future<ExpenseResponse> getExpenseById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiProcedureGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiExpenseGet}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',
@@ -30,48 +30,48 @@ class ProcedureService {
     );
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
-      return ProcedureResponse.fromJson(jsonResponse);
+      return ExpenseResponse.fromJson(jsonResponse);
     }
     return null;
   }
 
-  Future<ProcedureResponse> insertProcedure(ProcedureRequest procedureRequest, String token) async {
-    final response = await http.post(Uri.https(Strings.pathAPI, Strings.apiProcedureInsert),
+  Future<ExpenseResponse> insertExpense(ExpenseRequest expenseRequest, String token) async {
+    final response = await http.post(Uri.https(Strings.pathAPI, Strings.apiExpenseInsert),
         headers: <String, String>{
           Strings.apiContentType: Strings.apiApplicationJson,
           Strings.apiAuthorization: '${Strings.apiBearer} $token',
         },
-        body: jsonEncode(procedureRequest.toJson()));
+        body: jsonEncode(expenseRequest.toJson()));
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
-      return ProcedureResponse.fromJson(jsonResponse);
+      return ExpenseResponse.fromJson(jsonResponse);
     }
     return null;
   }
 
-  Future<ProcedureResponse> updateProcedure(ProcedureRequest procedureRequest, String token) async {
-    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiProcedureUpdate}/${procedureRequest.Id}'),
+  Future<ExpenseResponse> updateExpense(ExpenseRequest expenseRequest, String token) async {
+    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiExpenseUpdate}/${expenseRequest.Id}'),
         headers: <String, String>{
           Strings.apiContentType: Strings.apiApplicationJson,
           Strings.apiAuthorization: '${Strings.apiBearer} $token',
         },
-        body: jsonEncode(procedureRequest.toJson()));
+        body: jsonEncode(expenseRequest.toJson()));
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
-      return ProcedureResponse.fromJson(jsonResponse);
+      return ExpenseResponse.fromJson(jsonResponse);
     }
     return null;
   }
 
-  Future<ProcedureResponse> deleteProcedure(int id, String token) async {
+  Future<ExpenseResponse> deleteExpense(int id, String token) async {
     final response =
-        await http.delete(Uri.https(Strings.pathAPI, '${Strings.apiProcedureDelete}/$id'), headers: <String, String>{
+    await http.delete(Uri.https(Strings.pathAPI, '${Strings.apiExpenseDelete}/$id'), headers: <String, String>{
       Strings.apiContentType: Strings.apiApplicationJson,
       Strings.apiAuthorization: '${Strings.apiBearer} $token',
     });
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
-      return ProcedureResponse.fromJson(jsonResponse);
+      return ExpenseResponse.fromJson(jsonResponse);
     }
     return null;
   }

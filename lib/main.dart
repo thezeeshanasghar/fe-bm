@@ -9,7 +9,6 @@ import 'package:baby_doctor/Pages/DoctorList.dart';
 import 'package:baby_doctor/Pages/EditDoctor.dart';
 import 'package:baby_doctor/Pages/EditNurse.dart';
 import 'package:baby_doctor/Pages/EditReceptionist.dart';
-import 'package:baby_doctor/Pages/EditRoom.dart';
 import 'package:baby_doctor/Pages/EditService.dart';
 import 'package:baby_doctor/Pages/Home.dart';
 import 'package:baby_doctor/Pages/AddReceptionist.dart';
@@ -21,11 +20,9 @@ import 'package:baby_doctor/Pages/PatientList.dart';
 import 'package:baby_doctor/Pages/NurseAppointment.dart';
 import 'package:baby_doctor/Pages/ProcedureList.dart';
 import 'package:baby_doctor/Pages/ReceptionistList.dart';
-import 'package:baby_doctor/Pages/RoomList.dart';
 import 'package:baby_doctor/Pages/ServiceList.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Pages/AddService.dart';
-import 'package:baby_doctor/Pages/AddRoom.dart';
 import 'package:baby_doctor/Pages/EditProcedures.dart';
 
 import 'Pages/MonthlyShare.dart';
@@ -34,7 +31,6 @@ void main() {
   runApp(MaterialApp(
     initialRoute: Strings.routeLogin,
     routes: {
-      Strings.routeAddRoom: (context) => AddRoom(),
       Strings.routeAddService: (context) => AddService(),
       Strings.routeAddDoctor: (context) => AddDoctor(),
       Strings.routeAddNurse: (context) => AddNurse(),
@@ -42,12 +38,10 @@ void main() {
       Strings.routeAddReceptionist: (context) => AddReceptionist(),
       Strings.routePatientList: (context) => PatientList(),
       Strings.routeNurseAppointment: (context) => NurseAppointment(),
-      Strings.routeAddRoom: (context) => AddRoom(),
       Strings.routeDoctorList: (context) => DoctorList(),
       Strings.routeNurseList: (context) => NurseList(),
       Strings.routeReceptionistList: (context) => ReceptionistList(),
       Strings.routeProcedureList: (context) => ProcedureList(),
-      Strings.routeRoomList: (context) => RoomList(),
       Strings.routeServiceList: (context) => ServiceList(),
       Strings.routeHomePage: (context) => Home(),
       '/NurseMedication': (context) => NurseMedication(),
@@ -57,7 +51,6 @@ void main() {
       '/AdminPatient': (context) => AdminPatient(),
       Strings.routeEditProcedure: (context) => EditProcedures(),
       Strings.routeEditService: (context) => EditService(),
-      Strings.routeEditRoom: (context) => EditRoom(),
       Strings.routeEditReceptionist: (context) => EditReceptionist(),
       Strings.routeEditDoctor: (context) => EditDoctor(),
       Strings.routeEditNurse: (context) => EditNurse(),

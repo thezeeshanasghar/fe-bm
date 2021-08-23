@@ -1026,7 +1026,7 @@ class _AddDoctorState extends State<AddDoctor> {
     formKey.currentState.save();
 
     DoctorService doctorService = DoctorService();
-    DoctorResponse doctorResponse = await doctorService.InsertDoctor(
+    DoctorResponse doctorResponse = await doctorService.insertDoctor(
         DoctorRequest(
           FirstName: FirstName,
           LastName: LastName,
