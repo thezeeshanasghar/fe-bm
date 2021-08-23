@@ -13,7 +13,9 @@ class ReceptionistResponse {
 
   factory ReceptionistResponse.fromJson(Map<String, dynamic> json) {
     return ReceptionistResponse(
-        isSuccess: json['isSuccess'], message: json['message'], data: ReceptionistSample.fromJson(json['data']));
+        isSuccess: json['isSuccess'],
+        message: json['message'],
+        data: json['data'] != null ? ReceptionistSample.fromJson(json['data']) : null);
   }
 }
 

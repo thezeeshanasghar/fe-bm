@@ -13,7 +13,9 @@ class ReceiptResponse {
 
   factory ReceiptResponse.fromJson(Map<String, dynamic> json) {
     return ReceiptResponse(
-        isSuccess: json['isSuccess'], message: json['message'], data: ReceiptSample.fromJson(json['data']));
+        isSuccess: json['isSuccess'],
+        message: json['message'],
+        data: json['data'] != null ? ReceiptSample.fromJson(json['data']) : null);
   }
 }
 

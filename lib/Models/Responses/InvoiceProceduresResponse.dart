@@ -13,7 +13,9 @@ class InvoiceProceduresResponse {
 
   factory InvoiceProceduresResponse.fromJson(Map<String, dynamic> json) {
     return InvoiceProceduresResponse(
-        isSuccess: json['isSuccess'], message: json['message'], data: InvoiceProcedureSample.fromJson(json['data']));
+        isSuccess: json['isSuccess'],
+        message: json['message'],
+        data: json['data'] != null ? InvoiceProcedureSample.fromJson(json['data']) : null);
   }
 }
 

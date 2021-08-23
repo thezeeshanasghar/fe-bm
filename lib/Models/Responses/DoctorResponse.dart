@@ -13,7 +13,9 @@ class DoctorResponse {
 
   factory DoctorResponse.fromJson(Map<String, dynamic> json) {
     return DoctorResponse(
-        isSuccess: json['isSuccess'], message: json['message'], data: DoctorSample.fromJson(json['data']));
+        isSuccess: json['isSuccess'],
+        message: json['message'],
+        data: json['data'] != null ? DoctorSample.fromJson(json['data']) : null);
   }
 }
 

@@ -13,7 +13,9 @@ class LoginResponse {
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-        isSuccess: json['isSuccess'], message: json['message'], data: LoginSample.fromJson(json['data']));
+        isSuccess: json['isSuccess'],
+        message: json['message'],
+        data: json['data'] != null ? LoginSample.fromJson(json['data']) : null);
   }
 }
 

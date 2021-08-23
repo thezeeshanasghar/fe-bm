@@ -13,7 +13,9 @@ class ExpenseResponse {
 
   factory ExpenseResponse.fromJson(Map<String, dynamic> json) {
     return ExpenseResponse(
-        isSuccess: json['isSuccess'], message: json['message'], data: ExpenseSample.fromJson(json['data']));
+        isSuccess: json['isSuccess'],
+        message: json['message'],
+        data: json['data'] != null ? ExpenseSample.fromJson(json['data']) : null);
   }
 }
 
