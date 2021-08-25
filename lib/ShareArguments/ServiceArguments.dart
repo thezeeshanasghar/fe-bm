@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class ServiceArguments {
   final int id;
   final String name;
@@ -7,7 +5,7 @@ class ServiceArguments {
 
   ServiceArguments({
     this.id,
-    @required this.name,
-    @required this.description,
+    this.name,
+    this.description,
   });
 }

@@ -1,17 +1,22 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/NurseRequest.dart';
+import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
+import 'package:baby_doctor/Models/Responses/NurseResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
-
+import 'package:provider/provider.dart';
 
 class AddNurse extends StatefulWidget {
   @override
@@ -41,18 +46,31 @@ class _AddNurseState extends State<AddNurse> {
   int Salary;
   String JoiningDate;
   SimpleFontelicoProgressDialog _dialog;
-  NurseService nurseService= NurseService();
-  List<String> qualificationList = [''];
+  NurseService nurseService = NurseService();
   bool loadingButtonProgressIndicator = false;
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
+  GlobalProgressDialog globalProgressDialog;
+
+  List<QualificationRequest> qualificationList = [
+    QualificationRequest(Certificate: '', Description: '', QualificationType: '')
+  ];
+  bool hasChangeDependencies = false;
 
   @override
   void initState() {
     super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
+    _dialog = SimpleFontelicoProgressDialog(context: context, barrierDimisable: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -80,11 +98,8 @@ class _AddNurseState extends State<AddNurse> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
+                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                     child: Form(
                       key: formKey,
                       child: Column(
@@ -173,10 +188,7 @@ class _AddNurseState extends State<AddNurse> {
                                     right: 10.0,
                                     child: InkWell(
                                       onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
+                                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                                       },
                                       child: Icon(
                                         Icons.camera_alt,
@@ -194,9 +206,7 @@ class _AddNurseState extends State<AddNurse> {
                         Expanded(
                           child: TextFormField(
                             autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Qualification'),
+                            decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'Qualification'),
                             validator: (String value) {
                               if (value == null || value.isEmpty) {
                                 return 'This field cannot be empty';
@@ -256,18 +266,15 @@ class _AddNurseState extends State<AddNurse> {
             children: <Widget>[
               CircleAvatar(
                 radius: 90,
-                backgroundImage: _imageFile != null
-                    ? FileImage(File(_imageFile.path))
-                    : AssetImage('assets/doctordp.jpg'),
+                backgroundImage:
+                    _imageFile != null ? FileImage(File(_imageFile.path)) : AssetImage('assets/doctordp.jpg'),
               ),
               Positioned(
                   bottom: 30.0,
                   right: 30.0,
                   child: InkWell(
                     onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: ((builder) => bottomSheet()));
+                      showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                     },
                     child: Icon(
                       Icons.camera_alt,
@@ -286,18 +293,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'First Name'),
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'First Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -317,18 +319,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Last Name'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Last Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -347,11 +344,8 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
@@ -377,25 +371,24 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: DropdownButton<String>(
+              padding: const EdgeInsets.fromLTRB(
+                  Dimens.globalDbffLeft, Dimens.globalDbffTop, Dimens.globalDbffRight, Dimens.globalDbffBottom),
+              child: DropdownButtonFormField<String>(
                 isExpanded: true,
                 value: Gender,
                 elevation: 16,
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
+                decoration: InputDecoration.collapsed(hintText: ''),
+                validator: (String value) {
+                  if (value == 'Choose Gender') {
+                    return 'This field cannot be empty';
+                  }
+                  return null;
+                },
                 onChanged: (String newValue) {
                   setState(() {
                     Gender = newValue;
@@ -424,18 +417,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'CNIC Number'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'CNIC Number'),
             validator: (String value) {
               int _cnic = int.tryParse(value);
               if (value == null || value.isEmpty) {
@@ -460,18 +448,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -497,18 +480,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Emergency Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -534,22 +512,16 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.email), border: OutlineInputBorder(), labelText: 'Email'),
               validator: (String value) {
-                bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                bool emailValid =
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
                 }
@@ -570,18 +542,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.home),
-                  border: OutlineInputBorder(),
-                  labelText: 'Address'),
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.home), border: OutlineInputBorder(), labelText: 'Address'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -595,21 +562,17 @@ class _AddNurseState extends State<AddNurse> {
       ],
     );
   }
+
   Widget widgetExperience() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             autofocus: false,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.date_range_sharp),
-                border: OutlineInputBorder(),
-                labelText: 'Experience'),
+                prefixIcon: Icon(Icons.date_range_sharp), border: OutlineInputBorder(), labelText: 'Experience'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -629,18 +592,13 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 5,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on),
-                  border: OutlineInputBorder(),
-                  labelText: 'Salary'),
+                  prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'Salary'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
@@ -666,11 +624,8 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
@@ -706,11 +661,8 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 2,
@@ -746,11 +698,8 @@ class _AddNurseState extends State<AddNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
@@ -762,6 +711,7 @@ class _AddNurseState extends State<AddNurse> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              return null;
             },
             onSaved: (String value) {
               JoiningDate = value;
@@ -787,11 +737,8 @@ class _AddNurseState extends State<AddNurse> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -800,9 +747,7 @@ class _AddNurseState extends State<AddNurse> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
+              onPressed: () => onPressedSubmitButton(),
             ),
           ),
         ),
@@ -857,7 +802,75 @@ class _AddNurseState extends State<AddNurse> {
     );
   }
 
-  onPressedSubmitButton() async {
+  Future<void> onPressedSubmitButton() async {
+    if (!formKey.currentState.validate()) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
+      return;
+    }
+    formKey.currentState.save();
+    try {
+      globalProgressDialog.showSimpleFontellicoProgressDialog(
+          false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        onCallingInsertNurse();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
 
+  Future<void> onCallingInsertNurse() async {
+    try {
+      NurseService nurseService = NurseService();
+      NurseResponse nurseResponse = await nurseService.insertNurse(
+          NurseRequest(
+            firstName: FirstName,
+            lastName: LastName,
+            fatherHusbandName: FatherHusbandName,
+            gender: Gender,
+            cnic: CNIC,
+            contact: ContactNumber,
+            emergencyContact: EmergencyContactNumber,
+            email: Email,
+            experience: Experience,
+            address: Address,
+            dutyDuration: DutyDuration,
+            joiningDate: JoiningDate,
+            sharePercentage: ProceduresShare,
+            salary: Salary,
+            qualificationList: qualificationList,
+          ),
+          context.read<TokenProvider>().tokenSample.jwtToken);
+      if (nurseResponse != null) {
+        if (nurseResponse.isSuccess) {
+          resetValues();
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, nurseResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, nurseResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
+  void resetValues() {
+    formKey.currentState.reset();
+    setState(() {
+      Gender = 'Choose Gender';
+      Speciality = 'Select Speciality';
+      joinDateController.text = '';
+    });
   }
 }

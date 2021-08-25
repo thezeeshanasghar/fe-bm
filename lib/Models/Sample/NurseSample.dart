@@ -26,7 +26,7 @@ class NurseSample {
       dutyDuration: json['dutyDuration'],
       sharePercentage: json['sharePercentage'],
       salary: json['salary'],
-      user: json['user'],
+      user: json['user'] != null ? UserSample.fromJson(json['user']) : null,
     );
   }
 }

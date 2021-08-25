@@ -102,9 +102,12 @@ class Strings {
   static const String apiLoginUpdate = 'api/invoice/update';
   static const String apiLoginDelete = 'api/invoice/delete';
 
-  static const String alertDialogTitleDelete = 'Action';
+  static const String alertDialogTitleDelete = 'Remove';
   static const String alertDialogTitleEdit = 'Action';
   static const String alertDialogTitleDeleteNote = 'Are you sure you want to delete ';
+  static const String alertDialogButtonDelete = 'Delete';
+  static const String alertDialogButtonCancel = 'Cancel';
+
 
   static const String submitGlobal = 'Submit';
 
@@ -117,4 +120,5 @@ class Strings {
   static const String dialogSubmitting = 'Submitting...';
   static const String dialogUpdating = 'Updating...';
   static const String dialogDeleting = 'Deleting...';
+
 }

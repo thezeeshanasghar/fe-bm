@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class Shade {
@@ -17,4 +15,7 @@ class Shade {
 
   static final Color actionButtonTextDelete = Colors.red;
   static final Color actionButtonTextEdit = Colors.blueAccent;
+
+  static final FontWeight fwHomeHeaders = FontWeight.w600;
+  static final FontWeight fwHomeRowItems = FontWeight.w500;
 }

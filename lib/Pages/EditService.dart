@@ -1,9 +1,16 @@
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/ServiceRequest.dart';
+import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/Service.dart';
 import 'package:baby_doctor/ShareArguments/ServiceArguments.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditService extends StatefulWidget {
@@ -12,19 +19,37 @@ class EditService extends StatefulWidget {
 }
 
 class _EditServiceState extends State<EditService> {
-  @override
   final formKey = GlobalKey<FormState>();
   String Id;
   String ServiceName;
   String ServiceDescription;
-  bool isLoading = false;
+  bool isLoading = true;
   Service service;
   SimpleFontelicoProgressDialog sfpd;
-  TextEditingController TecServiceName;
-  TextEditingController TecServiceDescription;
-
+  TextEditingController tecServiceName;
+  TextEditingController tecServiceDescription;
   ServiceArguments arguments;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
+  @override
+  void initState() {
+    super.initState();
+    initVariablesAndClasses();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    if (!hasChangeDependencies) {
+      arguments = ModalRoute.of(context).settings.arguments;
+      globalProgressDialog = GlobalProgressDialog(context);
+      setValuesOfProcedures();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
@@ -44,20 +69,22 @@ class _EditServiceState extends State<EditService> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      Dimens.globalPaddingLeft,
-                      Dimens.globalPaddingTop,
-                      Dimens.globalPaddingRight,
-                      Dimens.globalPaddingBottom),
+                  padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                   child: Form(
                     key: formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        if (!isLoading) widgetServiceName(),
-                        if (!isLoading) widgetServiceDescription(),
-                        if (!isLoading) widgetSubmit(),
-                        if (isLoading) widgetCircularProgress(),
+                        !isLoading
+                            ? Column(
+                                children: [
+                                  widgetServiceName(),
+                                  widgetServiceDescription(),
+                                  widgetSubmit(),
+                                ],
+                              )
+                            : widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -70,31 +97,16 @@ class _EditServiceState extends State<EditService> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initVariablesAndClasses();
-  }
-
-  @override
-  void didChangeDependencies() async {
-    setState(() {
-      isLoading = true;
-    });
-    arguments = ModalRoute.of(context).settings.arguments;
-    setValuesOfProcedures();
-  }
-
   void initVariablesAndClasses() {
-    TecServiceName = new TextEditingController();
-    TecServiceDescription = new TextEditingController();
+    tecServiceName = new TextEditingController();
+    tecServiceDescription = new TextEditingController();
     service = Service();
   }
 
   void setValuesOfProcedures() {
     setState(() {
-      TecServiceName.text = arguments.name;
-      TecServiceDescription.text = arguments.description;
+      tecServiceName.text = arguments.name;
+      tecServiceDescription.text = arguments.description;
       isLoading = false;
     });
   }
@@ -103,19 +115,14 @@ class _EditServiceState extends State<EditService> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
-            controller: TecServiceName,
+            controller: tecServiceName,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.fact_check),
-                border: OutlineInputBorder(),
-                labelText: 'Service Name'),
+                prefixIcon: Icon(Icons.fact_check), border: OutlineInputBorder(), labelText: 'Service Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -135,19 +142,14 @@ class _EditServiceState extends State<EditService> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
-            maxLength: 15,
-            controller: TecServiceDescription,
+            maxLength: 100,
+            controller: tecServiceDescription,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Service Description'),
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Service Description'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -193,11 +195,8 @@ class _EditServiceState extends State<EditService> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -206,9 +205,7 @@ class _EditServiceState extends State<EditService> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text(Strings.submitGlobal),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
+              onPressed: () => onPressedSubmit(),
             ),
           ),
         )
@@ -216,7 +213,45 @@ class _EditServiceState extends State<EditService> {
     );
   }
 
-  onPressedSubmitButton() async {
+  Future<void> onPressedSubmit() async {
+    if (!formKey.currentState.validate()) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
+      return;
+    }
+    formKey.currentState.save();
 
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogUpdating, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        ServiceResponse serviceResponse = await service.updateService(
+            ServiceRequest(
+              id: arguments.id,
+              name: ServiceName,
+              description: ServiceDescription,
+            ),
+            context.read<TokenProvider>().tokenSample.jwtToken);
+        if (serviceResponse != null) {
+          if (serviceResponse.isSuccess) {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, serviceResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+            Navigator.pop(context);
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
   }
 }

@@ -1,76 +1,83 @@
+import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
+
 class DoctorRequest {
-  final int Id;
-  final int UserId;
+  int id;
+  int userId;
 
-  final String UserType;
-  final DateTime DateOfBirth;
-  final String MaritalStatus;
-  final String Religion;
-  final String FirstName;
-  final String LastName;
-  final String FatherHusbandName;
-  final String Gender;
-  final String Cnic;
-  final String Contact;
-  final String EmergencyContact;
-  final String Email;
-  final String Address;
-  final DateTime JoiningDate;
-  final int FloorNo;
-  final String Experience;
+  String userType;
+  String dateOfBirth;
+  String maritalStatus;
+  String religion;
+  String firstName;
+  String lastName;
+  String fatherHusbandName;
+  String gender;
+  String cnic;
+  String contact;
+  String emergencyContact;
+  String email;
+  String address;
+  String joiningDate;
+  int floorNo;
+  String experience;
+  int consultationFee;
+  int emergencyConsultationFee;
+  int shareInFee;
+  String specialityType;
+  List<QualificationRequest> qualificationList;
 
-  final int ConsultationFee;
-  final int EmergencyConsultationFee;
-  final int ShareInFee;
-  final String SpecialityType;
+  DoctorRequest(
+      {this.id = -1,
+      this.userId = -1,
+      this.userType,
+      this.dateOfBirth = '1900-01-01',
+      this.maritalStatus,
+      this.religion,
+      this.firstName,
+      this.lastName,
+      this.fatherHusbandName,
+      this.gender,
+      this.cnic,
+      this.contact,
+      this.emergencyContact,
+      this.email,
+      this.address,
+      this.joiningDate = '1900-01-01',
+      this.floorNo = -1,
+      this.experience,
+      this.consultationFee = -1,
+      this.emergencyConsultationFee = -1,
+      this.shareInFee = -1,
+      this.specialityType,
+      this.qualificationList});
 
-  DoctorRequest({
-    this.Id,
-    this.UserId,
-    this.UserType,
-    this.DateOfBirth,
-    this.MaritalStatus,
-    this.Religion,
-    this.FirstName,
-    this.LastName,
-    this.FatherHusbandName,
-    this.Gender,
-    this.Cnic,
-    this.Contact,
-    this.EmergencyContact,
-    this.Email,
-    this.Address,
-    this.JoiningDate,
-    this.FloorNo,
-    this.Experience,
-    this.ConsultationFee,
-    this.EmergencyConsultationFee,
-    this.ShareInFee,
-    this.SpecialityType,
-  });
-
-  Map<String, dynamic> toJson() => {
-        "Id": Id,
-        "UserId": UserId,
-        "UserType": UserType,
-        "DateOfBirth": DateOfBirth,
-        "MaritalStatus": MaritalStatus,
-        "Religion": Religion,
-        "FirstName": FirstName,
-        "LastName": LastName,
-        "FatherHusbandName": FatherHusbandName,
-        "Gender": Gender,
-        "Cnic": Cnic,
-        "Contact": Contact,
-        "EmergencyContact": EmergencyContact,
-        "Email": Email,
-        "Address": Address,
-        "JoiningDate": JoiningDate,
-        "FloorNo": FloorNo,
-        "Experience": Experience,
-        "ConsultationFee": ConsultationFee,
-        "EmergencyConsultationFee": EmergencyConsultationFee,
-        "ShareInFee": ShareInFee,
-        "SpecialityType": SpecialityType,
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Id'] = this.id;
+    data['UserId'] = this.userId;
+    data['UserType'] = this.userType;
+    data['DateOfBirth'] = this.dateOfBirth;
+    data['MaritalStatus'] = this.maritalStatus;
+    data['Religion'] = this.religion;
+    data['FirstName'] = this.firstName;
+    data['LastName'] = this.lastName;
+    data['FatherHusbandName'] = this.fatherHusbandName;
+    data['Gender'] = this.gender;
+    data['Cnic'] = this.cnic;
+    data['Contact'] = this.contact;
+    data['EmergencyContact'] = this.emergencyContact;
+    data['Email'] = this.email;
+    data['Address'] = this.address;
+    data['JoiningDate'] = this.joiningDate;
+    data['FloorNo'] = this.floorNo;
+    data['Experience'] = this.experience;
+    data['ConsultationFee'] = this.consultationFee;
+    data['EmergencyConsultationFee'] = this.emergencyConsultationFee;
+    data['ShareInFee'] = this.shareInFee;
+    data['SpecialityType'] = this.specialityType;
+    if (this.qualificationList != null) {
+      data['QualificationList'] = this.qualificationList.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }

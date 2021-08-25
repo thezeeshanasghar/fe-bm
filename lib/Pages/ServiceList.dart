@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
 import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
@@ -11,8 +14,8 @@ import 'package:baby_doctor/ShareArguments/ServiceArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
-import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class ServiceList extends StatefulWidget {
   @override
@@ -32,14 +35,13 @@ class _ServiceListState extends State<ServiceList> {
   bool serviceIsLoading;
   bool serviceShowSelect;
   bool showSearchedList;
-  SimpleFontelicoProgressDialog sfpd;
   List<DatatableHeader> serviceHeaders;
   List<int> servicePerPage;
   List<Map<String, dynamic>> serviceIsSource;
   List<Map<String, dynamic>> serviceIsSearched;
-  List<Map<String, dynamic>> serviceSelecteds;
+  List<Map<String, dynamic>> serviceSelected;
 
-  List<ServiceSample> listservices;
+  List<ServiceSample> listService;
   Service service;
 
   GlobalProgressDialog globalProgressDialog;
@@ -56,7 +58,7 @@ class _ServiceListState extends State<ServiceList> {
   void didChangeDependencies() {
     if (!hasChangeDependencies) {
       globalProgressDialog = GlobalProgressDialog(context);
-      getServicesFromApiAndLinkToTable();
+      checkTokenValidityAndGetService();
       hasChangeDependencies = true;
     }
     super.didChangeDependencies();
@@ -119,33 +121,55 @@ class _ServiceListState extends State<ServiceList> {
     serviceIsSearch = false;
     serviceIsSource = [];
     serviceIsSearched = [];
-    serviceSelecteds = [];
+    serviceSelected = [];
     serviceSelectableKey = "Invoice";
     serviceSortAscending = true;
     serviceIsLoading = true;
     serviceShowSelect = false;
-    listservices = [];
+    listService = [];
     showSearchedList = false;
     service = Service();
   }
 
-  void getServicesFromApiAndLinkToTable() async {
-    setState(() => serviceIsLoading = true);
-    listservices = [];
-    serviceIsSource = [];
-    ServiceResponseList serviceResponseList =
-        await service.getServices(context.read<TokenProvider>().tokenSample.jwtToken);
-    if (serviceResponseList != null) {
-      if (serviceResponseList.isSuccess) {
-        listservices = serviceResponseList.data;
-        serviceIsSource.addAll(generateServiceDataFromApi(listservices));
+  FutureOr onGoBack(dynamic value) {
+    checkTokenValidityAndGetService();
+  }
+
+  Future<void> checkTokenValidityAndGetService() async {
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        getServicesFromApiAndLinkToTable();
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponseList.message, context);
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
       }
-    } else {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
     }
-    setState(() => serviceIsLoading = false);
+  }
+
+  Future<void> getServicesFromApiAndLinkToTable() async {
+    setState(() => serviceIsLoading = true);
+    listService = [];
+    serviceIsSource = [];
+    try {
+      ServiceResponseList serviceResponseList =
+          await service.getServices(context.read<TokenProvider>().tokenSample.jwtToken);
+      if (serviceResponseList != null) {
+        if (serviceResponseList.isSuccess) {
+          listService = serviceResponseList.data;
+          serviceIsSource.addAll(generateServiceDataFromApi(listService));
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponseList.message, context);
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+      }
+      setState(() => serviceIsLoading = false);
+    } catch (exception) {
+      setState(() => serviceIsLoading = false);
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+    }
   }
 
   List<Map<String, dynamic>> generateServiceDataFromApi(List<ServiceSample> listOfServices) {
@@ -196,7 +220,7 @@ class _ServiceListState extends State<ServiceList> {
       DatatableHeader(
           value: "name",
           show: true,
-          flex: 2,
+          flex: 1,
           sortable: false,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -213,6 +237,7 @@ class _ServiceListState extends State<ServiceList> {
       DatatableHeader(
           value: "description",
           show: true,
+          flex: 3,
           sortable: false,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -243,15 +268,13 @@ class _ServiceListState extends State<ServiceList> {
               ),
             );
           },
-          sourceBuilder: (Id, row) {
+          sourceBuilder: (id, row) {
             return Container(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {
-                    onPressedEditFromTable(Id, row);
-                  },
+                  onPressed: () => onPressedEditFromTable(id, row),
                   child: Text('Edit',
                       style: TextStyle(
                         color: Shade.actionButtonTextEdit,
@@ -261,9 +284,7 @@ class _ServiceListState extends State<ServiceList> {
                   width: 10,
                 ),
                 TextButton(
-                    onPressed: () {
-                      onPressedDeleteFromTable(Id, row);
-                    },
+                    onPressed: () => onPressedDeleteFromTable(id, row),
                     child: Text(
                       'Delete',
                       style: TextStyle(
@@ -276,60 +297,23 @@ class _ServiceListState extends State<ServiceList> {
     ];
   }
 
-  void onPressedEditFromTable(Id, row) {
+  void onPressedEditFromTable(id, row) {
     Navigator.pushNamed(context, Strings.routeEditService,
-        arguments: ServiceArguments(id: Id, name: row['ServiceName'], description: row['ServiceDescription']));
+            arguments: ServiceArguments(id: row['id'], name: row['name'], description: row['description']))
+        .then((value) => onGoBack(value));
   }
 
-  void onPressedDeleteFromTable(Id, row) {
+  void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
+      onPressed: () => Navigator.of(context).pop(),
+      child: Text(Strings.alertDialogButtonCancel,
+          style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
-      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
-      onPressed: () async {
-        Navigator.of(context).pop();
-        sfpd = SimpleFontelicoProgressDialog(context: context, barrierDimisable: false);
-        await sfpd.show(
-            message: 'Deleting ...',
-            type: SimpleFontelicoProgressDialogType.hurricane,
-            width: MediaQuery.of(context).size.width - 20,
-            horizontal: true);
-        // service.DeleteServices(Id).then((response) async {
-        //   if (response == true) {
-        //     await sfpd.hide();
-        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //         backgroundColor: Shade.snackGlobalSuccess,
-        //         content: Row(
-        //           children: [
-        //             Text('Success: Deleted Service '),
-        //             Text(
-        //               row['ServiceName'],
-        //               style: TextStyle(fontWeight: FontWeight.bold),
-        //             ),
-        //           ],
-        //         )));
-        //     getServicesFromApiAndLinkToTable();
-        //   } else {
-        //     await sfpd.hide();
-        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //         backgroundColor: Shade.snackGlobalFailed,
-        //         content: Row(
-        //           children: [
-        //             Text('Error: Try Again: Failed to delete Service '),
-        //             Text(
-        //               row['ServiceName'],
-        //               style: TextStyle(fontWeight: FontWeight.bold),
-        //             ),
-        //           ],
-        //         )));
-        //   }
-        // });
-      },
+      child: Text(Strings.alertDialogButtonDelete,
+          style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      onPressed: () => onCallingDeleteService(id),
     );
 
     AlertDialog alert = AlertDialog(
@@ -342,7 +326,7 @@ class _ServiceListState extends State<ServiceList> {
         children: [
           Text(Strings.alertDialogTitleDeleteNote),
           Text(
-            row['ServiceName'] + ' ?',
+            row['name'] + ' ?',
             style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
           )
         ],
@@ -364,14 +348,46 @@ class _ServiceListState extends State<ServiceList> {
     );
   }
 
+  Future<void> onCallingDeleteService(int id) async {
+    try {
+      Navigator.pop(context);
+      globalProgressDialog.showSimpleFontellicoProgressDialog(
+          false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        ServiceResponse serviceResponse =
+            await service.deleteService(id, context.read<TokenProvider>().tokenSample.jwtToken);
+        if (serviceResponse != null) {
+          if (serviceResponse.isSuccess) {
+            checkTokenValidityAndGetService();
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, serviceResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
   void onChangedSearchedValue(value) {
     if (!serviceIsLoading) {
       if (value.isNotEmpty) {
         if (value.length >= 2) {
           var searchList = serviceIsSource.where((element) {
-            String searchById = element["Id"].toString().toLowerCase();
-            String searchByName = element["ServiceName"].toString().toLowerCase();
-            String searchByDescription = element["ServiceDescription"].toString().toLowerCase();
+            String searchById = element["id"].toString().toLowerCase();
+            String searchByName = element["name"].toString().toLowerCase();
+            String searchByDescription = element["description"].toString().toLowerCase();
 
             if (searchById.contains(value.toLowerCase()) ||
                 searchByName.contains(value.toLowerCase()) ||
@@ -420,7 +436,7 @@ class _ServiceListState extends State<ServiceList> {
               ],
               headers: serviceHeaders,
               source: !showSearchedList ? serviceIsSource : serviceIsSearched,
-              selecteds: serviceSelecteds,
+              selecteds: serviceSelected,
               showSelect: serviceShowSelect,
               autoHeight: false,
               onTabRow: (data) {
@@ -443,16 +459,16 @@ class _ServiceListState extends State<ServiceList> {
               onSelect: (value, item) {
                 print("$value  $item ");
                 if (value) {
-                  setState(() => serviceSelecteds.add(item));
+                  setState(() => serviceSelected.add(item));
                 } else {
-                  setState(() => serviceSelecteds.removeAt(serviceSelecteds.indexOf(item)));
+                  setState(() => serviceSelected.removeAt(serviceSelected.indexOf(item)));
                 }
               },
               onSelectAll: (value) {
                 if (value) {
-                  setState(() => serviceSelecteds = serviceIsSource.map((entry) => entry).toList().cast());
+                  setState(() => serviceSelected = serviceIsSource.map((entry) => entry).toList().cast());
                 } else {
-                  setState(() => serviceSelecteds.clear());
+                  setState(() => serviceSelected.clear());
                 }
               },
             ),

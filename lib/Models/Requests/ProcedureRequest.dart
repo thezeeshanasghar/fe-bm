@@ -1,24 +1,24 @@
 class ProcedureRequest {
-  final int Id;
+  final int id;
 
-  final String Name;
-  final String Executant;
-  final int Charges;
-  final int ExecutantShare;
+  final String name;
+  final String executant;
+  final int charges;
+  final int executantShare;
 
   ProcedureRequest({
-    this.Id,
-    this.Name,
-    this.Executant,
-    this.Charges,
-    this.ExecutantShare,
+    this.id = -1,
+    this.name,
+    this.executant,
+    this.charges,
+    this.executantShare,
   });
 
   Map<String, dynamic> toJson() => {
-        "Id": Id,
-        "Name": Name,
-        "Executant": Executant,
-        "Charges": Charges,
-        "ExecutantShare": ExecutantShare,
+        "Id": id,
+        "Name": name,
+        "Executant": executant,
+        "Charges": charges,
+        "ExecutantShare": executantShare,
       };
 }

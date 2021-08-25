@@ -12,7 +12,7 @@ class PatientSample {
   final String bloodGroup;
   final String clinicSite;
   final String referredBy;
-  final DateTime referredDate;
+  final String referredDate;
   final String guardian;
   final String paymentProfile;
   final String description;

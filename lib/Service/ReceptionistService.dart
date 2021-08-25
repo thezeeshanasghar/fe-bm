@@ -50,12 +50,13 @@ class ReceptionistService {
   }
 
   Future<ReceptionistResponse> updateReceptionist(ReceptionistRequest receptionistRequest, String token) async {
-    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiReceptionistUpdate}/${receptionistRequest.Id}'),
-        headers: <String, String>{
-          Strings.apiContentType: Strings.apiApplicationJson,
-          Strings.apiAuthorization: '${Strings.apiBearer} $token',
-        },
-        body: jsonEncode(receptionistRequest.toJson()));
+    final response =
+        await http.put(Uri.https(Strings.pathAPI, '${Strings.apiReceptionistUpdate}/${receptionistRequest.id}'),
+            headers: <String, String>{
+              Strings.apiContentType: Strings.apiApplicationJson,
+              Strings.apiAuthorization: '${Strings.apiBearer} $token',
+            },
+            body: jsonEncode(receptionistRequest.toJson()));
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
       return ReceptionistResponse.fromJson(jsonResponse);
@@ -65,7 +66,7 @@ class ReceptionistService {
 
   Future<ReceptionistResponse> deleteReceptionist(int id, String token) async {
     final response =
-    await http.delete(Uri.https(Strings.pathAPI, '${Strings.apiReceptionistDelete}/$id'), headers: <String, String>{
+        await http.delete(Uri.https(Strings.pathAPI, '${Strings.apiReceptionistDelete}/$id'), headers: <String, String>{
       Strings.apiContentType: Strings.apiApplicationJson,
       Strings.apiAuthorization: '${Strings.apiBearer} $token',
     });

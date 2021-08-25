@@ -7,8 +7,8 @@ class QualificationRequest {
   final String QualificationType;
 
   QualificationRequest({
-    this.Id,
-    this.UserId,
+    this.Id = -1,
+    this.UserId = -1,
     this.Certificate,
     this.Description,
     this.QualificationType,

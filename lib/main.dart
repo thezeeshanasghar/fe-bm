@@ -21,6 +21,7 @@ import 'package:baby_doctor/Pages/NurseAppointment.dart';
 import 'package:baby_doctor/Pages/ProcedureList.dart';
 import 'package:baby_doctor/Pages/ReceptionistList.dart';
 import 'package:baby_doctor/Pages/ServiceList.dart';
+import 'package:baby_doctor/Providers/LoginCredentialsProvider.dart';
 import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Pages/AddService.dart';
@@ -34,6 +35,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TokenProvider()),
+        ChangeNotifierProvider(create: (_) => LoginCredentialsProvider()),
       ],
       child: MyApp(),
     ),

@@ -3,8 +3,8 @@ class AppointmentSample {
   final int patientId;
   final int doctorId;
   final String code;
-  final DateTime date;
-  final DateTime consultationDate;
+  final String date;
+  final String consultationDate;
   final String type;
 
   AppointmentSample({

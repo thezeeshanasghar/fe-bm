@@ -222,7 +222,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         Center(
                           child: Text(
                             'For adding data in database',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: Shade.fwHomeHeaders),
                           ),
                         ),
                       ],
@@ -261,7 +261,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         Center(
                           child: Text(
                             'To view data that is present in database',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: Shade.fwHomeHeaders),
                           ),
                         ),
                       ],
@@ -294,8 +294,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
       textDirection: TextDirection.ltr,
       children: [
         widgetAddProcedureCard(),
-        widgetAddRoomCard(),
         widgetAddServiceCard(),
+        widgetDummySpaceCard(),
       ],
     );
   }
@@ -370,19 +370,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleServiceList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of doctors',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -419,19 +407,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleAccounts,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the Accounts',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -468,19 +444,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleRoomList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of doctors',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -517,19 +481,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleProcedureList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of doctors',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -566,19 +518,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleReceptionistList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of doctors',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -615,19 +555,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleNurseList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of doctors',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -664,19 +592,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleDoctorList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of doctors',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -729,19 +645,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleAddDoctor,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to create the account of a doctor',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -778,19 +682,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleAddNurse,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to create the account of a nurse',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -827,19 +719,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleAddProcedures,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to add procedure',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -876,19 +756,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleAddReceptionist,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to create the account of a receptionist',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -903,9 +771,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
   Widget widgetAddRoomCard() {
     return Expanded(
       child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, Strings.routeAddRoom);
-        },
+        onTap: () {},
         child: Card(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -926,18 +792,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     Text(
                       Strings.titleAddRoom,
                       style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to create the room of a hospital',
                     ),
                   ],
                 ),
@@ -974,19 +828,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleAddService,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to create a new service',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -1023,19 +865,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       'Admin Patients',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view Admin Patients',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -1072,19 +902,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       'Bed Time',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view Bed Time',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -1121,19 +939,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titleNurseAppointment,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to create the account of a receptionist',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),
@@ -1170,19 +976,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titlePatientList,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Click to view the list of patients',
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],
                 ),

@@ -4,7 +4,7 @@ class UserSample {
   final int id;
 
   final String userType;
-  final DateTime dateOfBirth;
+  final String dateOfBirth;
   final String maritalStatus;
   final String religion;
   final String firstName;
@@ -16,10 +16,9 @@ class UserSample {
   final String emergencyContact;
   final String email;
   final String address;
-  final DateTime joiningDate;
+  final String joiningDate;
   final int floorNo;
   final String experience;
-
   final List<QualificationSample> qualifications;
 
   UserSample({
@@ -44,10 +43,11 @@ class UserSample {
   });
 
   factory UserSample.fromJson(Map<String, dynamic> json) {
-    var list = json['qualifications'] as List;
-    List<QualificationSample> dataList =
-        list.map((i) => QualificationSample.fromJson(i)).toList();
-
+    List<QualificationSample> dataList;
+    if (json['qualifications'] != null) {
+      var list = json['qualifications'] as List;
+      dataList = list.map((i) => QualificationSample.fromJson(i)).toList();
+    }
     return UserSample(
       id: json['id'],
       userType: json['userType'],

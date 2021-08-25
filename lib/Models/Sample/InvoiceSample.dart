@@ -7,7 +7,7 @@ class InvoiceSample {
   final int doctorId;
   final int patientId;
 
-  final DateTime date;
+  final String date;
   final String checkupType;
   final double checkupFee;
   final String paymentType;
@@ -44,8 +44,8 @@ class InvoiceSample {
       paymentType: json['paymentType'],
       disposibles: json['disposibles'],
       grossAmount: json['grossAmount'],
-      appointment: json['appointment'],
-      doctor: json['doctor'],
+      appointment: json['appointment'] != null ? AppointmentSample.fromJson(json['appointment']) : null,
+      doctor: json['doctor'] != null ? DoctorSample.fromJson(json['doctor']) : null,
     );
   }
 }

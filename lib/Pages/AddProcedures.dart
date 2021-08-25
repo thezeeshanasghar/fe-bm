@@ -1,9 +1,16 @@
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/ProcedureRequest.dart';
+import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
+import 'package:baby_doctor/Service/ProcedureService.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_doctor/Service/ProcedureService.dart' as DAL;
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:provider/provider.dart';
 
 class AddProcedures extends StatefulWidget {
   @override
@@ -11,15 +18,34 @@ class AddProcedures extends StatefulWidget {
 }
 
 class _AddProceduresState extends State<AddProcedures> {
-  @override
   final formKey = GlobalKey<FormState>();
-  String ProcedureName;
-  String PerformedBy;
-  int Charges;
-  int Share;
-  SimpleFontelicoProgressDialog _dialog;
-  bool loadingButtonProgressIndicator = false;
+  String procedureName;
+  String executant;
+  int charges;
+  int executantShare;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
@@ -39,11 +65,8 @@ class _AddProceduresState extends State<AddProcedures> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      Dimens.globalPaddingLeft,
-                      Dimens.globalPaddingTop,
-                      Dimens.globalPaddingRight,
-                      Dimens.globalPaddingBottom),
+                  padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                   child: Form(
                     key: formKey,
                     child: Column(
@@ -65,29 +88,18 @@ class _AddProceduresState extends State<AddProcedures> {
       ),
     );
   }
-  @override
-  void initState() {
-    super.initState();
-    _dialog = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-  }
 
   Widget widgetProcedureName() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.fact_check),
-                border: OutlineInputBorder(),
-                labelText: 'Procedure Name'),
+                prefixIcon: Icon(Icons.fact_check), border: OutlineInputBorder(), labelText: 'Procedure Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -95,7 +107,7 @@ class _AddProceduresState extends State<AddProcedures> {
               return null;
             },
             onSaved: (String value) {
-              ProcedureName = value;
+              procedureName = value;
             },
           ),
         ),
@@ -107,18 +119,13 @@ class _AddProceduresState extends State<AddProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Performed By'),
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Performed By'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -126,7 +133,7 @@ class _AddProceduresState extends State<AddProcedures> {
               return null;
             },
             onSaved: (String value) {
-              PerformedBy = value;
+              executant = value;
             },
           ),
         ),
@@ -138,30 +145,29 @@ class _AddProceduresState extends State<AddProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-                labelText: 'Charges'),
+                prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'charges'),
             validator: (String value) {
-              if (value == null || value.isEmpty) {
+              if (value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              if (double.tryParse(value) <= 0) {
-                return 'Input Error: cannot enter negative digits';
+              int _cFee = int.tryParse(value);
+              if (_cFee == null) {
+                return 'Input Error: fee must be in numeric form\nCorrect Syntax: 2000';
+              }
+              if (_cFee <= 0) {
+                return 'Input Error: cannot enter negative digits\nCorrect Syntax: 2000';
               }
               return null;
             },
             onSaved: (String value) {
-              Charges = int.parse(value);
+              charges = int.parse(value);
             },
           ),
         ),
@@ -173,11 +179,8 @@ class _AddProceduresState extends State<AddProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 3,
@@ -185,18 +188,25 @@ class _AddProceduresState extends State<AddProcedures> {
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.monetization_on),
                 border: OutlineInputBorder(),
-                labelText: 'Performer Share'),
+                labelText: 'Performer executantShare'),
             validator: (String value) {
-              if (value == null || value.isEmpty) {
+              if (value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              //if(value>=0 || value<=100){
-              // return 'This field cannot be empty';
-              //}
+              int _cFee = int.tryParse(value);
+              if (_cFee == null) {
+                return 'Input Error: fee must be in numeric form\nCorrect Syntax: 20';
+              }
+              if (_cFee <= 0) {
+                return 'Input Error: cannot enter negative digits\nCorrect Syntax: 20';
+              }
+              if (_cFee > 100) {
+                return 'Input Error: percentage cannot be greater than 100\nCorrect Syntax: 20';
+              }
               return null;
             },
             onSaved: (String value) {
-              Share = int.parse(value);
+              executantShare = int.parse(value);
             },
           ),
         ),
@@ -207,94 +217,75 @@ class _AddProceduresState extends State<AddProcedures> {
   Widget widgetSubmit() {
     return Column(
       children: [
-        loadingButtonProgressIndicator == false
-            ? Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                      Dimens.globalInputFieldleft,
-                      Dimens.globalInputFieldTop,
-                      Dimens.globalInputFieldRight,
-                      Dimens.globalInputFieldBottom),
-                  child: ElevatedButton(
-                    autofocus: false,
-                    style: ElevatedButton.styleFrom(
-                      primary: Shade.submitButtonColor,
-                      minimumSize: Size(double.infinity, 45),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    ),
-                    child: Text(Strings.submitGlobal),
-                    onPressed: () {
-                      onPressedSubmitButton();
-                    },
-                  ),
-                ),
-              )
-            : Center(
-                child: CircularProgressIndicator(),
-              )
+        Align(
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+            child: ElevatedButton(
+              autofocus: false,
+              style: ElevatedButton.styleFrom(
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              ),
+              child: Text(Strings.submitGlobal),
+              onPressed: () => onPressedSubmitButton(),
+            ),
+          ),
+        )
       ],
     );
   }
 
-  onPressedSubmitButton() async {
+  Future<void> onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
-    setState(() {
-      loadingButtonProgressIndicator = true;
-    });
     formKey.currentState.save();
-    _dialog.show(
-        message: 'Loading...',
-        type: SimpleFontelicoProgressDialogType.multilines,  width: MediaQuery.of(context).size.width-50);
+    try {
+      globalProgressDialog.showSimpleFontellicoProgressDialog(
+          false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        onCallingInsertProcedure();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
 
-     DAL.ProcedureService service = new DAL.ProcedureService();
-    // ProcedureData obj = new ProcedureData(
-    //     name: ProcedureName,
-    //     performedBy: PerformedBy,
-    //     charges: Charges,
-    //     performerShare: Share);
-    // var response = await service.InsertProcedure(obj);
-    // print(response);
-    // if (response == true) {
-    //   setState(() {
-    //     loadingButtonProgressIndicator = false;
-    //   });
-    //   _dialog.hide();
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Shade.snackGlobalSuccess,
-    //       content: Row(
-    //         children: [
-    //           Text('Success: Created procedure '),
-    //           Text(
-    //             ProcedureName,
-    //             style: TextStyle(fontWeight: FontWeight.bold),
-    //           ),
-    //         ],
-    //       )));
-    //   formKey.currentState.reset();
-    //   Navigator.pushNamed(context, Strings.routeProcedureList);
-    // } else {
-    //   _dialog.hide();
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Shade.snackGlobalFailed,
-    //       content: Row(
-    //         children: [
-    //           Text('Error: Try Again: Failed to add '),
-    //           Text(
-    //             ProcedureName,
-    //             style: TextStyle(fontWeight: FontWeight.bold),
-    //           ),
-    //         ],
-    //       )));
-    //   setState(() {
-    //     loadingButtonProgressIndicator = false;
-    //   });
-    // }
+  Future<void> onCallingInsertProcedure() async {
+    try {
+      ProcedureService procedureService = ProcedureService();
+      ProcedureResponse procedureResponse = await procedureService.insertProcedure(
+          ProcedureRequest(name: procedureName, charges: charges, executant: executant, executantShare: executantShare),
+          context.read<TokenProvider>().tokenSample.jwtToken);
+      if (procedureResponse != null) {
+        if (procedureResponse.isSuccess) {
+          resetValues();
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, procedureResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
+  void resetValues() {
+    formKey.currentState.reset();
   }
 }

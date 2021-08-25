@@ -23,7 +23,7 @@ class ReceptionistSample {
       userId: json['userId'],
       jobType: json['jobType'],
       shiftTime: json['shiftTime'],
-      user: json['user'],
+      user: json['user'] != null ? UserSample.fromJson(json['user']) : null,
     );
   }
 }

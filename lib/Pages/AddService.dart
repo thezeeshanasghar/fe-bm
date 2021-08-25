@@ -21,7 +21,6 @@ class _AddServiceState extends State<AddService> {
   final formKey = GlobalKey<FormState>();
   String name;
   String description;
-  SimpleFontelicoProgressDialog sfpd;
   bool loadingButtonProgressIndicator = false;
   GlobalProgressDialog globalProgressDialog;
   bool hasChangeDependencies = false;
@@ -165,32 +164,32 @@ class _AddServiceState extends State<AddService> {
 
   Future<void> onPressedSubmit() async {
     if (!formKey.currentState.validate()) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, Strings.errorInputValidation, context);
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
     formKey.currentState.save();
     globalProgressDialog.showSimpleFontellicoProgressDialog(
         false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
-    bool hasRefreshToken = await GlobalRefreshToken.hasRefreshedToken(context);
-    if (hasRefreshToken) {
-      onInsertService();
+    bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+    if (hasToken) {
+      onCallingInsertService();
     } else {
       GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
 
-  Future<void> onInsertService() async {
+  Future<void> onCallingInsertService() async {
     Service service = Service();
     ServiceResponse serviceResponse = await service.insertService(
         ServiceRequest(
-          Id: 0,
-          Name: name,
-          Description: description,
+          name: name,
+          description: description,
         ),
         context.read<TokenProvider>().tokenSample.jwtToken);
     if (serviceResponse != null) {
       if (serviceResponse.isSuccess) {
+        formKey.currentState.reset();
         GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, serviceResponse.message, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       } else {

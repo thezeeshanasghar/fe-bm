@@ -29,7 +29,7 @@ class DoctorSample {
       emergencyConsultationFee: json['emergencyConsultationFee'],
       shareInFee: json['shareInFee'],
       specialityType: json['specialityType'],
-      user: json['user'],
+      user: json['user'] != null ? UserSample.fromJson(json['user']) : null,
     );
   }
 }

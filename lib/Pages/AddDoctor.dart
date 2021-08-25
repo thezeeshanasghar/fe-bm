@@ -1,19 +1,23 @@
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
 import 'package:baby_doctor/Models/Requests/DoctorRequest.dart';
+import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
 import 'package:baby_doctor/Models/Responses/DoctorResponse.dart';
 import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
-import 'package:baby_doctor/Models/Sample/TokenSample.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:provider/provider.dart';
 
 class AddDoctor extends StatefulWidget {
   @override
@@ -45,19 +49,17 @@ class _AddDoctorState extends State<AddDoctor> {
   String UserName;
   DoctorService doctorService;
   bool hasChangeDependencies = false;
-  List<QualificationSample> qualificationList = [
-    new QualificationSample(userId: 0, certificate: "", description: "", qualificationType: "")
+  List<QualificationRequest> qualificationList = [
+    QualificationRequest(Certificate: '', Description: '', QualificationType: '')
   ];
   List<QualificationSample> diplomaList = [
     new QualificationSample(userId: 0, certificate: "", description: "", qualificationType: "")
   ];
-
-  TokenSample args;
-
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
   Image image;
   bool loadingButtonProgressIndicator = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
@@ -68,7 +70,7 @@ class _AddDoctorState extends State<AddDoctor> {
   @override
   void didChangeDependencies() {
     if (!hasChangeDependencies) {
-      args = ModalRoute.of(context).settings.arguments;
+      globalProgressDialog = GlobalProgressDialog(context);
       hasChangeDependencies = true;
     }
     super.didChangeDependencies();
@@ -291,8 +293,8 @@ class _AddDoctorState extends State<AddDoctor> {
                             },
                             onSaved: (String value) {
                               setState(() {
-                                qualificationList[i] = new QualificationSample(
-                                    certificate: "", description: value, qualificationType: "Qualification");
+                                qualificationList[i] = new QualificationRequest(
+                                    Certificate: "", Description: value, QualificationType: "Qualification");
                               });
                             },
                           ),
@@ -312,7 +314,7 @@ class _AddDoctorState extends State<AddDoctor> {
     return qualificationWidgetList;
   }
 
-  Widget _addRemoveButton(bool add, int index, List<QualificationSample> list) {
+  Widget _addRemoveButton(bool add, int index, List<QualificationRequest> list) {
     return InkWell(
       onTap: () {
         if (add) {
@@ -403,7 +405,7 @@ class _AddDoctorState extends State<AddDoctor> {
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(i == diplomaList.length - 1, i, diplomaList)
+                        // _addRemoveButton(i == diplomaList.length - 1, i, diplomaList)
                       ],
                     ),
                   ],
@@ -480,15 +482,19 @@ class _AddDoctorState extends State<AddDoctor> {
           child: Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: DropdownButton<String>(
+              padding: const EdgeInsets.fromLTRB(
+                  Dimens.globalDbffLeft, Dimens.globalDbffTop, Dimens.globalDbffRight, Dimens.globalDbffBottom),
+              child: DropdownButtonFormField<String>(
                 isExpanded: true,
                 value: Gender,
                 elevation: 16,
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
+                decoration: InputDecoration.collapsed(hintText: ''),
+                validator: (String value) {
+                  if (value == 'Choose Gender') {
+                    return 'This field cannot be empty';
+                  }
+                  return null;
+                },
                 onChanged: (String newValue) {
                   setState(() {
                     Gender = newValue;
@@ -751,15 +757,19 @@ class _AddDoctorState extends State<AddDoctor> {
           child: Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: DropdownButton<String>(
+              padding: const EdgeInsets.fromLTRB(
+                  Dimens.globalDbffLeft, Dimens.globalDbffTop, Dimens.globalDbffRight, Dimens.globalDbffBottom),
+              child: DropdownButtonFormField<String>(
                 isExpanded: true,
                 value: Speciality,
                 elevation: 16,
-                underline: Container(
-                  height: 0,
-                  color: Colors.deepPurpleAccent,
-                ),
+                decoration: InputDecoration.collapsed(hintText: ''),
+                validator: (String value) {
+                  if (value == 'Select Speciality') {
+                    return 'This field cannot be empty';
+                  }
+                  return null;
+                },
                 onChanged: (String newValue) {
                   setState(() {
                     Speciality = newValue;
@@ -800,7 +810,7 @@ class _AddDoctorState extends State<AddDoctor> {
                   return 'This field cannot be empty';
                 }
                 int _cFee = int.tryParse(value);
-                if (_cFee == null && !value.isEmpty) {
+                if (_cFee == null) {
                   return 'Input Error: fee must be in numeric form\nCorrect Syntax: 2000';
                 }
                 if (_cFee <= 0) {
@@ -868,7 +878,7 @@ class _AddDoctorState extends State<AddDoctor> {
                   return 'This field cannot be empty';
                 }
                 int _cFee = int.tryParse(value);
-                if (_cFee == null && !value.isEmpty) {
+                if (_cFee == null) {
                   return 'Input Error: fee must be in numeric form\nCorrect Syntax: 20';
                 }
                 if (_cFee <= 0) {
@@ -904,6 +914,7 @@ class _AddDoctorState extends State<AddDoctor> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              return null;
             },
             onSaved: (String value) {
               JoiningDate = value;
@@ -996,7 +1007,6 @@ class _AddDoctorState extends State<AddDoctor> {
     );
   }
 
-  // functions required for working
   pickDate() async {
     DateTime date = await showDatePicker(
         context: context,
@@ -1019,32 +1029,74 @@ class _AddDoctorState extends State<AddDoctor> {
   }
 
   Future<void> onPressedSubmitButton() async {
-    print(args.jwtToken);
     if (!formKey.currentState.validate()) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
     formKey.currentState.save();
+    try {
+      globalProgressDialog.showSimpleFontellicoProgressDialog(
+          false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        onCallingInsertDoctor();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
 
-    DoctorService doctorService = DoctorService();
-    DoctorResponse doctorResponse = await doctorService.insertDoctor(
-        DoctorRequest(
-          FirstName: FirstName,
-          LastName: LastName,
-          FatherHusbandName: FatherHusbandName,
-          Gender: Gender,
-          Cnic: CNIC,
-          Contact: ContactNumber,
-          EmergencyContact: EmergencyContactNumber,
-          Email: Email,
-          Address: Address,
-          SpecialityType: Speciality,
-          Experience: Experience,
-          ConsultationFee: ConsultationFee,
-          EmergencyConsultationFee: EmergencyConsultationFee,
-          ShareInFee: FeeShare,
-        ),
-        args.jwtToken);
-    if (doctorResponse.isSuccess) {
-    } else {}
+  Future<void> onCallingInsertDoctor() async {
+    try {
+      DoctorService doctorService = DoctorService();
+      DoctorResponse doctorResponse = await doctorService.insertDoctor(
+          DoctorRequest(
+              firstName: FirstName,
+              lastName: LastName,
+              fatherHusbandName: FatherHusbandName,
+              gender: Gender,
+              cnic: CNIC,
+              contact: ContactNumber,
+              emergencyContact: EmergencyContactNumber,
+              email: Email,
+              address: Address,
+              specialityType: Speciality,
+              experience: Experience,
+              consultationFee: ConsultationFee,
+              emergencyConsultationFee: EmergencyConsultationFee,
+              shareInFee: FeeShare,
+              joiningDate: JoiningDate,
+              qualificationList: qualificationList),
+          context.read<TokenProvider>().tokenSample.jwtToken);
+      if (doctorResponse != null) {
+        if (doctorResponse.isSuccess) {
+          resetValues();
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, doctorResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorResponse.message, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
+  void resetValues() {
+    formKey.currentState.reset();
+    setState(() {
+      Gender = 'Choose Gender';
+      Speciality = 'Select Speciality';
+      joinDateController.text = '';
+    });
   }
 }

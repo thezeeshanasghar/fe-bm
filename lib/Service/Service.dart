@@ -50,7 +50,7 @@ class Service {
   }
 
   Future<ServiceResponse> updateService(ServiceRequest serviceRequest, String token) async {
-    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiServiceUpdate}/${serviceRequest.Id}'),
+    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiServiceUpdate}/${serviceRequest.id}'),
         headers: <String, String>{
           Strings.apiContentType: Strings.apiApplicationJson,
           Strings.apiAuthorization: '${Strings.apiBearer} $token',

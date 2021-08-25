@@ -5,6 +5,7 @@ import 'package:baby_doctor/Models/Requests/AuthenticateRequest.dart';
 import 'package:baby_doctor/Models/Requests/ServiceRequest.dart';
 import 'package:baby_doctor/Models/Responses/AuthenticateResponse.dart';
 import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
+import 'package:baby_doctor/Providers/LoginCredentialsProvider.dart';
 import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/AuthenticationService.dart';
 import 'package:baby_doctor/Service/Service.dart';
@@ -165,12 +166,15 @@ class _LoginState extends State<Login> {
     if (authenticateResponse != null) {
       if (authenticateResponse.isSuccess) {
         context.read<TokenProvider>().setToken(authenticateResponse.token);
+        context
+            .read<LoginCredentialsProvider>()
+            .setLoginCredentials(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
         Navigator.pop(context);
         Navigator.pushNamed(context, Strings.routeHomePage);
       } else {
         print(authenticateResponse.message);
       }
-    }else{
+    } else {
       showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Error: failed to call server');
     }
   }

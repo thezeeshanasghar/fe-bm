@@ -50,7 +50,7 @@ class NurseService {
   }
 
   Future<NurseResponse> updateNurse(NurseRequest nurseRequest, String token) async {
-    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiNurseUpdate}/${nurseRequest.Id}'),
+    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiNurseUpdate}/${nurseRequest.id}'),
         headers: <String, String>{
           Strings.apiContentType: Strings.apiApplicationJson,
           Strings.apiAuthorization: '${Strings.apiBearer} $token',

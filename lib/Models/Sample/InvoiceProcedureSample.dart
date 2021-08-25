@@ -22,8 +22,8 @@ class InvoiceProcedureSample {
       id: json['id'],
       userId: json['userId'],
       invoiceId: json['invoiceId'],
-      invoice: json['invoice'],
-      procedures: json['procedures'],
+      invoice: json['invoice'] != null ? InvoiceSample.fromJson(json['invoice']) : null,
+      procedures: json['procedures'] != null ? ProcedureSample.fromJson(json['procedures']) : null,
     );
   }
 }

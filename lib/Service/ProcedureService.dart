@@ -50,7 +50,7 @@ class ProcedureService {
   }
 
   Future<ProcedureResponse> updateProcedure(ProcedureRequest procedureRequest, String token) async {
-    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiProcedureUpdate}/${procedureRequest.Id}'),
+    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiProcedureUpdate}/${procedureRequest.id}'),
         headers: <String, String>{
           Strings.apiContentType: Strings.apiApplicationJson,
           Strings.apiAuthorization: '${Strings.apiBearer} $token',
