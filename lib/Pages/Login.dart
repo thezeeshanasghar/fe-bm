@@ -1,3 +1,5 @@
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
@@ -22,8 +24,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   AuthenticationService authenticationService;
+  GlobalProgressDialog globalProgressDialog;
   SimpleFontelicoProgressDialog simpleFontelicoProgressDialog;
-
+  bool hasChangeDependencies = false;
   String UserName;
   String Password;
 
@@ -31,6 +34,15 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     initVariablesAndClasses();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -155,27 +167,31 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> onPressedSubmitButton() async {
-    // if (!formKey.currentState.validate()) {
-    //   return;
-    // }
-    // formKey.currentState.save();
-
+    if (!formKey.currentState.validate()) {
+      return;
+    }
+    formKey.currentState.save();
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
     AuthenticationService authenticationService = AuthenticationService();
-    AuthenticateResponse authenticateResponse = await authenticationService
-        .authenticateLogin(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
+    AuthenticateResponse authenticateResponse =
+        await authenticationService.authenticateLogin(AuthenticateLoginRequest(UserName: UserName, Password: Password));
     if (authenticateResponse != null) {
       if (authenticateResponse.isSuccess) {
         context.read<TokenProvider>().setToken(authenticateResponse.token);
         context
             .read<LoginCredentialsProvider>()
-            .setLoginCredentials(AuthenticateLoginRequest(UserName: 'basit@gmail.com', Password: 'basit'));
+            .setLoginCredentials(AuthenticateLoginRequest(UserName: UserName, Password: Password));
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
         Navigator.pop(context);
         Navigator.pushNamed(context, Strings.routeHomePage);
       } else {
-        print(authenticateResponse.message);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, authenticateResponse.message, context);
       }
     } else {
-      showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Error: failed to call server');
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Error: failed to call server', context);
     }
   }
 

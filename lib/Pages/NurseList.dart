@@ -210,11 +210,10 @@ class _NurseListState extends State<NurseList> {
     List<Map<String, dynamic>> tempsnurse = [];
     for (var iterable in iterableList) {
       tempsnurse.add({
-        "Id": iterable["Id"],
-        "ConsultationFee": iterable["consultationFee"],
-        "EmergencyConsultationFee": iterable["emergencyConsultationFee"],
-        "ShareInFee": iterable["shareInFee"],
-        "SpecialityType": iterable["specialityType"],
+        "id": iterable["id"],
+        "firstName": iterable["firstName"],
+        "lastName": iterable["lastName"],
+        "email": iterable["email"],
         "Action": iterable["Action"],
       });
     }
@@ -732,16 +731,16 @@ class _NurseListState extends State<NurseList> {
   void onChangedSearchedValue(value) {
     if (!nurseIsLoading) {
       if (value.isNotEmpty) {
-        if (value.length >= 2) {
+        if (value.length >= 1) {
           var searchList = nurseIsSource.where((element) {
-            String searchById = element["Id"].toString().toLowerCase();
-            String searchByName = element["Name"].toString().toLowerCase();
-            String searchByPerformedBy = element["PerformedBy"].toString().toLowerCase();
-            String searchByCharges = element["Charges"].toString().toLowerCase();
+            String searchById = element["id"].toString().toLowerCase();
+            String searchByFirstName = element["firstName"].toString().toLowerCase();
+            String searchByLastName = element["lastName"].toString().toLowerCase();
+            String searchByEmail = element["email"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
-                searchByName.contains(value.toLowerCase()) ||
-                searchByPerformedBy.contains(value.toLowerCase()) ||
-                searchByCharges.contains(value.toLowerCase())) {
+                searchByFirstName.contains(value.toLowerCase()) ||
+                searchByLastName.contains(value.toLowerCase()) ||
+                searchByEmail.contains(value.toLowerCase())) {
               return true;
             } else {
               return false;
@@ -757,6 +756,10 @@ class _NurseListState extends State<NurseList> {
             showSearchedList = false;
           });
         }
+      } else {
+        setState(() {
+          showSearchedList = false;
+        });
       }
     }
   }

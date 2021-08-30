@@ -189,9 +189,6 @@ class _ProcedureListState extends State<ProcedureList> {
       tempsprocedure.add({
         "id": iterable["id"],
         "name": iterable["name"],
-        "executant": iterable["executant"],
-        "charges": iterable["charges"],
-        "executantShare": iterable["executantShare"],
         "Action": iterable["Action"],
       });
     }
@@ -428,14 +425,11 @@ class _ProcedureListState extends State<ProcedureList> {
       if (value.isNotEmpty) {
         if (value.length >= 2) {
           var searchList = procedureIsSource.where((element) {
-            String searchById = element["Id"].toString().toLowerCase();
-            String searchByName = element["Name"].toString().toLowerCase();
-            String searchByPerformedBy = element["PerformedBy"].toString().toLowerCase();
-            String searchByCharges = element["Charges"].toString().toLowerCase();
+            String searchById = element["id"].toString().toLowerCase();
+            String searchByName = element["name"].toString().toLowerCase();
+
             if (searchById.contains(value.toLowerCase()) ||
-                searchByName.contains(value.toLowerCase()) ||
-                searchByPerformedBy.contains(value.toLowerCase()) ||
-                searchByCharges.contains(value.toLowerCase())) {
+                searchByName.contains(value.toLowerCase())) {
               return true;
             } else {
               return false;

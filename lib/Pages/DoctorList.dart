@@ -215,7 +215,6 @@ class _DoctorListState extends State<DoctorList> {
         "firstName": iterable["firstName"],
         "lastName": iterable["lastName"],
         "specialityType": iterable["specialityType"],
-        "cnic": iterable["cnic"],
         "Action": iterable["Action"],
       });
     }
@@ -750,7 +749,7 @@ class _DoctorListState extends State<DoctorList> {
   void onChangedSearchedValue(value) {
     if (!doctorIsLoading) {
       if (value.isNotEmpty) {
-        if (value.length >= 2) {
+        if (value.length >= 1) {
           var searchList = doctorIsSource.where((element) {
             String searchById = element["id"].toString().toLowerCase();
             String searchByName = element["firstName"].toString().toLowerCase();
@@ -775,6 +774,10 @@ class _DoctorListState extends State<DoctorList> {
             showSearchedList = false;
           });
         }
+      } else {
+        setState(() {
+          showSearchedList = false;
+        });
       }
     }
   }

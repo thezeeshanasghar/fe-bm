@@ -384,7 +384,7 @@ class _ServiceListState extends State<ServiceList> {
   void onChangedSearchedValue(value) {
     if (!serviceIsLoading) {
       if (value.isNotEmpty) {
-        if (value.length >= 2) {
+        if (value.length >= 1) {
           var searchList = serviceIsSource.where((element) {
             String searchById = element["id"].toString().toLowerCase();
             String searchByName = element["name"].toString().toLowerCase();
@@ -408,6 +408,10 @@ class _ServiceListState extends State<ServiceList> {
             showSearchedList = false;
           });
         }
+      } else {
+        setState(() {
+          showSearchedList = false;
+        });
       }
     }
   }

@@ -157,7 +157,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   title: Text(Strings.titleLogout),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, Strings.routePatientList);
+                    Navigator.pushNamed(context, Strings.routeLogin);
                   })
             ],
           ),
@@ -953,7 +953,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, Strings.routePatientList);
+          // Navigator.pushNamed(context, Strings.routePatientList);
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
         },
         child: Card(
           child: Column(

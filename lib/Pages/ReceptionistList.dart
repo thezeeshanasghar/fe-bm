@@ -207,10 +207,9 @@ class _ReceptionistListState extends State<ReceptionistList> {
     List<Map<String, dynamic>> tempsreceptionist = [];
     for (var iterable in iterableList) {
       tempsreceptionist.add({
-        "Id": iterable["Id"],
+        "id": iterable["id"],
         "firstName": iterable["firstName"],
         "lastName": iterable["lastName"],
-        "CNIC": iterable["CNIC"],
         "email": iterable["email"],
         "contact": iterable["contact"],
         "Action": iterable["Action"],
@@ -713,9 +712,9 @@ class _ReceptionistListState extends State<ReceptionistList> {
   void onChangedSearchedValue(value) {
     if (!receptionistIsLoading) {
       if (value.isNotEmpty) {
-        if (value.length >= 2) {
+        if (value.length >= 1) {
           var searchList = receptionistIsSource.where((element) {
-            String searchById = element["Id"].toString().toLowerCase();
+            String searchById = element["id"].toString().toLowerCase();
             String searchByFirstName = element["firstName"].toString().toLowerCase();
             String searchByLastName = element["lastName"].toString().toLowerCase();
             String searchByEmail = element["email"].toString().toLowerCase();
@@ -740,6 +739,10 @@ class _ReceptionistListState extends State<ReceptionistList> {
             showSearchedList = false;
           });
         }
+      } else {
+        setState(() {
+          showSearchedList = false;
+        });
       }
     }
   }

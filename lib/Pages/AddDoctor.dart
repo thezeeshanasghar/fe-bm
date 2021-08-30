@@ -127,7 +127,7 @@ class _AddDoctorState extends State<AddDoctor> {
                           widgetSizedBox(),
                           ...widgetQualification(),
                           widgetSizedBox(),
-                          ...widgetDiplomas(),
+                          // ...widgetDiplomas(),
                           widgetSubmit()
                         ],
                       ),
