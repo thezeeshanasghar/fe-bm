@@ -1,9 +1,16 @@
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/ProcedureRequest.dart';
+import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/ShareArguments/ProcedureArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditProcedures extends StatefulWidget {
@@ -13,19 +20,20 @@ class EditProcedures extends StatefulWidget {
 
 class _EditProceduresState extends State<EditProcedures> {
   final formKey = GlobalKey<FormState>();
-  String Id;
-  String ProcedureName;
-  String PerformedBy;
-  int Charges;
-  int Share;
-  bool isLoading = false;
-  SimpleFontelicoProgressDialog sfpd;
+  String id;
+  String procedureName;
+  String executant;
+  int charges;
+  int share;
   ProcedureService procedureService;
   TextEditingController tecName;
   TextEditingController tecPerformedBy;
   TextEditingController tecCharges;
   TextEditingController tecShare;
-  ProcedureArguments arguments;
+  ProcedureRequest arguments;
+  bool isLoading = true;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
@@ -34,12 +42,14 @@ class _EditProceduresState extends State<EditProcedures> {
   }
 
   @override
-  void didChangeDependencies() async {
-    setState(() {
-      isLoading = true;
-    });
-    arguments = ModalRoute.of(context).settings.arguments;
-    setValuesOfProcedures();
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      arguments = ModalRoute.of(context).settings.arguments;
+      globalProgressDialog = GlobalProgressDialog(context);
+      setValuesOfProcedures();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -66,22 +76,22 @@ class _EditProceduresState extends State<EditProcedures> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      Dimens.globalPaddingLeft,
-                      Dimens.globalPaddingTop,
-                      Dimens.globalPaddingRight,
-                      Dimens.globalPaddingBottom),
+                  padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                   child: Form(
                     key: formKey,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        if (!isLoading) widgetProcedureName(),
-                        if (!isLoading) widgetPerformedBy(),
-                        if (!isLoading) widgetCharges(),
-                        if (!isLoading) widgetShare(),
-                        if (!isLoading) widgetSubmit(),
-                        if (isLoading) widgetCircularProgress(),
+                        !isLoading
+                            ? Column(children: [
+                                widgetProcedureName(),
+                                widgetPerformedBy(),
+                                widgetCharges(),
+                                widgetShare(),
+                                widgetSubmit(),
+                              ])
+                            : widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -97,73 +107,63 @@ class _EditProceduresState extends State<EditProcedures> {
   void setValuesOfProcedures() {
     setState(() {
       tecName.text = arguments.name;
-      tecShare.text = arguments.performerShare.toString();
-      tecPerformedBy.text = arguments.performedBy;
+      tecShare.text = arguments.executantShare.toString();
+      tecPerformedBy.text = arguments.executant;
       tecCharges.text = arguments.charges.toString();
       isLoading = false;
     });
   }
 
   void initVariablesAndClasses() {
-    tecName = new TextEditingController();
-    tecShare = new TextEditingController();
-    tecPerformedBy = new TextEditingController();
-    tecCharges = new TextEditingController();
+    tecName = TextEditingController();
+    tecShare = TextEditingController();
+    tecPerformedBy = TextEditingController();
+    tecCharges = TextEditingController();
     procedureService = ProcedureService();
   }
 
-  Future<void> onPressedSubmitButton()  async {
+  Future<void> onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
     formKey.currentState.save();
-    sfpd = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-    await sfpd.show(
-        message: 'Updating ...',
-        type: SimpleFontelicoProgressDialogType.threelines,
-        width: MediaQuery.of(context).size.width - 20,
-        horizontal: true);
-    // ProcedureData obj = new ProcedureData(
-    //     id: arguments.id,
-    //     name: ProcedureName,
-    //     performedBy: PerformedBy,
-    //     charges: Charges,
-    //     performerShare: Share);
-    // var response = await procedureService.UpdateProcedure(obj);
-    // print(response);
-    // if (response == true) {
-    //   await sfpd.hide();
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Shade.snackGlobalSuccess,
-    //       content: Row(
-    //         children: [
-    //           Text('Success: Procedure Updated '),
-    //           Text(
-    //             ProcedureName,
-    //             style: TextStyle(fontWeight: FontWeight.bold),
-    //           ),
-    //         ],
-    //       )));
-    //   formKey.currentState.reset();
-    //   Navigator.pushNamed(context, Strings.routeProcedureList);
-    // } else {
-    //   await sfpd.hide();
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Shade.snackGlobalFailed,
-    //       content: Row(
-    //         children: [
-    //           Text('Error: Try Again: Failed to edit '),
-    //           Text(
-    //             ProcedureName,
-    //             style: TextStyle(fontWeight: FontWeight.bold),
-    //           ),
-    //         ],
-    //       )));
-    // }
+
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogUpdating, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        ProcedureResponse procedureResponse = await procedureService.updateProcedure(
+            ProcedureRequest(
+              id: arguments.id,
+              charges: charges,
+              executant: executant,
+              executantShare: share,
+              name: procedureName,
+            ),
+            context.read<TokenProvider>().tokenSample.jwtToken);
+        if (procedureResponse != null) {
+          if (procedureResponse.isSuccess) {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, procedureResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+            Navigator.pop(context);
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
   }
 
   Widget widgetCircularProgress() {
@@ -194,19 +194,14 @@ class _EditProceduresState extends State<EditProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
             controller: tecName,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.fact_check),
-                border: OutlineInputBorder(),
-                labelText: 'Procedure Name'),
+                prefixIcon: Icon(Icons.fact_check), border: OutlineInputBorder(), labelText: 'Procedure Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -214,7 +209,7 @@ class _EditProceduresState extends State<EditProcedures> {
               return null;
             },
             onSaved: (String value) {
-              ProcedureName = value;
+              procedureName = value;
             },
           ),
         ),
@@ -226,19 +221,14 @@ class _EditProceduresState extends State<EditProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
             controller: tecPerformedBy,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'Performed By'),
+                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Performed By'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -246,7 +236,7 @@ class _EditProceduresState extends State<EditProcedures> {
               return null;
             },
             onSaved: (String value) {
-              PerformedBy = value;
+              executant = value;
             },
           ),
         ),
@@ -258,31 +248,33 @@ class _EditProceduresState extends State<EditProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
             controller: tecCharges,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-                labelText: 'Charges'),
+                prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'charges'),
             validator: (String value) {
-              if (value == null || value.isEmpty) {
+              if (value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              if (double.tryParse(value) <= 0) {
-                return 'Input Error: cannot enter negative digits';
+              int intValue = int.tryParse(value);
+              if (intValue == null) {
+                return 'Input Error: fee must be in numeric form\nCorrect Syntax: 20';
+              }
+              if (intValue <= 0) {
+                return 'Input Error: cannot enter negative digits\nCorrect Syntax: 20';
+              }
+              if (intValue > 100) {
+                return 'Input Error: percentage cannot be greater than 100\nCorrect Syntax: 20';
               }
               return null;
             },
             onSaved: (String value) {
-              Charges = int.parse(value);
+              charges = int.parse(value);
             },
           ),
         ),
@@ -294,31 +286,26 @@ class _EditProceduresState extends State<EditProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 3,
             controller: tecShare,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.monetization_on),
-                border: OutlineInputBorder(),
-                labelText: 'Performer Share'),
+                prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'Performer share'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
-              // if(value >= 0 || value<=100){
-              // return 'This field cannot be empty';
-              // }
+              if (int.parse(value) >= 0 || int.parse(value) <= 100) {
+                return 'This field cannot be empty';
+              }
               return null;
             },
             onSaved: (String value) {
-              Share = int.tryParse(value);
+              share = int.tryParse(value);
             },
           ),
         ),
@@ -332,11 +319,8 @@ class _EditProceduresState extends State<EditProcedures> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -345,9 +329,7 @@ class _EditProceduresState extends State<EditProcedures> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text(Strings.submitGlobal),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
+              onPressed: () => onPressedSubmitButton(),
             ),
           ),
         )

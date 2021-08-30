@@ -349,10 +349,11 @@ class _ServiceListState extends State<ServiceList> {
   }
 
   Future<void> onCallingDeleteService(int id) async {
+    Navigator.pop(context);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+
     try {
-      Navigator.pop(context);
-      globalProgressDialog.showSimpleFontellicoProgressDialog(
-          false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
         ServiceResponse serviceResponse =

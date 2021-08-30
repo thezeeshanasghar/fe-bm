@@ -1,14 +1,21 @@
+import 'dart:async';
+
 import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
 import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
 import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/DoctorRequest.dart';
+import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
 import 'package:baby_doctor/Models/Responses/DoctorResponse.dart';
 import 'package:baby_doctor/Models/Sample/DoctorSample.dart';
+import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:baby_doctor/ShareArguments/DoctorArguments.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
@@ -39,8 +46,7 @@ class _DoctorListState extends State<DoctorList> {
   List<Map<String, dynamic>> doctorSelected;
   List<DoctorSample> listDoctor;
   DoctorService doctorService;
-
-  bool hasChangeDependencies=false;
+  bool hasChangeDependencies = false;
   GlobalProgressDialog globalProgressDialog;
 
   @override
@@ -48,14 +54,13 @@ class _DoctorListState extends State<DoctorList> {
     super.initState();
     initVariablesAndClasses();
     initializeDoctorHeaders();
-    getDoctorsFromApiAndLinkToTable();
   }
 
   @override
   void didChangeDependencies() {
     if (!hasChangeDependencies) {
       globalProgressDialog = GlobalProgressDialog(context);
-      checkTokenValidityAndGetService();
+      checkTokenValidityAndGetDoctor();
       hasChangeDependencies = true;
     }
     super.didChangeDependencies();
@@ -92,7 +97,7 @@ class _DoctorListState extends State<DoctorList> {
                         key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[widgetdoctorPatients()],
+                          children: <Widget>[widgetDoctorPatients()],
                         ),
                       )),
                 ),
@@ -108,6 +113,10 @@ class _DoctorListState extends State<DoctorList> {
           child: const Icon(Icons.add),
           backgroundColor: Shade.fabGlobalButtonColor,
         ));
+  }
+
+  FutureOr onGoBack(dynamic value) {
+    checkTokenValidityAndGetDoctor();
   }
 
   void initVariablesAndClasses() {
@@ -128,7 +137,7 @@ class _DoctorListState extends State<DoctorList> {
     doctorService = DoctorService();
   }
 
-  Future<void> checkTokenValidityAndGetService() async {
+  Future<void> checkTokenValidityAndGetDoctor() async {
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
@@ -141,78 +150,83 @@ class _DoctorListState extends State<DoctorList> {
     }
   }
 
-  void getDoctorsFromApiAndLinkToTable() async {
+  Future<void> getDoctorsFromApiAndLinkToTable() async {
     setState(() => doctorIsLoading = true);
     listDoctor = [];
     doctorIsSource = [];
-    // try {
-    //   DoctorResponseList serviceResponseList =
-    //   await service.getServices(context.read<TokenProvider>().tokenSample.jwtToken);
-    //   if (serviceResponseList != null) {
-    //     if (serviceResponseList.isSuccess) {
-    //       listService = serviceResponseList.data;
-    //       serviceIsSource.addAll(generateServiceDataFromApi(listService));
-    //     } else {
-    //       GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponseList.message, context);
-    //     }
-    //   } else {
-    //     GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
-    //   }
-    //   setState(() => serviceIsLoading = false);
-    // } catch (exception) {
-    //   setState(() => serviceIsLoading = false);
-    //   GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
-    // }
+    try {
+      DoctorResponseList doctorList =
+          await doctorService.getDoctors(context.read<TokenProvider>().tokenSample.jwtToken);
+      if (doctorList != null) {
+        if (doctorList.isSuccess) {
+          listDoctor = doctorList.data;
+          doctorIsSource.addAll(generateDoctorDataFromApi(listDoctor));
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorList.message, context);
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+      }
+      setState(() => doctorIsLoading = false);
+    } catch (exception) {
+      setState(() => doctorIsLoading = false);
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+    }
   }
 
-  // List<Map<String, dynamic>> generateDoctorDataFromApi(
-  //     List<DoctorData> listOfDoctors) {
-  //   List<Map<String, dynamic>> tempsdoctor = [];
-  //   for (DoctorData doctors in listOfDoctors) {
-  //     tempsdoctor.add({
-  //       "id": doctors.id,
-  //       "firstName": doctors.employee.firstName,
-  //       "lastName": doctors.employee.lastName,
-  //       "fatherHusbandName": doctors.employee.fatherHusbandName,
-  //       "gender": doctors.employee.gender,
-  //       "CNIC": doctors.employee.CNIC,
-  //       "contact": doctors.employee.contact,
-  //       "emergencyContactNumber": doctors.employee.emergencyContact,
-  //       "email": doctors.employee.email,
-  //       "address": doctors.employee.address,
-  //       "employeeId": doctors.employee.id,
-  //       "joiningDate": doctors.employee.joiningDate.substring(0,10),
-  //       "experience": doctors.employee.experience,
-  //       "SpecialityType": doctors.SpecialityType,
-  //       "ConsultationFee": doctors.ConsultationFee,
-  //       "EmergencyConsultationFee": doctors.EmergencyConsultationFee,
-  //       "FeeShare": doctors.ShareInFee,
-  //       "Action": doctors.id,
-  //     });
-  //   }
-  //   return tempsdoctor;
-  // }
+  List<Map<String, dynamic>> generateDoctorDataFromApi(List<DoctorSample> listOfDoctors) {
+    List<Map<String, dynamic>> tempsdoctor = [];
+    for (DoctorSample doctors in listOfDoctors) {
+      tempsdoctor.add({
+        "id": doctors.id,
+        "userId": doctors.userId,
+        "consultationFee": doctors.consultationFee,
+        "emergencyConsultationFee": doctors.emergencyConsultationFee,
+        "shareInFee": doctors.shareInFee,
+        "specialityType": doctors.specialityType,
+        "userType": doctors.user.userType,
+        "dateOfBirth": doctors.user.dateOfBirth,
+        "maritalStatus": doctors.user.maritalStatus,
+        "religion": doctors.user.religion,
+        "firstName": doctors.user.firstName,
+        "lastName": doctors.user.lastName,
+        "fatherHusbandName": doctors.user.fatherHusbandName,
+        "gender": doctors.user.gender,
+        "cnic": doctors.user.cnic,
+        "contact": doctors.user.contact,
+        "emergencyContact": doctors.user.emergencyContact,
+        "email": doctors.user.email,
+        "address": doctors.user.address,
+        "joiningDate": doctors.user.joiningDate,
+        "floorNo": doctors.user.floorNo,
+        "experience": doctors.user.experience,
+        "qualifications": doctors.user.qualifications,
+        "Action": doctors.id,
+      });
+    }
+    return tempsdoctor;
+  }
 
   List<Map<String, dynamic>> generateDoctorSearchData(Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsdoctor = [];
     for (var iterable in iterableList) {
       tempsdoctor.add({
-        "Id": iterable["Id"],
-        "ConsultationFee": iterable["consultationFee"],
-        "EmergencyConsultationFee": iterable["emergencyConsultationFee"],
-        "ShareInFee": iterable["shareInFee"],
-        "SpecialityType": iterable["specialityType"],
+        "id": iterable["id"],
+        "firstName": iterable["firstName"],
+        "lastName": iterable["lastName"],
+        "specialityType": iterable["specialityType"],
+        "cnic": iterable["cnic"],
         "Action": iterable["Action"],
       });
     }
     return tempsdoctor;
   }
 
-  initializeDoctorHeaders() {
+  void initializeDoctorHeaders() {
     doctorHeaders = [
       DatatableHeader(
-          value: "Id",
-          show: false,
+          value: "id",
+          show: true,
           sortable: true,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -221,6 +235,22 @@ class _DoctorListState extends State<DoctorList> {
               child: Center(
                 child: Text(
                   "Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "userId",
+          show: false,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "User Id",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -237,6 +267,134 @@ class _DoctorListState extends State<DoctorList> {
               child: Center(
                 child: Text(
                   "First Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "consultationFee",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Fee",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "emergencyConsultationFee",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Emergency Fee",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "shareInFee",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Fee Share",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "specialityType",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Speciality Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "userType",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "User Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "dateOfBirth",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Birth Date",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "maritalStatus",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Marital Status",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "religion",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Religion",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -268,14 +426,14 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Father Name",
+                  "fatherHusbandName",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "CNIC",
+          value: "gender",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -284,7 +442,23 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "CNIC",
+                  "Gender",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "cnic",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "cnic",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -292,22 +466,6 @@ class _DoctorListState extends State<DoctorList> {
           }),
       DatatableHeader(
           value: "contact",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Contact Number",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "emergencyContactNumber",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -316,7 +474,23 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Emergency Contact Number",
+                  "contact",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "emergencyContact",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "emergencyContact",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -332,7 +506,7 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Email",
+                  "email",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -348,87 +522,7 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Address",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "SpecialityType",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Speciality",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "experience",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Experience",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "ConsultationFee",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Consultation Fee",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "EmergencyConsultationFee",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Emergency Fee",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "FeeShare",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Fee Share",
+                  "address",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -444,14 +538,14 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "JoiningDate",
+                  "joiningDate",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "Qualification",
+          value: "floorNo",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -460,14 +554,14 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Qualification",
+                  "floorNo",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "Diplomas",
+          value: "experience",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -476,7 +570,7 @@ class _DoctorListState extends State<DoctorList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Diplomas",
+                  "experience",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -486,7 +580,7 @@ class _DoctorListState extends State<DoctorList> {
           value: "Action",
           show: true,
           flex: 1,
-          sortable: true,
+          sortable: false,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
             return Padding(
@@ -499,15 +593,13 @@ class _DoctorListState extends State<DoctorList> {
               ),
             );
           },
-          sourceBuilder: (Id, row) {
+          sourceBuilder: (id, row) {
             return Container(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {
-                    onPressedEditFromTable(Id, row);
-                  },
+                  onPressed: () => onPressedEditFromTable(id, row),
                   child: Text('Edit',
                       style: TextStyle(
                         color: Shade.actionButtonTextEdit,
@@ -517,9 +609,7 @@ class _DoctorListState extends State<DoctorList> {
                   width: 10,
                 ),
                 TextButton(
-                    onPressed: () {
-                      onPressedDeleteFromTable(Id, row);
-                    },
+                    onPressed: () => onPressedDeleteFromTable(id, row),
                     child: Text(
                       'Delete',
                       style: TextStyle(
@@ -532,82 +622,65 @@ class _DoctorListState extends State<DoctorList> {
     ];
   }
 
-  void onPressedEditFromTable(Id, row) {
-    print(Id);
-    Navigator.pushNamed(context, Strings.routeEditDoctor,
-        arguments: DoctorArguments(
-            id: Id,
-            ConsultationFee: row['ConsultationFee'],
-            EmergencyConsultationFee: row['EmergencyConsultationFee'],
-            ShareInFee: row['FeeShare'],
-            SpecialityType: row['SpecialityType'],
-            firstName: row['firstName'],
-            employeeId: row['employeeId'],
-            lastName: row['lastName'],
-            fatherHusbandName: row['fatherHusbandName'],
-            gender: row['gender'],
-            CNIC: row['CNIC'],
-            contact: row['contact'],
-            emergencyContact: row['emergencyContactNumber'],
-            experience: row['experience'],
-            flourNo: row['flourNo'],
-            password: row['password'],
-            userName: row['userName'],
-            joiningDate: row['joiningDate'],
-            address: row['address'],
-            email: row['email']));
-    print(row['employeeId']);
+  void onPressedEditFromTable(id, row) {
+    List<QualificationRequest> qualificationRequestList = [];
+    List<QualificationSample> qualificationSampleList = row['qualifications'];
+    if (qualificationSampleList != null) {
+      if (qualificationSampleList.length > 0) {
+        for (QualificationSample qualificationSample in qualificationSampleList) {
+          qualificationRequestList.add(QualificationRequest(
+            Id: qualificationSample.id,
+            UserId: qualificationSample.userId,
+            Certificate: qualificationSample.certificate,
+            Description: qualificationSample.description,
+            QualificationType: qualificationSample.qualificationType,
+          ));
+        }
+      }
+    }
+
+    DoctorRequest doctorRequest = DoctorRequest(
+      id: row['id'],
+      consultationFee: row['consultationFee'],
+      emergencyConsultationFee: row['emergencyConsultationFee'],
+      shareInFee: row['shareInFee'],
+      specialityType: row['specialityType'],
+      firstName: row['firstName'],
+      lastName: row['lastName'],
+      fatherHusbandName: row['fatherHusbandName'],
+      gender: row['gender'],
+      cnic: row['cnic'],
+      contact: row['contact'],
+      emergencyContact: row['emergencyContact'],
+      experience: row['experience'],
+      floorNo: row['floorNo'],
+      joiningDate: row['joiningDate'],
+      address: row['address'],
+      userId: row['userId'],
+      userType: row['userType'],
+      email: row['email'],
+      dateOfBirth: row['dateOfBirth'],
+      maritalStatus: row['maritalStatus'],
+      religion: row['religion'],
+      qualificationList: qualificationRequestList,
+    );
+
+    Navigator.pushNamed(
+      context,
+      Strings.routeEditDoctor,
+      arguments: doctorRequest,
+    ).then((value) => onGoBack(value));
   }
 
-  void onPressedDeleteFromTable(Id, row) {
+  void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
+      onPressed: () => Navigator.of(context).pop(),
       child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
       child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
-      onPressed: () async {
-        Navigator.of(context).pop();
-        sfpd = SimpleFontelicoProgressDialog(context: context, barrierDimisable: false);
-        await sfpd.show(
-            message: 'Deleting ...',
-            type: SimpleFontelicoProgressDialogType.hurricane,
-            width: MediaQuery.of(context).size.width - 20,
-            horizontal: true);
-        // doctorService.DeleteDoctor(Id).then((response) async {
-        //   if (response == true) {
-        //     await sfpd.hide();
-        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //         backgroundColor: Shade.snackGlobalSuccess,
-        //         content: Row(
-        //           children: [
-        //             Text('Success: Deleted doctor '),
-        //             Text(
-        //               row['firstName'],
-        //               style: TextStyle(fontWeight: FontWeight.bold),
-        //             ),
-        //           ],
-        //         )));
-        //     getDoctorsFromApiAndLinkToTable();
-        //   } else {
-        //     await sfpd.hide();
-        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //         backgroundColor: Shade.snackGlobalFailed,
-        //         content: Row(
-        //           children: [
-        //             Text('Error: Try Again: Failed to delete Doctor '),
-        //             Text(
-        //               row['FirstName'],
-        //               style: TextStyle(fontWeight: FontWeight.bold),
-        //             ),
-        //           ],
-        //         )));
-        //   }
-        // });
-      },
+      onPressed: () => onCallingDeleteDoctor(id),
     );
 
     AlertDialog alert = AlertDialog(
@@ -642,15 +715,47 @@ class _DoctorListState extends State<DoctorList> {
     );
   }
 
+  Future<void> onCallingDeleteDoctor(int id) async {
+    Navigator.pop(context);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        DoctorResponse doctorResponse =
+            await doctorService.deleteDoctor(id, context.read<TokenProvider>().tokenSample.jwtToken);
+        if (doctorResponse != null) {
+          if (doctorResponse.isSuccess) {
+            checkTokenValidityAndGetDoctor();
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, doctorResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
   void onChangedSearchedValue(value) {
     if (!doctorIsLoading) {
       if (value.isNotEmpty) {
         if (value.length >= 2) {
           var searchList = doctorIsSource.where((element) {
-            String searchById = element["Id"].toString().toLowerCase();
-            String searchByName = element["Name"].toString().toLowerCase();
-            String searchByPerformedBy = element["PerformedBy"].toString().toLowerCase();
-            String searchByCharges = element["Charges"].toString().toLowerCase();
+            String searchById = element["id"].toString().toLowerCase();
+            String searchByName = element["firstName"].toString().toLowerCase();
+            String searchByPerformedBy = element["lastName"].toString().toLowerCase();
+            String searchByCharges = element["specialityType"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByName.contains(value.toLowerCase()) ||
                 searchByPerformedBy.contains(value.toLowerCase()) ||
@@ -674,7 +779,7 @@ class _DoctorListState extends State<DoctorList> {
     }
   }
 
-  Widget widgetdoctorPatients() {
+  Widget widgetDoctorPatients() {
     return Card(
       elevation: 1,
       shadowColor: Colors.black,

@@ -186,7 +186,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               widgetRowHeaderTwo(),
                               widgetRowThree(),
                               widgetRowFour(),
-                              widgetRowFive()
                             ],
                           ),
                         )),
@@ -305,9 +304,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        widgetNurseAppointmentsCard(),
         widgetPatientListCard(),
         widgetDoctorListCard(),
+        widgetNurseListCard(),
       ],
     );
   }
@@ -317,9 +316,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        widgetNurseListCard(),
         widgetReceptionistListCard(),
         widgetProcedureListCard(),
+        widgetServiceListCard(),
       ],
     );
   }
@@ -329,9 +328,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        widgetRoomListCard(),
-        widgetServiceListCard(),
-        widgetAccountsCard(),
+        widgetDummySpaceCard(),
+        widgetDummySpaceCard(),
       ],
     );
   }

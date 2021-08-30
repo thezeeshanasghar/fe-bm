@@ -1,9 +1,21 @@
+import 'dart:async';
+
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/NurseRequest.dart';
+import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
+import 'package:baby_doctor/Models/Responses/NurseResponse.dart';
+import 'package:baby_doctor/Models/Sample/NurseSample.dart';
+import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
 import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
@@ -33,16 +45,26 @@ class _NurseListState extends State<NurseList> {
   List<Map<String, dynamic>> nurseIsSource;
   List<Map<String, dynamic>> nurseIsSearched;
   List<Map<String, dynamic>> nurseSelecteds;
-  //List<NurseData> listNurses;
-
+  List<NurseSample> listNurse;
   NurseService nurseService;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-    initializenurseListHeaders();
-    getNursesFromApiAndLinkToTable();
+    initializeNurseListHeaders();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      checkTokenValidityAndGetNurse();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -63,19 +85,15 @@ class _NurseListState extends State<NurseList> {
         body: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyText2,
           child: LayoutBuilder(
-            builder:
-                (BuildContext context, BoxConstraints viewportConstraints) {
+            builder: (BuildContext context, BoxConstraints viewportConstraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.minHeight,
                   ),
                   child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          Dimens.globalPaddingLeft,
-                          Dimens.globalPaddingTop,
-                          Dimens.globalPaddingRight,
-                          Dimens.globalPaddingBottom),
+                      padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -98,68 +116,97 @@ class _NurseListState extends State<NurseList> {
         ));
   }
 
+  FutureOr onGoBack(dynamic value) {
+    checkTokenValidityAndGetNurse();
+  }
+
   void initVariablesAndClasses() {
     nurseHeaders = [];
     nursePerPage = [5, 10, 15, 100];
     nurseTotal = 100;
-    nurseCurrentPerPage;
     nurseCurrentPage = 1;
     nurseIsSearch = false;
     nurseIsSource = [];
     nurseIsSearched = [];
     nurseSelecteds = [];
     nurseSelectableKey = "Invoice";
-    nurseSortColumn;
     nurseSortAscending = true;
     nurseIsLoading = true;
     nurseShowSelect = false;
-   // listNurses = [];
+    listNurse = [];
     showSearchedList = false;
-
     nurseService = NurseService();
   }
 
-  void getNursesFromApiAndLinkToTable() async {
-    setState(() => nurseIsLoading = true);
-   // listNurses = [];
-    nurseIsSource = [];
-
-    // Nurse nurseResponse = await nurseService.getNurse();
-    // listNurses = nurseResponse.data;
-    // nurseIsSource.addAll(generateNurseDataFromApi(listNurses));
-    setState(() => nurseIsLoading = false);
+  Future<void> checkTokenValidityAndGetNurse() async {
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        getDoctorsFromApiAndLinkToTable();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+    }
   }
 
-  // List<Map<String, dynamic>> generateNurseDataFromApi(
-  //     List<NurseData> listOfNurses) {
-  //   List<Map<String, dynamic>> tempsnurse = [];
-  //   for (NurseData nurses in listOfNurses) {
-  //     tempsnurse.add({
-  //       "Id": nurses.id,
-  //       "firstName": nurses.employee.firstName,
-  //       "lastName": nurses.employee.lastName,
-  //       "fatherHusbandName": nurses.employee.fatherHusbandName,
-  //       "contact": nurses.employee.contact,
-  //       "emergencyContactNumber": nurses.employee.emergencyContact,
-  //       "gender": nurses.employee.gender,
-  //       "email": nurses.employee.email,
-  //       "experience": nurses.employee.experience,
-  //       "employeeId": nurses.employee.id,
-  //       "CNIC": nurses.employee.CNIC,
-  //       "DutyDuration": nurses.DutyDuration,
-  //       "address": nurses.employee.address,
-  //       "joiningDate": nurses.employee.joiningDate.substring(0, 10),
-  //       "DutyDuration": nurses.DutyDuration,
-  //       "Salary": nurses.Salary,
-  //       "ProcedureShare": nurses.SharePercentage,
-  //       "Action": nurses.id,
-  //     });
-  //   }
-  //   return tempsnurse;
-  // }
+  Future<void> getDoctorsFromApiAndLinkToTable() async {
+    setState(() => nurseIsLoading = true);
+    listNurse = [];
+    nurseIsSource = [];
+    try {
+      NurseResponseList nurseList = await nurseService.getNurses(context.read<TokenProvider>().tokenSample.jwtToken);
+      if (nurseList != null) {
+        if (nurseList.isSuccess) {
+          listNurse = nurseList.data;
+          nurseIsSource.addAll(generateDoctorDataFromApi(listNurse));
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, nurseList.message, context);
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+      }
+      setState(() => nurseIsLoading = false);
+    } catch (exception) {
+      setState(() => nurseIsLoading = false);
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+    }
+  }
 
-  List<Map<String, dynamic>> generateNurseSearchData(
-      Iterable<Map<String, dynamic>> iterableList) {
+  List<Map<String, dynamic>> generateDoctorDataFromApi(List<NurseSample> listOfNurse) {
+    List<Map<String, dynamic>> tempNurse = [];
+    for (NurseSample nurse in listOfNurse) {
+      tempNurse.add({
+        "id": nurse.id,
+        "userId": nurse.userId,
+        "dutyDuration": nurse.dutyDuration,
+        "sharePercentage": nurse.sharePercentage,
+        "salary": nurse.salary,
+        "userType": nurse.user.userType,
+        "dateOfBirth": nurse.user.dateOfBirth,
+        "maritalStatus": nurse.user.maritalStatus,
+        "religion": nurse.user.religion,
+        "firstName": nurse.user.firstName,
+        "lastName": nurse.user.lastName,
+        "fatherHusbandName": nurse.user.fatherHusbandName,
+        "gender": nurse.user.gender,
+        "cnic": nurse.user.cnic,
+        "contact": nurse.user.contact,
+        "emergencyContact": nurse.user.emergencyContact,
+        "email": nurse.user.email,
+        "address": nurse.user.address,
+        "joiningDate": nurse.user.joiningDate,
+        "floorNo": nurse.user.floorNo,
+        "experience": nurse.user.experience,
+        "qualifications": nurse.user.qualifications,
+        "Action": nurse.id,
+      });
+    }
+    return tempNurse;
+  }
+
+  List<Map<String, dynamic>> generateNurseSearchData(Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsnurse = [];
     for (var iterable in iterableList) {
       tempsnurse.add({
@@ -174,10 +221,10 @@ class _NurseListState extends State<NurseList> {
     return tempsnurse;
   }
 
-  initializenurseListHeaders() {
+  initializeNurseListHeaders() {
     nurseHeaders = [
       DatatableHeader(
-          value: "Id",
+          value: "id",
           show: true,
           sortable: true,
           textAlign: TextAlign.center,
@@ -187,6 +234,22 @@ class _NurseListState extends State<NurseList> {
               child: Center(
                 child: Text(
                   "Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "userId",
+          show: false,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "User Id",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -203,6 +266,118 @@ class _NurseListState extends State<NurseList> {
               child: Center(
                 child: Text(
                   "First Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "dutyDuration",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Duty Duration",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "sharePercentage",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Share Percentage",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "salary",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Salary",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "userType",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "User Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "dateOfBirth",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Birth Date",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "maritalStatus",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Marital Status",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "religion",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Religion",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -234,7 +409,7 @@ class _NurseListState extends State<NurseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Father Name",
+                  "fatherHusbandName",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -257,7 +432,7 @@ class _NurseListState extends State<NurseList> {
             );
           }),
       DatatableHeader(
-          value: "CNIC",
+          value: "cnic",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -266,7 +441,7 @@ class _NurseListState extends State<NurseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "CNIC",
+                  "cnic",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -274,22 +449,6 @@ class _NurseListState extends State<NurseList> {
           }),
       DatatableHeader(
           value: "contact",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Contact Number",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "emergencyContactNumber",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -298,7 +457,39 @@ class _NurseListState extends State<NurseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Emergency Contact Number",
+                  "contact",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "emergencyContact",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "emergencyContact",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "email",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "email",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -314,23 +505,7 @@ class _NurseListState extends State<NurseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Address",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "DutyDuration",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Duty Duration",
+                  "address",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -338,54 +513,6 @@ class _NurseListState extends State<NurseList> {
           }),
       DatatableHeader(
           value: "joiningDate",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Joining Date",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "ProcedureShare",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Procedure Share",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "Salary",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Salary",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "Qualification",
           show: false,
           sortable: true,
           textAlign: TextAlign.center,
@@ -394,7 +521,39 @@ class _NurseListState extends State<NurseList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Qualification",
+                  "joiningDate",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "floorNo",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "floorNo",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "experience",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "experience",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -404,7 +563,7 @@ class _NurseListState extends State<NurseList> {
           value: "Action",
           show: true,
           flex: 1,
-          sortable: true,
+          sortable: false,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
             return Padding(
@@ -417,26 +576,28 @@ class _NurseListState extends State<NurseList> {
               ),
             );
           },
-          sourceBuilder: (Id, row) {
+          sourceBuilder: (id, row) {
             return Container(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                    onPressed: () {
-                      onPressedEditFromTable(Id, row);
-                    },
-                    child: Text('Edit')),
+                  onPressed: () => onPressedEditFromTable(id, row),
+                  child: Text('Edit',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextEdit,
+                      )),
+                ),
                 SizedBox(
                   width: 10,
                 ),
                 TextButton(
-                    onPressed: () {
-                      onPressedDeleteFromTable(Id, row);
-                    },
+                    onPressed: () => onPressedDeleteFromTable(id, row),
                     child: Text(
                       'Delete',
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
                     )),
               ],
             ));
@@ -444,88 +605,64 @@ class _NurseListState extends State<NurseList> {
     ];
   }
 
-  void onPressedEditFromTable(Id, row) {
-    print(Id);
-    Navigator.pushNamed(context, Strings.routeEditNurse,
-        arguments: NurseArguments(
-            id:Id,
-            DutyDuration: row['DutyDuration'],
-            SharePercentage: row['ProcedureShare'],
-            Salary: row['Salary'],
-            firstName: row['firstName'],
-            employeeId: row['employeeId'],
-            lastName: row['lastName'],
-            fatherHusbandName: row['fatherHusbandName'],
-            gender: row['gender'],
-            CNIC: row['CNIC'],
-            contact: row['contact'],
-            emergencyContact: row['emergencyContactNumber'],
-            experience: row['experience'],
-            flourNo: row['flourNo'],
-            password: row['password'],
-            userName: row['userName'],
-            joiningDate: row['joiningDate'],
-            address: row['address'],
-            email: row['email']));
+  void onPressedEditFromTable(id, row) {
+    List<QualificationRequest> qualificationRequestList = [];
+    List<QualificationSample> qualificationSampleList = row['qualifications'];
+    if (qualificationSampleList != null) {
+      if (qualificationSampleList.length > 0) {
+        for (QualificationSample qualificationSample in qualificationSampleList) {
+          qualificationRequestList.add(QualificationRequest(
+            Id: qualificationSample.id,
+            UserId: qualificationSample.userId,
+            Certificate: qualificationSample.certificate,
+            Description: qualificationSample.description,
+            QualificationType: qualificationSample.qualificationType,
+          ));
+        }
+      }
+    }
 
+    NurseRequest nurseRequest = NurseRequest(
+      id: row['id'],
+      userId: row['userId'],
+      dutyDuration: row['dutyDuration'],
+      sharePercentage: row['sharePercentage'],
+      salary: row['salary'],
+      firstName: row['firstName'],
+      lastName: row['lastName'],
+      fatherHusbandName: row['fatherHusbandName'],
+      gender: row['gender'],
+      cnic: row['cnic'],
+      contact: row['contact'],
+      emergencyContact: row['emergencyContact'],
+      experience: row['experience'],
+      floorNo: row['floorNo'],
+      joiningDate: row['joiningDate'],
+      address: row['address'],
+      userType: row['userType'],
+      email: row['email'],
+      dateOfBirth: row['dateOfBirth'],
+      maritalStatus: row['maritalStatus'],
+      religion: row['religion'],
+      qualificationList: qualificationRequestList,
+    );
+
+    Navigator.pushNamed(
+      context,
+      Strings.routeEditNurse,
+      arguments: nurseRequest,
+    ).then((value) => onGoBack(value));
   }
 
-  void onPressedDeleteFromTable(Id, row) {
+  void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-      child: Text("Cancel",
-          style: TextStyle(
-              color: Shade.alertBoxButtonTextCancel,
-              fontWeight: FontWeight.w900)),
+      onPressed: () => Navigator.of(context).pop(),
+      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
-      child: Text("Delete",
-          style: TextStyle(
-              color: Shade.alertBoxButtonTextDelete,
-              fontWeight: FontWeight.w900)),
-      onPressed: () async {
-        Navigator.of(context).pop();
-        sfpd = SimpleFontelicoProgressDialog(
-            context: context, barrierDimisable: false);
-        await sfpd.show(
-            message: 'Deleting ...',
-            type: SimpleFontelicoProgressDialogType.hurricane,
-            width: MediaQuery.of(context).size.width - 20,
-            horizontal: true);
-        // nurseService.DeleteNurse(Id).then((response) async {
-        //   if (response == true) {
-        //     await sfpd.hide();
-        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //         backgroundColor: Shade.snackGlobalSuccess,
-        //         content: Row(
-        //           children: [
-        //             Text('Success: Deleted Nurse '),
-        //             Text(
-        //               row['firstName'],
-        //               style: TextStyle(fontWeight: FontWeight.bold),
-        //             ),
-        //           ],
-        //         )));
-        //     getNursesFromApiAndLinkToTable();
-        //   } else {
-        //     await sfpd.hide();
-        //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        //         backgroundColor: Shade.snackGlobalFailed,
-        //         content: Row(
-        //           children: [
-        //             Text('Error: Try Again: Failed to delete Nurse '),
-        //             Text(
-        //               row['firstName'],
-        //               style: TextStyle(fontWeight: FontWeight.bold),
-        //             ),
-        //           ],
-        //         )));
-        //   }
-        // });
-      },
+      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      onPressed: () => onCallingDeleteNurse(id),
     );
 
     AlertDialog alert = AlertDialog(
@@ -547,11 +684,8 @@ class _NurseListState extends State<NurseList> {
         cancelButton,
         deleteButton,
       ],
-      actionsPadding: EdgeInsets.fromLTRB(
-          Dimens.actionsGlobalButtonLeft,
-          Dimens.actionsGlobalButtonTop,
-          Dimens.actionsGlobalButtonRight,
-          Dimens.actionsGlobalButtonBottom),
+      actionsPadding: EdgeInsets.fromLTRB(Dimens.actionsGlobalButtonLeft, Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight, Dimens.actionsGlobalButtonBottom),
     );
 
     showDialog(
@@ -563,6 +697,38 @@ class _NurseListState extends State<NurseList> {
     );
   }
 
+  Future<void> onCallingDeleteNurse(int id) async {
+    Navigator.pop(context);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        NurseResponse doctorResponse =
+            await nurseService.deleteNurse(id, context.read<TokenProvider>().tokenSample.jwtToken);
+        if (doctorResponse != null) {
+          if (doctorResponse.isSuccess) {
+            checkTokenValidityAndGetNurse();
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, doctorResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
   void onChangedSearchedValue(value) {
     if (!nurseIsLoading) {
       if (value.isNotEmpty) {
@@ -570,10 +736,8 @@ class _NurseListState extends State<NurseList> {
           var searchList = nurseIsSource.where((element) {
             String searchById = element["Id"].toString().toLowerCase();
             String searchByName = element["Name"].toString().toLowerCase();
-            String searchByPerformedBy =
-                element["PerformedBy"].toString().toLowerCase();
-            String searchByCharges =
-                element["Charges"].toString().toLowerCase();
+            String searchByPerformedBy = element["PerformedBy"].toString().toLowerCase();
+            String searchByCharges = element["Charges"].toString().toLowerCase();
             if (searchById.contains(value.toLowerCase()) ||
                 searchByName.contains(value.toLowerCase()) ||
                 searchByPerformedBy.contains(value.toLowerCase()) ||
@@ -602,74 +766,65 @@ class _NurseListState extends State<NurseList> {
       elevation: 1,
       shadowColor: Colors.black,
       clipBehavior: Clip.none,
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(0),
-              constraints: BoxConstraints(
-                maxHeight: 500,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ResponsiveDatatable(
-                  actions: [
-                    Expanded(
-                        child: TextField(
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.search_outlined),
-                          hintText: 'Search nurse'),
-                      onChanged: (value) => onChangedSearchedValue(value),
-                    )),
-                  ],
-                  headers: nurseHeaders,
-                  source: !showSearchedList ? nurseIsSource : nurseIsSearched,
-                  selecteds: nurseSelecteds,
-                  showSelect: nurseShowSelect,
-                  autoHeight: false,
-                  onTabRow: (data) {
-                    print(data);
-                  },
-                  onSort: (value) {
-                    setState(() {
-                      nurseSortColumn = value;
-                      nurseSortAscending = !nurseSortAscending;
-                      if (nurseSortAscending) {
-                        nurseIsSource.sort((a, b) => b["$nurseSortColumn"]
-                            .compareTo(a["$nurseSortColumn"]));
-                      } else {
-                        nurseIsSource.sort((a, b) => a["$nurseSortColumn"]
-                            .compareTo(b["$nurseSortColumn"]));
-                      }
-                    });
-                  },
-                  sortAscending: nurseSortAscending,
-                  sortColumn: nurseSortColumn,
-                  isLoading: nurseIsLoading,
-                  onSelect: (value, item) {
-                    print("$value  $item ");
-                    if (value) {
-                      setState(() => nurseSelecteds.add(item));
-                    } else {
-                      setState(() => nurseSelecteds
-                          .removeAt(nurseSelecteds.indexOf(item)));
-                    }
-                  },
-                  onSelectAll: (value) {
-                    if (value) {
-                      setState(() => nurseSelecteds =
-                          nurseIsSource.map((entry) => entry).toList().cast());
-                    } else {
-                      setState(() => nurseSelecteds.clear());
-                    }
-                  },
-                ),
-              ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
+        Container(
+          margin: EdgeInsets.all(10),
+          padding: EdgeInsets.all(0),
+          constraints: BoxConstraints(
+            maxHeight: 500,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ResponsiveDatatable(
+              actions: [
+                Expanded(
+                    child: TextField(
+                  decoration: InputDecoration(
+                      border: InputBorder.none, prefixIcon: Icon(Icons.search_outlined), hintText: 'Search nurse'),
+                  onChanged: (value) => onChangedSearchedValue(value),
+                )),
+              ],
+              headers: nurseHeaders,
+              source: !showSearchedList ? nurseIsSource : nurseIsSearched,
+              selecteds: nurseSelecteds,
+              showSelect: nurseShowSelect,
+              autoHeight: false,
+              onTabRow: (data) {
+                print(data);
+              },
+              onSort: (value) {
+                setState(() {
+                  nurseSortColumn = value;
+                  nurseSortAscending = !nurseSortAscending;
+                  if (nurseSortAscending) {
+                    nurseIsSource.sort((a, b) => b["$nurseSortColumn"].compareTo(a["$nurseSortColumn"]));
+                  } else {
+                    nurseIsSource.sort((a, b) => a["$nurseSortColumn"].compareTo(b["$nurseSortColumn"]));
+                  }
+                });
+              },
+              sortAscending: nurseSortAscending,
+              sortColumn: nurseSortColumn,
+              isLoading: nurseIsLoading,
+              onSelect: (value, item) {
+                print("$value  $item ");
+                if (value) {
+                  setState(() => nurseSelecteds.add(item));
+                } else {
+                  setState(() => nurseSelecteds.removeAt(nurseSelecteds.indexOf(item)));
+                }
+              },
+              onSelectAll: (value) {
+                if (value) {
+                  setState(() => nurseSelecteds = nurseIsSource.map((entry) => entry).toList().cast());
+                } else {
+                  setState(() => nurseSelecteds.clear());
+                }
+              },
             ),
-          ]),
+          ),
+        ),
+      ]),
     );
   }
 }

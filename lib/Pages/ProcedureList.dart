@@ -1,13 +1,22 @@
+import 'dart:async';
+
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/ProcedureRequest.dart';
+import 'package:baby_doctor/Models/Responses/ProcedureResponse.dart';
+import 'package:baby_doctor/Models/Sample/ProcedureSample.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/ProcedureService.dart';
 import 'package:baby_doctor/ShareArguments/ProcedureArguments.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
-import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class ProcedureList extends StatefulWidget {
   @override
@@ -27,23 +36,31 @@ class _ProcedureListState extends State<ProcedureList> {
   bool procedureIsLoading;
   bool procedureShowSelect;
   bool showSearchedList;
-  SimpleFontelicoProgressDialog sfpd;
   List<DatatableHeader> procedureHeaders;
   List<int> procedurePerPage;
   List<Map<String, dynamic>> procedureIsSource;
   List<Map<String, dynamic>> procedureIsSearched;
   List<Map<String, dynamic>> procedureSelecteds;
-
-  // List<ProcedureData> listProcedures;
-
+  List<ProcedureSample> listProcedures;
   ProcedureService procedureService;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
     initHeadersOfProcedureTable();
-    getProceduresFromApiAndLinkToTable();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      globalProgressDialog = GlobalProgressDialog(context);
+      checkTokenValidityAndGetProcedure();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -99,59 +116,82 @@ class _ProcedureListState extends State<ProcedureList> {
     procedureHeaders = [];
     procedurePerPage = [5, 10, 15, 100];
     procedureTotal = 100;
-    procedureCurrentPerPage;
     procedureCurrentPage = 1;
     procedureIsSearch = false;
     procedureIsSource = [];
     procedureIsSearched = [];
     procedureSelecteds = [];
     procedureSelectableKey = "Invoice";
-    procedureSortColumn;
     procedureSortAscending = true;
     procedureIsLoading = true;
     procedureShowSelect = false;
-    // listProcedures = [];
+    listProcedures = [];
     showSearchedList = false;
 
     procedureService = ProcedureService();
   }
 
-  void getProceduresFromApiAndLinkToTable() async {
-    setState(() => procedureIsLoading = true);
-    // listProcedures = [];
-    // procedureIsSource = [];
-    // Procedure procedureResponse = await procedureService.getProcedures();
-    // listProcedures = procedureResponse.data;
-    // procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
-    //
-    // setState(() => procedureIsLoading = false);
+  Future<void> checkTokenValidityAndGetProcedure() async {
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        getProceduresFromApiAndLinkToTable();
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+    }
   }
 
-  // List<Map<String, dynamic>> generateProcedureDataFromApi(
-  //     List<ProcedureData> listOfProcedures) {
-  //   List<Map<String, dynamic>> tempsprocedure = [];
-  //   for (ProcedureData procedures in listOfProcedures) {
-  //     tempsprocedure.add({
-  //       "Id": procedures.id,
-  //       "Name": procedures.name,
-  //       "PerformedBy": procedures.performedBy,
-  //       "Charges": procedures.charges,
-  //       "Share": procedures.performerShare,
-  //       "Action": procedures.id,
-  //     });
-  //   }
-  //   return tempsprocedure;
-  // }
+  Future<void> getProceduresFromApiAndLinkToTable() async {
+    setState(() => procedureIsLoading = true);
+    listProcedures = [];
+    procedureIsSource = [];
+    try {
+      ProcedureResponseList procedureList =
+          await procedureService.getProcedures(context.read<TokenProvider>().tokenSample.jwtToken);
+      if (procedureList != null) {
+        if (procedureList.isSuccess) {
+          listProcedures = procedureList.data;
+          procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureList.message, context);
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+      }
+      setState(() => procedureIsLoading = false);
+    } catch (exception) {
+      setState(() => procedureIsLoading = false);
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+    }
+  }
+
+  List<Map<String, dynamic>> generateProcedureDataFromApi(List<ProcedureSample> listOfProcedure) {
+    List<Map<String, dynamic>> tempsProcedure = [];
+    for (ProcedureSample procedureSample in listOfProcedure) {
+      tempsProcedure.add({
+        "id": procedureSample.id,
+        "name": procedureSample.name,
+        "executant": procedureSample.executant,
+        "charges": procedureSample.charges,
+        "executantShare": procedureSample.executantShare,
+        "Action": procedureSample.id,
+      });
+    }
+    return tempsProcedure;
+  }
 
   List<Map<String, dynamic>> generateProcedureSearchData(Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsprocedure = [];
     for (var iterable in iterableList) {
       tempsprocedure.add({
-        "Id": iterable["Id"],
-        "Name": iterable["Name"],
-        "PerformedBy": iterable["PerformedBy"],
-        "Charges": iterable["Charges"],
-        "Share": iterable["Share"],
+        "id": iterable["id"],
+        "name": iterable["name"],
+        "executant": iterable["executant"],
+        "charges": iterable["charges"],
+        "executantShare": iterable["executantShare"],
         "Action": iterable["Action"],
       });
     }
@@ -161,7 +201,7 @@ class _ProcedureListState extends State<ProcedureList> {
   void initHeadersOfProcedureTable() {
     procedureHeaders = [
       DatatableHeader(
-          value: "Id",
+          value: "id",
           show: true,
           flex: 1,
           sortable: false,
@@ -178,7 +218,7 @@ class _ProcedureListState extends State<ProcedureList> {
             );
           }),
       DatatableHeader(
-          value: "Name",
+          value: "name",
           show: true,
           flex: 2,
           sortable: false,
@@ -195,7 +235,7 @@ class _ProcedureListState extends State<ProcedureList> {
             );
           }),
       DatatableHeader(
-          value: "PerformedBy",
+          value: "executant",
           show: true,
           sortable: false,
           textAlign: TextAlign.center,
@@ -204,14 +244,14 @@ class _ProcedureListState extends State<ProcedureList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Performed By",
+                  "Executant",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "Charges",
+          value: "charges",
           show: true,
           sortable: false,
           textAlign: TextAlign.center,
@@ -227,7 +267,7 @@ class _ProcedureListState extends State<ProcedureList> {
             );
           }),
       DatatableHeader(
-          value: "Share",
+          value: "executantShare",
           show: true,
           sortable: false,
           textAlign: TextAlign.center,
@@ -259,15 +299,13 @@ class _ProcedureListState extends State<ProcedureList> {
               ),
             );
           },
-          sourceBuilder: (Id, row) {
+          sourceBuilder: (id, row) {
             return Container(
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () {
-                    onPressedEditFromTable(Id, row);
-                  },
+                  onPressed: () => onPressedEditFromTable(id, row),
                   child: Text('Edit',
                       style: TextStyle(
                         color: Shade.actionButtonTextEdit,
@@ -277,9 +315,7 @@ class _ProcedureListState extends State<ProcedureList> {
                   width: 10,
                 ),
                 TextButton(
-                    onPressed: () {
-                      onPressedDeleteFromTable(Id, row);
-                    },
+                    onPressed: () => onPressedDeleteFromTable(id, row),
                     child: Text(
                       'Delete',
                       style: TextStyle(
@@ -292,107 +328,99 @@ class _ProcedureListState extends State<ProcedureList> {
     ];
   }
 
-  void onPressedEditFromTable(Id, row) {
-    Navigator.pushNamed(context, Strings.routeEditProcedure,
-        arguments: ProcedureArguments(
-            id: Id,
-            name: row['Name'],
-            performedBy: row['PerformedBy'],
-            charges: row['Charges'],
-            performerShare: row['Share']));
+  FutureOr onGoBack(dynamic value) {
+    checkTokenValidityAndGetProcedure();
   }
 
-  void onPressedDeleteFromTable(Id, row) {
-    // Widget cancelButton = TextButton(
-    //   onPressed: () {
-    //     Navigator.of(context).pop();
-    //   },
-    //   child: Text("Cancel",
-    //       style: TextStyle(
-    //           color: Shade.alertBoxButtonTextCancel,
-    //           fontWeight: FontWeight.w900)),
-    // );
-    //
-    // Widget deleteButton = TextButton(
-    //   child: Text("Delete",
-    //       style: TextStyle(
-    //           color: Shade.alertBoxButtonTextDelete,
-    //           fontWeight: FontWeight.w900)),
-    //   onPressed: ()  async{
-    //     Navigator.of(context).pop();
-    //     sfpd = SimpleFontelicoProgressDialog(
-    //         context: context, barrierDimisable: false);
-    //    await sfpd.show(
-    //         message: 'Deleting ...',
-    //         type: SimpleFontelicoProgressDialogType.hurricane,
-    //         width: MediaQuery.of(context).size.width - 20,
-    //         horizontal: true);
-    //     procedureService.DeleteProcedure(Id).then((response) async {
-    //       if (response == true) {
-    //         await sfpd.hide();
-    //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //             backgroundColor: Shade.snackGlobalSuccess,
-    //             content: Row(
-    //               children: [
-    //                 Text('Success: Deleted procedure '),
-    //                 Text(
-    //                   row['Name'],
-    //                   style: TextStyle(fontWeight: FontWeight.bold),
-    //                 ),
-    //               ],
-    //             )));
-    //         getProceduresFromApiAndLinkToTable();
-    //       } else {
-    //         await sfpd.hide();
-    //         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //             backgroundColor: Shade.snackGlobalFailed,
-    //             content: Row(
-    //               children: [
-    //                 Text('Error: Try Again: Failed to delete procedure '),
-    //                 Text(
-    //                   row['Name'],
-    //                   style: TextStyle(fontWeight: FontWeight.bold),
-    //                 ),
-    //               ],
-    //             )));
-    //       }
-    //     });
-    //   },
-    // );
-    //
-    // AlertDialog alert = AlertDialog(
-    //   title: Row(
-    //     children: [
-    //       Text(Strings.alertDialogTitleDelete),
-    //     ],
-    //   ),
-    //   content: Row(
-    //     children: [
-    //       Text(Strings.alertDialogTitleDeleteNote),
-    //       Text(
-    //         row['Name'] + ' ?',
-    //         style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
-    //       )
-    //     ],
-    //   ),
-    //   actions: [
-    //     cancelButton,
-    //     deleteButton,
-    //   ],
-    //   actionsPadding: EdgeInsets.fromLTRB(
-    //       Dimens.actionsGlobalButtonLeft,
-    //       Dimens.actionsGlobalButtonTop,
-    //       Dimens.actionsGlobalButtonRight,
-    //       Dimens.actionsGlobalButtonBottom),
-    // );
-    //
-    // showDialog(
-    //   barrierDismissible: true,
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return alert;
-    //   },
-    // );
+  void onPressedEditFromTable(id, row) {
+    ProcedureRequest procedureRequest = ProcedureRequest(
+      id: row['id'],
+      name: row['name'],
+      executantShare: row['executantShare'],
+      executant: row['executant'],
+      charges: row['charges'],
+    );
+
+    Navigator.pushNamed(
+      context,
+      Strings.routeEditProcedure,
+      arguments: procedureRequest,
+    ).then((value) => onGoBack(value));
+  }
+
+  void onPressedDeleteFromTable(id, row) {
+    Widget cancelButton = TextButton(
+      onPressed: () => Navigator.of(context).pop(),
+      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
+    );
+
+    Widget deleteButton = TextButton(
+      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      onPressed: () => onCallingDeleteProcedure(id),
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: [
+          Text(Strings.alertDialogTitleDelete),
+        ],
+      ),
+      content: Row(
+        children: [
+          Text(Strings.alertDialogTitleDeleteNote),
+          Text(
+            row['firstName'],
+            style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
+          )
+        ],
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+      actionsPadding: EdgeInsets.fromLTRB(Dimens.actionsGlobalButtonLeft, Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight, Dimens.actionsGlobalButtonBottom),
+    );
+
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future<void> onCallingDeleteProcedure(int id) async {
+    Navigator.pop(context);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        ProcedureResponse procedureResponse =
+            await procedureService.deleteProcedure(id, context.read<TokenProvider>().tokenSample.jwtToken);
+        if (procedureResponse != null) {
+          if (procedureResponse.isSuccess) {
+            checkTokenValidityAndGetProcedure();
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, procedureResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
   }
 
   void onChangedSearchedValue(value) {

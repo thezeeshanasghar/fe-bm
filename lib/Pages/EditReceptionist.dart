@@ -1,9 +1,16 @@
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/ReceptionistRequest.dart';
+import 'package:baby_doctor/Models/Responses/ReceptionistResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/ShareArguments/ReceptionistArguments.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditReceptionist extends StatefulWidget {
@@ -12,44 +19,37 @@ class EditReceptionist extends StatefulWidget {
 }
 
 class _EditReceptionistState extends State<EditReceptionist> {
-  @override
   final formKey = GlobalKey<FormState>();
-  final ReceptionistController = TextEditingController();
-  final joinDateController = TextEditingController();
-  final DOBController = TextEditingController();
-  String FirstName;
-  String LastName;
-  String CNIC;
-  String ContactNumber;
-  String EmergencyContactNumber;
-  String Email;
-  String Address;
-  String Gender;
-  int FlourNo;
-  String JoiningDate;
-  String DOB;
-  String FatherHusbandName;
-  String Password;
-  String UserName;
-  String Experience;
+  String firstName;
+  String lastName;
+  String cnic;
+  String contactNumber;
+  String emergencyContactNumber;
+  String email;
+  String address;
+  String gender;
+  int floor;
+  String joiningDate;
+  String dob;
+  String fatherHusbandName;
+  String experience;
   bool isLoading = false;
   ReceptionistService receptionistService;
-  SimpleFontelicoProgressDialog sfpd;
-  TextEditingController _firstnamecontroller;
-  TextEditingController _lastnamecontroller;
-  TextEditingController _usennamecontroller;
-  TextEditingController _cniccontroller;
-  TextEditingController _gendercontroller;
-  TextEditingController _flournocontroller;
-  TextEditingController _emailcontroller;
-  TextEditingController _passwwordcontroller;
-  TextEditingController _addresscontroller;
-  TextEditingController _contactnumbercontroller;
-  TextEditingController _emergencycontactnumbercontroller;
-  TextEditingController _fatherhusbandnamecontroller;
-  TextEditingController _dobcontroller;
-
-  ReceptionistArguments arguments;
+  TextEditingController tecFirstName;
+  TextEditingController tecLastName;
+  TextEditingController tecCnic;
+  TextEditingController tecGender;
+  TextEditingController tecFloor;
+  TextEditingController tecEmail;
+  TextEditingController tecAddress;
+  TextEditingController tecContact;
+  TextEditingController tecEmergencyContact;
+  TextEditingController tecFatherHusbandName;
+  TextEditingController tecDob;
+  TextEditingController tecJoiningDate;
+  ReceptionistRequest arguments;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
@@ -58,48 +58,22 @@ class _EditReceptionistState extends State<EditReceptionist> {
   }
 
   @override
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      arguments = ModalRoute.of(context).settings.arguments;
+      globalProgressDialog = GlobalProgressDialog(context);
+      setValuesOfReceptionist();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
 
-  void initVariablesAndClasses() {
-    _firstnamecontroller = new TextEditingController();
-    _lastnamecontroller = new TextEditingController();
-    _usennamecontroller = new TextEditingController();
-    _cniccontroller = new TextEditingController();
-    _flournocontroller = new TextEditingController();
-    _emailcontroller = new TextEditingController();
-    _passwwordcontroller = new TextEditingController();
-    _addresscontroller = new TextEditingController();
-    _contactnumbercontroller = new TextEditingController();
-    _emergencycontactnumbercontroller = new TextEditingController();
-    _fatherhusbandnamecontroller = new TextEditingController();
-    _dobcontroller = new TextEditingController();
-    receptionistService = ReceptionistService();
-  }
-
-  void setValuesOfReceptionist() {
-    setState(() {
-      _firstnamecontroller.text = arguments.firstName;
-      _lastnamecontroller.text = arguments.lastName;
-      _fatherhusbandnamecontroller.text = arguments.fatherHusbandName;
-      _usennamecontroller.text = arguments.userName;
-      joinDateController.text = arguments.joiningDate.toString().substring(0,10);
-      _cniccontroller.text = arguments.CNIC;
-
-      Gender = arguments.gender;
-
-      _flournocontroller.text = arguments.flourNo.toString();
-      _emailcontroller.text = arguments.email;
-      _passwwordcontroller.text = arguments.password;
-      _addresscontroller.text = arguments.address;
-      _contactnumbercontroller.text = arguments.contact;
-      _emergencycontactnumbercontroller.text = arguments.emergencyContact;
-
-      isLoading = false;
-    });
-  }
-
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
@@ -119,31 +93,31 @@ class _EditReceptionistState extends State<EditReceptionist> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      Dimens.globalPaddingLeft,
-                      Dimens.globalPaddingTop,
-                      Dimens.globalPaddingRight,
-                      Dimens.globalPaddingBottom),
+                  padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                   child: Form(
                     key: formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        if (!isLoading) widgetFirstName(),
-                        if (!isLoading) widgetLastName(),
-                        if (!isLoading) widgetFatherHusbandName(),
-                        if (!isLoading) widgetUserName(),
-                        if (!isLoading) widgetPassword(),
-                        if (!isLoading) widgetGender(),
-                        if (!isLoading) widgetDob(),
-                        if (!isLoading) widgetCnicNumber(),
-                        if (!isLoading) widgetContactNumber(),
-                        if (!isLoading) widgetEmail(),
-                        if (!isLoading) widgetAddress(),
-                        if (!isLoading) widgetFlourNo(),
-                        if (!isLoading) widgetJoiningDate(),
-                        if (!isLoading) widgetSubmit(),
-                        if (isLoading) widgetCircularProgress(),
+                        !isLoading
+                            ? Column(
+                                children: [
+                                  widgetFirstName(),
+                                  widgetLastName(),
+                                  widgetFatherHusbandName(),
+                                  widgetGender(),
+                                  widgetDob(),
+                                  widgetCnicNumber(),
+                                  widgetContactNumber(),
+                                  widgetEmail(),
+                                  widgetAddress(),
+                                  widgetFloor(),
+                                  widgetJoiningDate(),
+                                  widgetSubmit(),
+                                ],
+                              )
+                            : widgetCircularProgress(),
                       ],
                     ),
                   ),
@@ -156,34 +130,51 @@ class _EditReceptionistState extends State<EditReceptionist> {
     );
   }
 
-  @override
-  void didChangeDependencies() async {
+  void initVariablesAndClasses() {
+    tecFirstName = TextEditingController();
+    tecLastName = TextEditingController();
+    tecCnic = TextEditingController();
+    tecFloor = TextEditingController();
+    tecEmail = TextEditingController();
+    tecAddress = TextEditingController();
+    tecContact = TextEditingController();
+    tecEmergencyContact = TextEditingController();
+    tecJoiningDate = TextEditingController();
+    tecFatherHusbandName = TextEditingController();
+    tecDob = TextEditingController();
+    receptionistService = ReceptionistService();
+  }
+
+  void setValuesOfReceptionist() {
     setState(() {
-      isLoading = true;
+      tecFirstName.text = arguments.firstName;
+      tecLastName.text = arguments.lastName;
+      tecFatherHusbandName.text = arguments.fatherHusbandName;
+      tecJoiningDate.text = arguments.joiningDate.toString().substring(0, 10);
+      tecCnic.text = arguments.cnic;
+      gender = arguments.gender;
+      tecFloor.text = arguments.floorNo.toString();
+      tecEmail.text = arguments.email;
+      tecAddress.text = arguments.address;
+      tecContact.text = arguments.contact;
+      tecEmergencyContact.text = arguments.emergencyContact;
+      tecDob.text = arguments.dateOfBirth;
+      isLoading = false;
     });
-    arguments = ModalRoute.of(context).settings.arguments;
-    setValuesOfReceptionist();
-
-
   }
 
   Widget widgetFirstName() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            controller: _firstnamecontroller,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'First Name'),
+            controller: tecFirstName,
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'First Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -191,7 +182,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
               return null;
             },
             onSaved: (String value) {
-              FirstName = value;
+              firstName = value;
             },
           ),
         ),
@@ -203,19 +194,14 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
-              controller: _lastnamecontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Last Name'),
+              controller: tecLastName,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Last Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -223,7 +209,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                LastName = value;
+                lastName = value;
               },
             )),
       ],
@@ -234,19 +220,14 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
-              controller: _fatherhusbandnamecontroller,
+              controller: tecFatherHusbandName,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Father/Husband Name'),
+                  prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Father/Husband Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -254,69 +235,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                FatherHusbandName = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  Widget widgetUserName() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              controller: _usennamecontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.supervised_user_circle),
-                  border: OutlineInputBorder(),
-                  labelText: 'User Name'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                UserName = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  Widget widgetPassword() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              controller: _passwwordcontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline_rounded),
-                  border: OutlineInputBorder(),
-                  labelText: 'Password'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                Password = value;
+                fatherHusbandName = value;
               },
             )),
       ],
@@ -327,20 +246,15 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
                 isExpanded: true,
-                value: Gender,
+                value: gender,
                 elevation: 16,
                 underline: Container(
                   height: 0,
@@ -348,11 +262,11 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 ),
                 onChanged: (String newValue) {
                   setState(() {
-                    Gender = newValue;
+                    gender = newValue;
                   });
                 },
                 items: <String>[
-                  'Choose Gender',
+                  'Choose gender',
                   'Male',
                   'Female',
                   'Other',
@@ -374,32 +288,27 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
-            controller: _cniccontroller,
+            controller: tecCnic,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'CNIC Number'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'cnic Number'),
             validator: (String value) {
               int _cnic = int.tryParse(value);
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               } else if (_cnic == null) {
-                return 'Syntax Error: CNIC mut be in numeric form\nCorrect Syntax: 6110185363984';
+                return 'Syntax Error: cnic mut be in numeric form\nCorrect Syntax: 6110185363984';
               } else if (value.length > 13 || value.length < 13) {
-                return 'Syntax Error: A valid CNIC must have 13 digits';
+                return 'Syntax Error: A valid cnic must have 13 digits';
               }
               return null;
             },
             onSaved: (String value) {
-              CNIC = value;
+              cnic = value;
             },
           ),
         ),
@@ -411,19 +320,14 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
-              controller: _contactnumbercontroller,
+              controller: tecContact,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -438,7 +342,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                ContactNumber = value;
+                contactNumber = value;
               }),
         ),
       ],
@@ -449,23 +353,17 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
-              controller: _emailcontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
+              controller: tecEmail,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.email), border: OutlineInputBorder(), labelText: 'email'),
               validator: (String value) {
-                bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                bool emailValid =
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
                 }
@@ -475,7 +373,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                Email = value;
+                email = value;
               }),
         ),
       ],
@@ -486,19 +384,14 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
-              controller: _addresscontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.home),
-                  border: OutlineInputBorder(),
-                  labelText: 'Address'),
+              controller: tecAddress,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.home), border: OutlineInputBorder(), labelText: 'address'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -506,7 +399,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                Address = value;
+                address = value;
               }),
         ),
       ],
@@ -517,13 +410,10 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
-            controller: joinDateController,
+            controller: tecJoiningDate,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
@@ -533,9 +423,10 @@ class _EditReceptionistState extends State<EditReceptionist> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              return null;
             },
             onSaved: (String value) {
-              JoiningDate = value;
+              joiningDate = value;
             },
             onTap: () {
               pickDate1();
@@ -550,13 +441,10 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
-            controller: DOBController,
+            controller: tecDob,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
@@ -566,9 +454,10 @@ class _EditReceptionistState extends State<EditReceptionist> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              return null;
             },
             onSaved: (String value) {
-              DOB = value;
+              dob = value;
             },
             onTap: () {
               pickDate();
@@ -579,30 +468,25 @@ class _EditReceptionistState extends State<EditReceptionist> {
     );
   }
 
-  Widget widgetFlourNo() {
+  Widget widgetFloor() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
-              controller: _flournocontroller,
+              controller: tecFloor,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on),
-                  border: OutlineInputBorder(),
-                  labelText: 'Flour No'),
+                  prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'Flour No'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
                 }
                 int _cFlourNo = int.tryParse(value);
-                if (_cFlourNo == null && !value.isEmpty) {
-                  return 'Input Error: FlourNo must be in numeric form\nCorrect Syntax: 20';
+                if (_cFlourNo == null) {
+                  return 'Input Error: floor must be in numeric form\nCorrect Syntax: 20';
                 }
                 if (_cFlourNo <= 0) {
                   return 'Input Error: cannot enter negative digits\nCorrect Syntax: 20';
@@ -610,7 +494,7 @@ class _EditReceptionistState extends State<EditReceptionist> {
                 return null;
               },
               onSaved: (String value) {
-                FlourNo = int.parse(value);
+                floor = int.parse(value);
               }),
         ),
       ],
@@ -651,34 +535,29 @@ class _EditReceptionistState extends State<EditReceptionist> {
     return Column(
       children: [
         Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                      Dimens.globalInputFieldleft,
-                      Dimens.globalInputFieldTop,
-                      Dimens.globalInputFieldRight,
-                      Dimens.globalInputFieldBottom),
-                  child: ElevatedButton(
-                    autofocus: false,
-                    style: ElevatedButton.styleFrom(
-                      primary: Shade.submitButtonColor,
-                      minimumSize: Size(double.infinity, 45),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    ),
-                    child: Text(Strings.submitGlobal),
-                    onPressed: () {
-                      onPressedSubmitButton();
-                    },
-                  ),
-                ),
-              )
+          alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+            child: ElevatedButton(
+              autofocus: false,
+              style: ElevatedButton.styleFrom(
+                primary: Shade.submitButtonColor,
+                minimumSize: Size(double.infinity, 45),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              ),
+              child: Text(Strings.submitGlobal),
+              onPressed: () {
+                onPressedSubmitButton();
+              },
+            ),
+          ),
+        )
       ],
     );
   }
 
-  // functions required for working
-  pickDate() async {
+  Future<void> pickDate() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -686,13 +565,13 @@ class _EditReceptionistState extends State<EditReceptionist> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        DOB = date.toString();
-        DOBController.text = DOB.toString();
+        dob = date.toString();
+        tecDob.text = dob.toString();
       });
     }
   }
 
-  pickDate1() async {
+  Future<void> pickDate1() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -700,14 +579,61 @@ class _EditReceptionistState extends State<EditReceptionist> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        JoiningDate = date.toString();
-        joinDateController.text = JoiningDate.toString();
+        joiningDate = date.toString();
+        tecJoiningDate.text = joiningDate.toString();
       });
     }
   }
 
-  onPressedSubmitButton() async {
+  Future<void> onPressedSubmitButton() async {
+    if (!formKey.currentState.validate()) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
+      return;
+    }
+    formKey.currentState.save();
 
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogUpdating, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        ReceptionistResponse receptionistResponse = await receptionistService.updateReceptionist(
+            ReceptionistRequest(
+              id: arguments.id,
+              firstName: firstName,
+              lastName: lastName,
+              fatherHusbandName: fatherHusbandName,
+              gender: gender,
+              dateOfBirth: dob,
+              cnic: cnic,
+              contact: contactNumber,
+              emergencyContact: emergencyContactNumber,
+              email: email,
+              address: address,
+              floorNo: floor,
+              joiningDate: joiningDate,
+            ),
+            context.read<TokenProvider>().tokenSample.jwtToken);
+        if (receptionistResponse != null) {
+          if (receptionistResponse.isSuccess) {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, receptionistResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+            Navigator.pop(context);
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, receptionistResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
   }
-
 }

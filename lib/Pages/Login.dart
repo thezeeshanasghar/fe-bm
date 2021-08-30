@@ -168,7 +168,7 @@ class _LoginState extends State<Login> {
         context.read<TokenProvider>().setToken(authenticateResponse.token);
         context
             .read<LoginCredentialsProvider>()
-            .setLoginCredentials(AuthenticateLoginRequest(UserName: 'ahmed@gmail.com', Password: 'ahmed'));
+            .setLoginCredentials(AuthenticateLoginRequest(UserName: 'basit@gmail.com', Password: 'basit'));
         Navigator.pop(context);
         Navigator.pushNamed(context, Strings.routeHomePage);
       } else {

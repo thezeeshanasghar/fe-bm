@@ -1,10 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/NurseRequest.dart';
+import 'package:baby_doctor/Models/Responses/NurseResponse.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/ShareArguments/NurseArguments.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
 import 'package:baby_doctor/Service/NurseService.dart';
@@ -21,48 +28,43 @@ class EditNurse extends StatefulWidget {
 
 class _EditNurseState extends State<EditNurse> {
   final formKey = GlobalKey<FormState>();
-  final joinDateController = TextEditingController();
 
-  int id;
-  String FirstName;
-  String LastName;
-  String FatherHusbandName;
-  String Gender = 'Choose Gender';
-  String CNIC;
-  String ContactNumber;
-  String EmergencyContactNumber;
-  String Email;
-  String Address;
-  String Speciality;
-  int DutyDuration;
-  String UserName;
-  int EmergencyConsultationFee;
-  int FeeShare;
-  String Experience;
-  int ProceduresShare;
-  int Salary;
-  String JoiningDate;
-  int employeeId;
-  bool isLoading = false;
+  String firstName;
+  String lastName;
+  String fatherHusbandName;
+  String gender = 'Choose Gender';
+  String cnic;
+  String contactNumber;
+  String emergencyContactNumber;
+  String email;
+  String address;
+  int dutyDuration;
+  String experience;
+  int proceduresShare;
+  int salary;
+  String joiningDate;
+  bool isLoading = true;
   NurseService nurseService;
   List<String> qualificationList = [''];
-  NurseArguments arguments;
+  NurseRequest arguments;
   PickedFile _imageFile;
+  TextEditingController tecFirstName;
+  TextEditingController tecLastName;
+  TextEditingController tecFatherHusbandName;
+  TextEditingController tecContactNumber;
+  TextEditingController tecEmergencyContactNumber;
+  TextEditingController tecAddress;
+  TextEditingController tecEmail;
+  TextEditingController tecCnic;
+  TextEditingController tecExperience;
+  TextEditingController tecDutyDuration;
+  TextEditingController tecSalary;
+  TextEditingController tecSharePercentage;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
+  TextEditingController tecJoinDate;
+
   final ImagePicker _imagePicker = ImagePicker();
-  SimpleFontelicoProgressDialog sfpd;
-  TextEditingController _firstnamecontroller;
-  TextEditingController _lastnamecontroller;
-  TextEditingController _fatherhusbandnamecontroller;
-  TextEditingController _contacnumbercontroller;
-  TextEditingController _emergencycontactcontroller;
-  TextEditingController _addresscontroller;
-  TextEditingController _consultationfeecontroller;
-  TextEditingController _emailcontroller;
-  TextEditingController _cniccontroller;
-  TextEditingController _experiencecontroller;
-  TextEditingController _dutydurationcontroller;
-  TextEditingController _salerycontroller;
-  TextEditingController sharePercentageController;
 
   @override
   void initState() {
@@ -76,50 +78,14 @@ class _EditNurseState extends State<EditNurse> {
   }
 
   @override
-  void didChangeDependencies() async {
-    setState(() {
-      isLoading = true;
-    });
-    arguments = ModalRoute.of(context).settings.arguments;
-    setValuesOfNurse();
-  }
-
-  void initVariablesAndClasses() {
-    _firstnamecontroller = new TextEditingController();
-    _lastnamecontroller = new TextEditingController();
-    _addresscontroller = new TextEditingController();
-    _cniccontroller = new TextEditingController();
-    _emailcontroller = new TextEditingController();
-    _experiencecontroller = new TextEditingController();
-    _contacnumbercontroller = new TextEditingController();
-    _emergencycontactcontroller = new TextEditingController();
-    _fatherhusbandnamecontroller = new TextEditingController();
-    _dutydurationcontroller = new TextEditingController();
-    sharePercentageController = new TextEditingController();
-    _salerycontroller = new TextEditingController();
-    nurseService = NurseService();
-  }
-
-  void setValuesOfNurse() {
-    setState(() {
-      id = arguments.id;
-      _firstnamecontroller.text = arguments.firstName;
-      _lastnamecontroller.text = arguments.lastName;
-      _addresscontroller.text = arguments.address;
-      _cniccontroller.text = arguments.CNIC;
-      _emailcontroller.text = arguments.email;
-      _experiencecontroller.text = arguments.experience;
-      _contacnumbercontroller.text = arguments.contact;
-      _emergencycontactcontroller.text = arguments.emergencyContact;
-      _fatherhusbandnamecontroller.text = arguments.fatherHusbandName;
-       Gender=arguments.gender;
-      _dutydurationcontroller.text = arguments.DutyDuration.toString();
-      joinDateController.text = arguments.joiningDate.toString().substring(0,10);
-      sharePercentageController.text = arguments.SharePercentage.toString();
-      _dutydurationcontroller.text = arguments.DutyDuration.toString();
-      _salerycontroller.text = arguments.Salary.toString();
-      isLoading = false;
-    });
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      arguments = ModalRoute.of(context).settings.arguments;
+      globalProgressDialog = GlobalProgressDialog(context);
+      setValuesOfNurse();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -142,35 +108,34 @@ class _EditNurseState extends State<EditNurse> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
+                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                     child: Form(
                       key: formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          // widgetProfileImage(),
-                          // widgetSizedBox(),
-                          if (!isLoading) widgetFirstName(),
-                          if (!isLoading) widgetLastName(),
-                          if (!isLoading) widgetFatherOrHusbandName(),
-                          if (!isLoading) widgetGender(),
-                          if (!isLoading) widgetCnicNumber(),
-                          if (!isLoading) widgetContactNumber(),
-                          if (!isLoading) widgetEmergencyContactNumber(),
-                          if (!isLoading) widgetEmail(),
-                          if (!isLoading) widgetExperience(),
-                          if (!isLoading) widgetAddress(),
-                          if (!isLoading) widgetDuration(),
-                          if (!isLoading) widgetJoiningDate(),
-                          if (!isLoading) widgetProcedureShare(),
-                          if (!isLoading) widgetSalary(),
-                          if (!isLoading) ...widgetQualification(),
-                          if (!isLoading) widgetSubmit(),
-                          if (isLoading) widgetCircularProgress(),
+                          !isLoading
+                              ? Column(
+                            children: [
+                              widgetFirstName(),
+                              widgetLastName(),
+                              widgetFatherOrHusbandName(),
+                              widgetGender(),
+                              widgetCnicNumber(),
+                              widgetContactNumber(),
+                              widgetEmergencyContactNumber(),
+                              widgetEmail(),
+                              widgetExperience(),
+                              widgetAddress(),
+                              widgetDuration(),
+                              widgetJoiningDate(),
+                              widgetProcedureShare(),
+                              widgetSalary(),
+                              widgetSubmit(),
+                            ],
+                          )
+                              : widgetCircularProgress(),
                         ],
                       ),
                     )),
@@ -180,6 +145,44 @@ class _EditNurseState extends State<EditNurse> {
         ),
       ),
     );
+  }
+
+  void initVariablesAndClasses() {
+    tecFirstName = TextEditingController();
+    tecLastName = TextEditingController();
+    tecAddress = TextEditingController();
+    tecCnic = TextEditingController();
+    tecEmail = TextEditingController();
+    tecExperience = TextEditingController();
+    tecContactNumber = TextEditingController();
+    tecEmergencyContactNumber = TextEditingController();
+    tecFatherHusbandName = TextEditingController();
+    tecDutyDuration = TextEditingController();
+    tecSharePercentage = TextEditingController();
+    tecSalary = TextEditingController();
+    tecJoinDate = TextEditingController();
+    nurseService = NurseService();
+  }
+
+  void setValuesOfNurse() {
+    setState(() {
+      tecFirstName.text = arguments.firstName;
+      tecLastName.text = arguments.lastName;
+      tecAddress.text = arguments.address;
+      tecCnic.text = arguments.cnic;
+      tecEmail.text = arguments.email;
+      tecExperience.text = arguments.experience;
+      tecContactNumber.text = arguments.contact;
+      tecEmergencyContactNumber.text = arguments.emergencyContact;
+      tecFatherHusbandName.text = arguments.fatherHusbandName;
+      tecDutyDuration.text = arguments.dutyDuration.toString();
+      tecJoinDate.text = arguments.joiningDate.toString().substring(0, 10);
+      tecSharePercentage.text = arguments.sharePercentage.toString();
+      tecDutyDuration.text = arguments.dutyDuration.toString();
+      tecSalary.text = arguments.salary.toString();
+      gender = arguments.gender;
+      isLoading = false;
+    });
   }
 
   Widget widgetCircularProgress() {
@@ -206,8 +209,7 @@ class _EditNurseState extends State<EditNurse> {
     );
   }
 
-  // functions required for working
-  pickDate() async {
+  Future<void> pickDate() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -215,20 +217,19 @@ class _EditNurseState extends State<EditNurse> {
         lastDate: DateTime(DateTime.now().year + 1));
     if (date != null) {
       setState(() {
-        JoiningDate = date.toString();
-        joinDateController.text = JoiningDate.toString();
+        joiningDate = date.toString();
+        tecJoinDate.text = joiningDate.toString();
       });
     }
   }
 
-  void takePhotoFromPhone(ImageSource source) async {
+  Future<void> takePhotoFromPhone(ImageSource source) async {
     final pickedFile = await _imagePicker.getImage(source: source);
     setState(() {
       _imageFile = pickedFile;
     });
   }
 
-  // widget functions
   List<Widget> widgetQualification() {
     List<Widget> qualificationWidgetList = [];
 
@@ -260,10 +261,7 @@ class _EditNurseState extends State<EditNurse> {
                                     right: 10.0,
                                     child: InkWell(
                                       onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
+                                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                                       },
                                       child: Icon(
                                         Icons.camera_alt,
@@ -281,18 +279,14 @@ class _EditNurseState extends State<EditNurse> {
                         Expanded(
                           child: TextFormField(
                             autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Qualification'),
+                            decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'Qualification'),
                             validator: (String value) {
                               if (value == null || value.isEmpty) {
                                 return 'This field cannot be empty';
                               }
                               return null;
                             },
-                            onSaved: (String value) {
-
-                            },
+                            onSaved: (String value) {},
                           ),
                         ),
                         SizedBox(
@@ -343,18 +337,15 @@ class _EditNurseState extends State<EditNurse> {
             children: <Widget>[
               CircleAvatar(
                 radius: 90,
-                backgroundImage: _imageFile != null
-                    ? FileImage(File(_imageFile.path))
-                    : AssetImage('assets/doctordp.jpg'),
+                backgroundImage:
+                    _imageFile != null ? FileImage(File(_imageFile.path)) : AssetImage('assets/doctordp.jpg'),
               ),
               Positioned(
                   bottom: 30.0,
                   right: 30.0,
                   child: InkWell(
                     onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: ((builder) => bottomSheet()));
+                      showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                     },
                     child: Icon(
                       Icons.camera_alt,
@@ -373,19 +364,14 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            controller: _firstnamecontroller,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'First Name'),
+            controller: tecFirstName,
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'First Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -393,7 +379,7 @@ class _EditNurseState extends State<EditNurse> {
               return null;
             },
             onSaved: (String value) {
-              FirstName = value;
+              firstName = value;
             },
           ),
         ),
@@ -405,19 +391,14 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
-              controller: _lastnamecontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Last Name'),
+              controller: tecLastName,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Last Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -425,7 +406,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                LastName = value;
+                lastName = value;
               },
             )),
       ],
@@ -436,15 +417,12 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
-              controller: _fatherhusbandnamecontroller,
+              controller: tecFatherHusbandName,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -456,7 +434,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                FatherHusbandName = value;
+                fatherHusbandName = value;
               }),
         ),
       ],
@@ -467,20 +445,15 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
                 isExpanded: true,
-                value: Gender,
+                value: gender,
                 elevation: 16,
                 underline: Container(
                   height: 0,
@@ -488,11 +461,11 @@ class _EditNurseState extends State<EditNurse> {
                 ),
                 onChanged: (String newValue) {
                   setState(() {
-                    Gender = newValue;
+                    gender = newValue;
                   });
                 },
                 items: <String>[
-                  'Choose Gender',
+                  'Choose gender',
                   'Male',
                   'Female',
                   'Other',
@@ -514,32 +487,27 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
-            controller: _cniccontroller,
+            controller: tecCnic,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'CNIC Number'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'cnic Number'),
             validator: (String value) {
               int _cnic = int.tryParse(value);
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               } else if (_cnic == null) {
-                return 'Syntax Error: CNIC mut be in numeric form\nCorrect Syntax: 6110185363984';
+                return 'Syntax Error: cnic mut be in numeric form\nCorrect Syntax: 6110185363984';
               } else if (value.length > 13 || value.length < 13) {
-                return 'Syntax Error: A valid CNIC must have 13 digits';
+                return 'Syntax Error: A valid cnic must have 13 digits';
               }
               return null;
             },
             onSaved: (String value) {
-              CNIC = value;
+              cnic = value;
             },
           ),
         ),
@@ -551,19 +519,14 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
-              controller: _contacnumbercontroller,
+              controller: tecContactNumber,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -578,7 +541,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                ContactNumber = value;
+                contactNumber = value;
               }),
         ),
       ],
@@ -589,19 +552,14 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
-              controller: _emergencycontactcontroller,
+              controller: tecEmergencyContactNumber,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Emergency Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -616,7 +574,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                EmergencyContactNumber = value;
+                emergencyContactNumber = value;
               }),
         ),
       ],
@@ -627,23 +585,17 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
-              controller: _emailcontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
+              controller: tecEmail,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.email), border: OutlineInputBorder(), labelText: 'email'),
               validator: (String value) {
-                bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                bool emailValid =
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
                 }
@@ -653,7 +605,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                Email = value;
+                email = value;
               }),
         ),
       ],
@@ -664,19 +616,14 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
-              controller: _addresscontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.home),
-                  border: OutlineInputBorder(),
-                  labelText: 'Address'),
+              controller: tecAddress,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.home), border: OutlineInputBorder(), labelText: 'address'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -684,7 +631,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                Address = value;
+                address = value;
               }),
         ),
       ],
@@ -695,18 +642,13 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             autofocus: false,
-            controller: _experiencecontroller,
+            controller: tecExperience,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.date_range_sharp),
-                border: OutlineInputBorder(),
-                labelText: 'Experience'),
+                prefixIcon: Icon(Icons.date_range_sharp), border: OutlineInputBorder(), labelText: 'experience'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -714,7 +656,7 @@ class _EditNurseState extends State<EditNurse> {
               return null;
             },
             onSaved: (String value) {
-              Experience = value;
+              experience = value;
             },
           ),
         ),
@@ -726,19 +668,14 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 5,
-              controller: _salerycontroller,
+              controller: tecSalary,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on),
-                  border: OutlineInputBorder(),
-                  labelText: 'Salary'),
+                  prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'salary'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
@@ -753,7 +690,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                Salary = int.parse(value);
+                salary = int.parse(value);
               }),
         ),
       ],
@@ -764,15 +701,12 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
-              controller: sharePercentageController,
+              controller: tecSharePercentage,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -794,7 +728,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                ProceduresShare = int.parse(value);
+                proceduresShare = int.parse(value);
               }),
         ),
       ],
@@ -805,15 +739,12 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 2,
-              controller: _dutydurationcontroller,
+              controller: tecDutyDuration,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -835,7 +766,7 @@ class _EditNurseState extends State<EditNurse> {
                 return null;
               },
               onSaved: (String value) {
-                DutyDuration = int.parse(value);
+                dutyDuration = int.parse(value);
               }),
         ),
       ],
@@ -846,13 +777,10 @@ class _EditNurseState extends State<EditNurse> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
-            controller: joinDateController,
+            controller: tecJoinDate,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.date_range),
               border: OutlineInputBorder(),
@@ -864,7 +792,7 @@ class _EditNurseState extends State<EditNurse> {
               }
             },
             onSaved: (String value) {
-              JoiningDate = value;
+              joiningDate = value;
             },
             onTap: () {
               pickDate();
@@ -887,11 +815,8 @@ class _EditNurseState extends State<EditNurse> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -957,59 +882,57 @@ class _EditNurseState extends State<EditNurse> {
     );
   }
 
-  void onPressedSubmitButton() async {
-      List<dynamic> degrees = [];
-      if (!formKey.currentState.validate()) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Shade.snackGlobalFailed,
-            content: Text('Error: Some input fields are not filled')));
-        return;
+  Future<void> onPressedSubmitButton() async {
+    if (!formKey.currentState.validate()) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
+      return;
+    }
+    formKey.currentState.save();
+
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogUpdating, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        NurseResponse nurseResponse = await nurseService.updateNurse(
+            NurseRequest(
+              id: arguments.id,
+              firstName: firstName,
+              lastName: lastName,
+              fatherHusbandName: fatherHusbandName,
+              gender: gender,
+              cnic: cnic,
+              contact: contactNumber,
+              emergencyContact: emergencyContactNumber,
+              email: email,
+              experience: experience,
+              address: address,
+              dutyDuration: dutyDuration,
+              joiningDate: joiningDate,
+              sharePercentage: proceduresShare,
+              salary: salary,
+            ),
+            context.read<TokenProvider>().tokenSample.jwtToken);
+        if (nurseResponse != null) {
+          if (nurseResponse.isSuccess) {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, nurseResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+            Navigator.pop(context);
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, nurseResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
-      formKey.currentState.save();
-      sfpd = SimpleFontelicoProgressDialog(
-          context: context, barrierDimisable: false);
-      await sfpd.show(
-          message: 'Updating ...',
-          type: SimpleFontelicoProgressDialogType.threelines,
-          width: MediaQuery.of(context).size.width - 20,
-          horizontal: true);
-      NurseModel nurseData = NurseModel(
-          arguments.id,
-          arguments.employeeId,
-          DutyDuration,
-          ProceduresShare,
-          Salary,
-          EmployeeModelDetails(
-              arguments.employeeId,
-              'Nurse',
-              FirstName,
-              LastName,
-              FatherHusbandName,
-              Gender,
-              CNIC,
-              ContactNumber,
-              EmergencyContactNumber,
-              Email,
-              Address,
-              JoiningDate,
-              UserName,
-              'Password',
-              2,
-              Experience, []));
-      //
-      // bool hasUpdated = await nurseService.UpdateNurse(nurseData);
-      // if (hasUpdated) {
-      //   await sfpd.hide();
-      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //       backgroundColor: Shade.snackGlobalSuccess,
-      //       content: Text('Success: Updated $FirstName')));
-      //
-      //   Navigator.pushNamed(context, Strings.routeNurseList);
-      // } else {
-      //   await sfpd.hide();
-      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //       backgroundColor: Shade.snackGlobalFailed,
-      //       content: Text('Error: Failed to update $FirstName')));
-      // }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
   }
 }

@@ -1,11 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
+import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
+import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
+import 'package:baby_doctor/Models/Requests/DoctorRequest.dart';
 import 'package:baby_doctor/Models/Requests/EmployeeModel.dart';
+import 'package:baby_doctor/Models/Requests/QualificationRequest.dart';
+import 'package:baby_doctor/Models/Responses/DoctorResponse.dart';
 import 'package:baby_doctor/Models/Sample/QualificationSample.dart';
+import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
 import 'package:baby_doctor/ShareArguments/DoctorArguments.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
@@ -13,6 +20,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class EditDoctor extends StatefulWidget {
@@ -45,49 +53,53 @@ class _EditDoctorState extends State<EditDoctor> {
   String Password = "222222";
   String UserName;
   DoctorService doctorService;
-  bool isLoading = false;
-  TextEditingController _firstnamecontroller;
-  TextEditingController _lastnamecontroller;
-  TextEditingController _fatherhusbandnamecontroller;
-  TextEditingController _contactnumbercontroller;
-  TextEditingController _emergencycontactcontroller;
-  TextEditingController _addresscontroller;
-  TextEditingController _consultationfeecontroller;
-  TextEditingController _emailcontroller;
-  TextEditingController _cniccontroller;
-  TextEditingController _experiencecontroller;
-  TextEditingController _emergencyconsultationfeecontroller;
-  TextEditingController _feesharecontroller;
-  DoctorArguments arguments;
-  SimpleFontelicoProgressDialog sfpd;
+  bool isLoading = true;
+  TextEditingController tecFirstName;
+  TextEditingController tecLastName;
+  TextEditingController tecFatherHusbandName;
+  TextEditingController tecContact;
+  TextEditingController tecEmergencyContact;
+  TextEditingController tecAddress;
+  TextEditingController tecFee;
+  TextEditingController tecEmail;
+  TextEditingController tecCnic;
+  TextEditingController tecExperience;
+  TextEditingController tecEmergencyFee;
+  TextEditingController tecFeeShare;
+  DoctorRequest arguments;
 
-  List<QualificationSample> qualificationList = [
-    new QualificationSample(
-        userId: 0, certificate: "", description: "", qualificationType: "")
+  List<QualificationRequest> qualificationRequestList = [
+    QualificationRequest(
+      Description: "",
+      QualificationType: "",
+      Certificate: '',
+    )
   ];
   List<QualificationSample> diplomaList = [
-    new QualificationSample(
-        userId: 0, certificate: "", description: "", qualificationType: "")
+    new QualificationSample(userId: 0, certificate: "", description: "", qualificationType: "")
   ];
 
   PickedFile _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
   Image image;
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-   }
+  }
 
   @override
-  void didChangeDependencies() async {
-    setState(() {
-      isLoading = true;
-    });
-    arguments = ModalRoute.of(context).settings.arguments;
-
-    setValuesOfDoctor();
+  void didChangeDependencies() {
+    if (!hasChangeDependencies) {
+      arguments = ModalRoute.of(context).settings.arguments;
+      globalProgressDialog = GlobalProgressDialog(context);
+      setValuesOfDoctor();
+      hasChangeDependencies = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -95,47 +107,8 @@ class _EditDoctorState extends State<EditDoctor> {
     super.dispose();
   }
 
-  void initVariablesAndClasses() {
-    _firstnamecontroller = new TextEditingController();
-    _lastnamecontroller = new TextEditingController();
-    _addresscontroller = new TextEditingController();
-    _cniccontroller = new TextEditingController();
-    _emailcontroller = new TextEditingController();
-    _experiencecontroller = new TextEditingController();
-    _addresscontroller = new TextEditingController();
-    _contactnumbercontroller = new TextEditingController();
-    _emergencycontactcontroller = new TextEditingController();
-    _fatherhusbandnamecontroller = new TextEditingController();
-    _emergencyconsultationfeecontroller = new TextEditingController();
-    _consultationfeecontroller = new TextEditingController();
-    _feesharecontroller = new TextEditingController();
-    doctorService = DoctorService();
-  }
-
-  void setValuesOfDoctor() {
-    setState(() {
-       _firstnamecontroller.text = arguments.firstName;
-       _lastnamecontroller.text = arguments.lastName;
-       _fatherhusbandnamecontroller.text = arguments.fatherHusbandName;
-       Gender=arguments.gender;
-       _cniccontroller.text = arguments.CNIC;
-       _contactnumbercontroller.text = arguments.contact;
-       _emergencycontactcontroller.text = arguments.emergencyContact;
-        _emailcontroller.text = arguments.email;
-       _addresscontroller.text = arguments.address;
-       _experiencecontroller.text = arguments.experience;
-        joinDateController.text = arguments.joiningDate.toString().substring(0,10);
-       _emergencyconsultationfeecontroller.text = arguments.EmergencyConsultationFee.toString();
-      _consultationfeecontroller.text = arguments.ConsultationFee.toString();
-      _feesharecontroller.text = arguments.ShareInFee.toString();
-      Speciality=arguments.SpecialityType;
-      isLoading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    doctorService = DoctorService();
     return Scaffold(
       backgroundColor: Shade.globalBackgroundColor,
       appBar: AppBar(
@@ -154,39 +127,38 @@ class _EditDoctorState extends State<EditDoctor> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
+                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
                     child: Form(
                       key: formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          // widgetProfileImage(),
-                          // widgetSizedBox(),
-                          if (!isLoading) widgetFirstName(),
-                          if (!isLoading) widgetLastName(),
-                          if (!isLoading) widgetFatherOrHusbandName(),
-                          if (!isLoading) widgetGender(),
-                          if (!isLoading) widgetCnicNumber(),
-                          if (!isLoading) widgetContactNumber(),
-                          if (!isLoading) widgetEmergencyContactNumber(),
-                          if (!isLoading) widgetEmail(),
-                          if (!isLoading) widgetAddress(),
-                          if (!isLoading) widgetSpeciality(),
-                          if (!isLoading) widgetExperience(),
-                          if (!isLoading) widgetConsultationFee(),
-                          if (!isLoading) widgetEmergencyConsultationFee(),
-                          if (!isLoading) widgetFeeShare(),
-                          if (!isLoading) widgetJoiningDate(),
-                          if (!isLoading) widgetSizedBox(),
-                          if (!isLoading) ...widgetQualification(),
-                          if (!isLoading) widgetSizedBox(),
-                          if (!isLoading) ...widgetDiplomas(),
-                          if (!isLoading) widgetSubmit(),
-                          if (isLoading) widgetCircularProgress(),
+                          !isLoading
+                              ? Column(
+                                  children: [
+                                    widgetFirstName(),
+                                    widgetLastName(),
+                                    widgetFatherOrHusbandName(),
+                                    widgetGender(),
+                                    widgetCnicNumber(),
+                                    widgetContactNumber(),
+                                    widgetEmergencyContactNumber(),
+                                    widgetEmail(),
+                                    widgetAddress(),
+                                    widgetSpeciality(),
+                                    widgetExperience(),
+                                    widgetConsultationFee(),
+                                    widgetEmergencyConsultationFee(),
+                                    widgetFeeShare(),
+                                    widgetJoiningDate(),
+                                    widgetSizedBox(),
+                                    // ...widgetQualification(),
+                                    widgetSizedBox(),
+                                    widgetSubmit(),
+                                  ],
+                                )
+                              : widgetCircularProgress(),
                         ],
                       ),
                     )),
@@ -196,6 +168,50 @@ class _EditDoctorState extends State<EditDoctor> {
         ),
       ),
     );
+  }
+
+  void initVariablesAndClasses() {
+    tecFirstName = new TextEditingController();
+    tecLastName = new TextEditingController();
+    tecAddress = new TextEditingController();
+    tecCnic = new TextEditingController();
+    tecEmail = new TextEditingController();
+    tecExperience = new TextEditingController();
+    tecAddress = new TextEditingController();
+    tecContact = new TextEditingController();
+    tecEmergencyContact = new TextEditingController();
+    tecFatherHusbandName = new TextEditingController();
+    tecEmergencyFee = new TextEditingController();
+    tecFee = new TextEditingController();
+    tecFeeShare = new TextEditingController();
+    doctorService = DoctorService();
+  }
+
+  void setValuesOfDoctor() {
+    setState(() {
+      tecFirstName.text = arguments.firstName;
+      tecLastName.text = arguments.lastName;
+      tecFatherHusbandName.text = arguments.fatherHusbandName;
+      Gender = arguments.gender;
+      tecCnic.text = arguments.cnic;
+      tecContact.text = arguments.contact;
+      tecEmergencyContact.text = arguments.emergencyContact;
+      tecEmail.text = arguments.email;
+      tecAddress.text = arguments.address;
+      tecExperience.text = arguments.experience;
+      joinDateController.text = arguments.joiningDate.toString().substring(0, 10);
+      tecEmergencyFee.text = arguments.emergencyConsultationFee.toString();
+      tecFee.text = arguments.consultationFee.toString();
+      tecFeeShare.text = arguments.shareInFee.toString();
+      Speciality = arguments.specialityType;
+      if (arguments.qualificationList != null) {
+        if (arguments.qualificationList.length > 0) {
+          qualificationRequestList.clear();
+          qualificationRequestList = arguments.qualificationList;
+        }
+      }
+      isLoading = false;
+    });
   }
 
   Widget widgetCircularProgress() {
@@ -222,76 +238,12 @@ class _EditDoctorState extends State<EditDoctor> {
     );
   }
 
-  Widget widgetUserName() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.supervised_user_circle),
-                  border: OutlineInputBorder(),
-                  labelText: 'User Name'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                UserName = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  Widget widgetPassword() {
-    return Column(
-      children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
-            child: TextFormField(
-              autofocus: false,
-              maxLength: 15,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline_rounded),
-                  border: OutlineInputBorder(),
-                  labelText: 'Password'),
-              validator: (String value) {
-                if (value == null || value.isEmpty) {
-                  return 'This field cannot be empty';
-                }
-                return null;
-              },
-              onSaved: (String value) {
-                Password = value;
-              },
-            )),
-      ],
-    );
-  }
-
-  // widget functions
   Widget widgetDob() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             controller: DOBController,
             decoration: InputDecoration(
@@ -303,6 +255,7 @@ class _EditDoctorState extends State<EditDoctor> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              return null;
             },
             onSaved: (String value) {
               DOB = value;
@@ -316,24 +269,10 @@ class _EditDoctorState extends State<EditDoctor> {
     );
   }
 
-  pickDateDob() async {
-    DateTime date = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime(DateTime.now().year + 1));
-    if (date != null) {
-      setState(() {
-        DOB = date.toString();
-        DOBController.text = DOB.toString();
-      });
-    }
-  }
-
   List<Widget> widgetQualification() {
     List<Widget> qualificationWidgetList = [];
 
-    for (int i = 0; i < qualificationList.length; i++) {
+    for (int i = 0; i < qualificationRequestList.length; i++) {
       qualificationWidgetList.add(Column(
         children: [
           Card(
@@ -361,10 +300,7 @@ class _EditDoctorState extends State<EditDoctor> {
                                     right: 10.0,
                                     child: InkWell(
                                       onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
+                                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                                       },
                                       child: Icon(
                                         Icons.camera_alt,
@@ -382,9 +318,9 @@ class _EditDoctorState extends State<EditDoctor> {
                         Expanded(
                           child: TextFormField(
                             autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Qualification'),
+                            initialValue:
+                                qualificationRequestList[i] == null ? '' : qualificationRequestList[i].Description,
+                            decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'Qualification'),
                             validator: (String value) {
                               if (value == null || value.isEmpty) {
                                 return 'This field cannot be empty';
@@ -393,10 +329,12 @@ class _EditDoctorState extends State<EditDoctor> {
                             },
                             onSaved: (String value) {
                               setState(() {
-                                qualificationList[i] = new QualificationSample(
-                                    certificate: "",
-                                    description: value,
-                                    qualificationType: "Qualification");
+                                qualificationRequestList[i] = QualificationRequest(
+                                    Id: qualificationRequestList[i].Id,
+                                    UserId: qualificationRequestList[i].UserId,
+                                    Certificate: "",
+                                    Description: value,
+                                    QualificationType: "Qualification");
                               });
                             },
                           ),
@@ -404,8 +342,7 @@ class _EditDoctorState extends State<EditDoctor> {
                         SizedBox(
                           width: 10,
                         ),
-                        _addRemoveButton(i == qualificationList.length - 1, i,
-                            qualificationList)
+                        _addRemoveButton(i == qualificationRequestList.length - 1, i, qualificationRequestList)
                       ],
                     ),
                   ],
@@ -417,11 +354,12 @@ class _EditDoctorState extends State<EditDoctor> {
     return qualificationWidgetList;
   }
 
-  Widget _addRemoveButton(bool add, int index, List<QualificationSample> list) {
+  Widget _addRemoveButton(bool add, int index, List<QualificationRequest> list) {
+    print(index);
     return InkWell(
       onTap: () {
         if (add) {
-          list.insert(0, null);
+          qualificationRequestList.add(null);
         } else {
           list.removeAt(index);
         }
@@ -442,106 +380,17 @@ class _EditDoctorState extends State<EditDoctor> {
     );
   }
 
-  List<Widget> widgetDiplomas() {
-    List<Widget> diplomaWidgetList = [];
-
-    for (int i = 0; i < diplomaList.length; i++) {
-      diplomaWidgetList.add(Column(
-        children: [
-          Card(
-            color: Colors.grey[100],
-            shadowColor: Colors.grey,
-            child: Padding(
-                padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Column(
-                          children: [
-                            Stack(
-                              children: <Widget>[
-                                CircleAvatar(
-                                  radius: 50,
-                                  backgroundImage: _imageFile != null
-                                      ? FileImage(File(_imageFile.path))
-                                      : AssetImage('assets/diplomas.png'),
-                                ),
-                                Positioned(
-                                    bottom: 10.0,
-                                    right: 10.0,
-                                    child: InkWell(
-                                      onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            builder: ((builder) =>
-                                                bottomSheet()));
-                                      },
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.teal,
-                                        size: 22,
-                                      ),
-                                    ))
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            autofocus: false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Diplomas'),
-                            validator: (String value) {
-                              if (value == null || value.isEmpty) {
-                                return 'This field cannot be empty';
-                              }
-                              return null;
-                            },
-                            onSaved: (String value) {
-                              setState(() {
-                                // diplomaList[i]=value;
-                              });
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        _addRemoveButton(
-                            i == diplomaList.length - 1, i, diplomaList)
-                      ],
-                    ),
-                  ],
-                )),
-          ),
-        ],
-      ));
-    }
-    return diplomaWidgetList;
-  }
-
   Widget widgetExperience() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: TextFormField(
             autofocus: false,
-            controller: _experiencecontroller,
+            controller: tecExperience,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.date_range_sharp),
-                border: OutlineInputBorder(),
-                labelText: 'Experience'),
+                prefixIcon: Icon(Icons.date_range_sharp), border: OutlineInputBorder(), labelText: 'Experience'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -565,18 +414,15 @@ class _EditDoctorState extends State<EditDoctor> {
             children: <Widget>[
               CircleAvatar(
                 radius: 90,
-                backgroundImage: _imageFile != null
-                    ? FileImage(File(_imageFile.path))
-                    : AssetImage('assets/doctordp.jpg'),
+                backgroundImage:
+                    _imageFile != null ? FileImage(File(_imageFile.path)) : AssetImage('assets/doctordp.jpg'),
               ),
               Positioned(
                   bottom: 30.0,
                   right: 30.0,
                   child: InkWell(
                     onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: ((builder) => bottomSheet()));
+                      showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
                     },
                     child: Icon(
                       Icons.camera_alt,
@@ -595,15 +441,10 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
@@ -642,19 +483,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
-            controller: _firstnamecontroller,
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-                labelText: 'First Name'),
+            controller: tecFirstName,
+            decoration:
+                InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'First Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -674,19 +510,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: TextFormField(
               autofocus: false,
               maxLength: 15,
-              controller: _lastnamecontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
-                  labelText: 'Last Name'),
+              controller: tecLastName,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Last Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -705,15 +536,12 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 30,
-              controller: _fatherhusbandnamecontroller,
+              controller: tecFatherHusbandName,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
@@ -736,19 +564,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
-            controller: _cniccontroller,
+            controller: tecCnic,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.credit_card),
-                border: OutlineInputBorder(),
-                labelText: 'CNIC Number'),
+                prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'CNIC Number'),
             validator: (String value) {
               int _cnic = int.tryParse(value);
               if (value == null || value.isEmpty) {
@@ -773,19 +596,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
-              controller: _contactnumbercontroller,
+              controller: tecContact,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -811,19 +629,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
-              controller: _emergencycontactcontroller,
+              controller: tecEmergencyContact,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone),
-                  border: OutlineInputBorder(),
-                  labelText: 'Emergency Contact Number'),
+                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -849,23 +662,17 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 40,
-              controller: _emailcontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                  labelText: 'Email'),
+              controller: tecEmail,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.email), border: OutlineInputBorder(), labelText: 'Email'),
               validator: (String value) {
-                bool emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                bool emailValid =
+                    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
                 }
@@ -886,19 +693,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               maxLength: 50,
               autofocus: false,
-              controller: _addresscontroller,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.home),
-                  border: OutlineInputBorder(),
-                  labelText: 'Address'),
+              controller: tecAddress,
+              decoration:
+                  InputDecoration(prefixIcon: Icon(Icons.home), border: OutlineInputBorder(), labelText: 'Address'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -918,15 +720,10 @@ class _EditDoctorState extends State<EditDoctor> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottomWithoutMaxLength),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.grey)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.grey)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: DropdownButton<String>(
@@ -965,19 +762,14 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
-              controller: _consultationfeecontroller,
+              controller: tecFee,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on),
-                  border: OutlineInputBorder(),
-                  labelText: 'Consultation Fee'),
+                  prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'Consultation Fee'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
@@ -1003,15 +795,12 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 4,
-              controller: _emergencyconsultationfeecontroller,
+              controller: tecEmergencyFee,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -1041,15 +830,12 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
-              controller: _feesharecontroller,
+              controller: tecFeeShare,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.monetization_on),
                   border: OutlineInputBorder(),
@@ -1082,11 +868,8 @@ class _EditDoctorState extends State<EditDoctor> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-              Dimens.globalInputFieldleft,
-              Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight,
-              Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
           child: TextFormField(
             controller: joinDateController,
             decoration: InputDecoration(
@@ -1098,6 +881,7 @@ class _EditDoctorState extends State<EditDoctor> {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
               }
+              return null;
             },
             onSaved: (String value) {
               JoiningDate = value;
@@ -1123,11 +907,8 @@ class _EditDoctorState extends State<EditDoctor> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-                Dimens.globalInputFieldleft,
-                Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight,
-                Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -1136,9 +917,7 @@ class _EditDoctorState extends State<EditDoctor> {
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               ),
               child: Text('Submit'),
-              onPressed: () {
-                onPressedSubmitButton();
-              },
+              onPressed: () => onPressedSubmitButton(),
             ),
           ),
         ),
@@ -1195,8 +974,7 @@ class _EditDoctorState extends State<EditDoctor> {
     );
   }
 
-  // functions required for working
-  pickDate() async {
+  Future<void> pickDate() async {
     DateTime date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -1210,6 +988,20 @@ class _EditDoctorState extends State<EditDoctor> {
     }
   }
 
+  Future<void> pickDateDob() async {
+    DateTime date = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 1));
+    if (date != null) {
+      setState(() {
+        DOB = date.toString();
+        DOBController.text = DOB.toString();
+      });
+    }
+  }
+
   void takePhotoFromPhone(ImageSource source) async {
     final pickedFile = await _imagePicker.getImage(source: source);
     setState(() {
@@ -1217,59 +1009,58 @@ class _EditDoctorState extends State<EditDoctor> {
     });
   }
 
-  void onPressedSubmitButton() async {
-    List<dynamic> degrees = [];
+  Future<void> onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Shade.snackGlobalFailed,
-          content: Text('Error: Some input fields are not filled')));
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
     formKey.currentState.save();
-    sfpd = SimpleFontelicoProgressDialog(
-        context: context, barrierDimisable: false);
-    await sfpd.show(
-        message: 'Updating ...',
-        type: SimpleFontelicoProgressDialogType.threelines,
-        width: MediaQuery.of(context).size.width - 20,
-        horizontal: true);
-    DoctorModel doctorModel = DoctorModel(
-        arguments.id,
-        arguments.employeeId,
-        ConsultationFee,
-        EmergencyConsultationFee,
-        FeeShare,
-        Speciality,
-        EmployeeModelDetails(
-            arguments.employeeId,
-            'Doctor',
-            FirstName,
-            LastName,
-            FatherHusbandName,
-            Gender,
-            CNIC,
-            ContactNumber,
-            EmergencyContactNumber,
-            Email,
-            Address,
-            JoiningDate,
-            UserName,
-            'Password',
-            2,
-            Experience, []));
 
-    // bool hasUpdated = await doctorService.UpdateDoctor(doctorModel);
-    // if (hasUpdated) {
-    //   await sfpd.hide();
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Shade.snackGlobalSuccess,
-    //       content: Text('Success: Updated $FirstName')));
-    //   Navigator.pushNamed(context, Strings.routeDoctorList);
-    // } else {
-    //   await sfpd.hide();
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //       backgroundColor: Shade.snackGlobalFailed,
-    //       content: Text('Error: Failed to update $FirstName')));
-    // }
+    globalProgressDialog.showSimpleFontellicoProgressDialog(
+        false, Strings.dialogUpdating, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        DoctorResponse doctorResponse = await doctorService.updateDoctor(
+            DoctorRequest(
+              id: arguments.id,
+              firstName: FirstName,
+              lastName: LastName,
+              fatherHusbandName: FatherHusbandName,
+              gender: Gender,
+              cnic: CNIC,
+              contact: ContactNumber,
+              emergencyContact: EmergencyContactNumber,
+              email: Email,
+              address: Address,
+              specialityType: Speciality,
+              experience: Experience,
+              consultationFee: ConsultationFee,
+              emergencyConsultationFee: EmergencyConsultationFee,
+              shareInFee: FeeShare,
+              joiningDate: JoiningDate,
+            ),
+            context.read<TokenProvider>().tokenSample.jwtToken);
+        if (doctorResponse != null) {
+          if (doctorResponse.isSuccess) {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, doctorResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+            Navigator.pop(context);
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
   }
 }
