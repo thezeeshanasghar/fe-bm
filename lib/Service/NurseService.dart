@@ -22,7 +22,7 @@ class NurseService {
 
   Future<NurseResponse> getNurseById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiNurseGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiNurseGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

@@ -22,7 +22,7 @@ class ExpenseService {
 
   Future<ExpenseResponse> getExpenseById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiExpenseGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiExpenseGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

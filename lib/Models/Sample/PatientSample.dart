@@ -3,9 +3,8 @@ import 'package:baby_doctor/Models/Sample/UserSample.dart';
 
 class PatientSample {
   final int id;
-  final String userId;
+  final int userId;
 
-  final String category;
   final String birthPlace;
   final String type;
   final String externalId;
@@ -23,7 +22,6 @@ class PatientSample {
   PatientSample(
       {this.id,
       this.userId,
-      this.category,
       this.birthPlace,
       this.type,
       this.externalId,
@@ -38,14 +36,15 @@ class PatientSample {
       this.user});
 
   factory PatientSample.fromJson(Map<String, dynamic> json) {
-    var list = json['appointments'] as List;
-    List<AppointmentSample> dataList =
-        list.map((i) => AppointmentSample.fromJson(i)).toList();
+    List<AppointmentSample> dataList;
+    if (json['appointments'] != null) {
+      var list = json['appointments'] as List;
+      dataList = list.map((i) => AppointmentSample.fromJson(i)).toList();
+    }
 
     return PatientSample(
       id: json['id'],
       userId: json['userId'],
-      category: json['category'],
       birthPlace: json['birthPlace'],
       type: json['type'],
       externalId: json['externalId'],
@@ -57,7 +56,7 @@ class PatientSample {
       paymentProfile: json['paymentProfile'],
       description: json['description'],
       appointments: dataList,
-      user: json['user'],
+      user: json['user'] != null ? UserSample.fromJson(json['user']) : null,
     );
   }
 }

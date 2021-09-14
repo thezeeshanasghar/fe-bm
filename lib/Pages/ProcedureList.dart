@@ -176,6 +176,7 @@ class _ProcedureListState extends State<ProcedureList> {
         "name": procedureSample.name,
         "executant": procedureSample.executant,
         "charges": procedureSample.charges,
+        "consent": procedureSample.consent,
         "executantShare": procedureSample.executantShare,
         "Action": procedureSample.id,
       });
@@ -226,6 +227,23 @@ class _ProcedureListState extends State<ProcedureList> {
               child: Center(
                 child: Text(
                   "Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "consent",
+          show: true,
+          flex: 2,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Consent",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -335,6 +353,7 @@ class _ProcedureListState extends State<ProcedureList> {
       name: row['name'],
       executantShare: row['executantShare'],
       executant: row['executant'],
+      consent: row['consent'],
       charges: row['charges'],
     );
 
@@ -366,7 +385,7 @@ class _ProcedureListState extends State<ProcedureList> {
         children: [
           Text(Strings.alertDialogTitleDeleteNote),
           Text(
-            row['firstName'],
+            row['Name'],
             style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
           )
         ],

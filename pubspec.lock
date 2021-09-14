@@ -14,7 +14,7 @@ packages:
       name: basic_utils
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.4.0"
+    version: "3.5.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -63,7 +63,7 @@ packages:
       name: cross_file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.1+4"
+    version: "0.3.1+5"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -138,7 +138,7 @@ packages:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -197,7 +197,7 @@ packages:
       name: image_picker_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.0"
+    version: "2.4.1"
   intl:
     dependency: transitive
     description:
@@ -274,7 +274,7 @@ packages:
       name: pointycastle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.3.1"
+    version: "3.3.4"
   provider:
     dependency: "direct main"
     description:
@@ -309,7 +309,7 @@ packages:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.27.1"
+    version: "0.27.2"
   shifting_tabbar:
     dependency: "direct main"
     description:

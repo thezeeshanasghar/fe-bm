@@ -11,6 +11,7 @@ import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
+import 'package:flutter/services.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 import 'package:provider/provider.dart';
 
@@ -101,11 +102,11 @@ class _AddReceptionistState extends State<AddReceptionist> {
                           widgetFatherHusbandName(),
                           widgetGender(),
                           widgetDob(),
+                          widgetAddress(),
                           widgetCnicNumber(),
                           widgetContactNumber(),
                           widgetEmergencyContactNumber(),
                           widgetEmail(),
-                          widgetAddress(),
                           widgetFloorNo(),
                           widgetJoiningDate(),
                           widgetSubmit(),
@@ -129,8 +130,9 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               autofocus: false,
               maxLength: 11,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
+                  prefixIcon: Icon(Icons.quick_contacts_dialer ), border: OutlineInputBorder(), labelText: 'Emergency Contact Number'),
               validator: (String value) {
                 int _number = int.tryParse(value);
                 if (value == null || value.isEmpty) {
@@ -213,7 +215,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
               autofocus: false,
               maxLength: 15,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Father/Husband Name'),
+                  prefixIcon: Icon(Icons.person_pin_rounded ), border: OutlineInputBorder(), labelText: 'Father/Husband Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -333,6 +335,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
             maxLength: 13,
             autofocus: false,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: InputDecoration(
                 prefixIcon: Icon(Icons.credit_card), border: OutlineInputBorder(), labelText: 'CNIC Number'),
             validator: (String value) {
@@ -364,6 +367,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               maxLength: 11,
               autofocus: false,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.phone), border: OutlineInputBorder(), labelText: 'Contact Number'),
               validator: (String value) {
@@ -427,7 +431,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
               maxLength: 50,
               autofocus: false,
               decoration:
-                  InputDecoration(prefixIcon: Icon(Icons.home), border: OutlineInputBorder(), labelText: 'Address'),
+                  InputDecoration(prefixIcon: Icon(Icons.home_work_sharp), border: OutlineInputBorder(), labelText: 'Address'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -513,8 +517,9 @@ class _AddReceptionistState extends State<AddReceptionist> {
           child: TextFormField(
               autofocus: false,
               maxLength: 3,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'Flour No'),
+                  prefixIcon: Icon(Icons.home_work_outlined), border: OutlineInputBorder(), labelText: 'Floor No'),
               validator: (String value) {
                 if (value.isEmpty) {
                   return 'This field cannot be empty';
@@ -576,7 +581,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
     if (date != null) {
       setState(() {
         DOB = date.toString();
-        DOBController.text = DOB.toString();
+        DOBController.text = DOB.toString().substring(0,10);
       });
     }
   }
@@ -590,7 +595,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
     if (date != null) {
       setState(() {
         JoiningDate = date.toString();
-        joinDateController.text = JoiningDate.toString();
+        joinDateController.text = JoiningDate.toString().substring(0,10);
       });
     }
   }

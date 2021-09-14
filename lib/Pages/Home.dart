@@ -96,7 +96,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 title: Text(Strings.titleAddDoctor),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, Strings.routeAddDoctor, arguments: args);
+                  Navigator.pushNamed(context, Strings.routeAddDoctor,
+                      arguments: args);
                 },
               ),
               ListTile(
@@ -151,6 +152,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, Strings.routePatientList);
+                  }), ListTile(
+                  leading: Icon(Icons.list_alt),
+                  title: Text(Strings.titleAppointmentList),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, Strings.routeAppointmentList);
                   }),
               ListTile(
                   leading: Icon(Icons.logout),
@@ -167,14 +174,19 @@ class _HomeDrawerState extends State<HomeDrawer> {
           body: DefaultTextStyle(
             style: Theme.of(context).textTheme.bodyText2,
             child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints viewportConstraints) {
+              builder:
+                  (BuildContext context, BoxConstraints viewportConstraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                        minHeight: viewportConstraints.minHeight, minWidth: viewportConstraints.minWidth),
+                        minHeight: viewportConstraints.minHeight,
+                        minWidth: viewportConstraints.minWidth),
                     child: Padding(
-                        padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                            Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                        padding: EdgeInsets.fromLTRB(
+                            Dimens.globalPaddingLeft,
+                            Dimens.globalPaddingTop,
+                            Dimens.globalPaddingRight,
+                            Dimens.globalPaddingBottom),
                         child: Form(
                           key: formKey,
                           child: Column(
@@ -186,6 +198,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               widgetRowHeaderTwo(),
                               widgetRowThree(),
                               widgetRowFour(),
+                              widgetRowSix(),
+                              widgetRowFive(),
                             ],
                           ),
                         )),
@@ -304,7 +318,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        widgetPatientListCard(),
+        widgetInvoiceListCard(),
         widgetDoctorListCard(),
         widgetNurseListCard(),
       ],
@@ -319,6 +333,18 @@ class _HomeDrawerState extends State<HomeDrawer> {
         widgetReceptionistListCard(),
         widgetProcedureListCard(),
         widgetServiceListCard(),
+      ],
+    );
+  }
+
+  Widget widgetRowSix() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.ltr,
+      children: [
+        widgetPatientListCard(),
+        widgetDummySpaceCard(),
+        widgetDummySpaceCard(),
       ],
     );
   }
@@ -358,7 +384,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -395,7 +424,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -432,7 +464,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -469,7 +504,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -506,7 +544,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -543,7 +584,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -580,7 +624,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -604,17 +651,20 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   Future<void> getServices() async {
     Service service = Service();
-    ServiceResponseList serviceResponseList =
-        await service.getServices(context.read<TokenProvider>().tokenSample.jwtToken);
+    ServiceResponseList serviceResponseList = await service
+        .getServices(context.read<TokenProvider>().tokenSample.jwtToken);
     if (serviceResponseList != null) {
       if (serviceResponseList.isSuccess) {
         // successful so move to next screen
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, serviceResponseList.message, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalSuccess, serviceResponseList.message, context);
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, serviceResponseList.message, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, serviceResponseList.message, context);
       }
     } else {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, Strings.errorNull, context);
     }
   }
 
@@ -633,7 +683,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.add_circle_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -670,7 +723,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.add_circle_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -707,7 +763,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.add_circle_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -744,7 +803,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.add_circle_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -779,7 +841,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.add_circle_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -816,7 +881,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.add_circle_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.add_circle_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -853,7 +921,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -890,7 +961,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.king_bed), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.king_bed), fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -927,7 +1000,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -953,8 +1029,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
     return Expanded(
       child: InkWell(
         onTap: () {
-          // Navigator.pushNamed(context, Strings.routePatientList);
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
+          Navigator.pushNamed(context, Strings.routePatientList);
+          //GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
         },
         child: Card(
           child: Column(
@@ -965,7 +1041,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: Container(child: FittedBox(child: Icon(Icons.list_alt_outlined), fit: BoxFit.fill)),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -975,6 +1054,47 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   children: [
                     Text(
                       Strings.titlePatientList,
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetInvoiceListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeAppointmentList);
+          //GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleAppointmentList,
                       style: TextStyle(fontWeight: Shade.fwHomeRowItems),
                     ),
                   ],

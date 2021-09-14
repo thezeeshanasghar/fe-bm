@@ -22,7 +22,7 @@ class DoctorService {
 
   Future<DoctorResponse> getDoctorById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiDoctorGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiDoctorGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

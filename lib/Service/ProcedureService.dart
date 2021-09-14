@@ -22,7 +22,7 @@ class ProcedureService {
 
   Future<ProcedureResponse> getProcedureById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiProcedureGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiProcedureGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

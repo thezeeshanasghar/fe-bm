@@ -22,7 +22,7 @@ class Service {
 
   Future<ServiceResponse> getServicesById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiServiceGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiServiceGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

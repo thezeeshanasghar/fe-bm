@@ -22,7 +22,7 @@ class InvoiceService {
 
   Future<InvoiceResponse> getInvoiceById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiInvoiceGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiInvoiceGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

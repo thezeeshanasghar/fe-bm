@@ -14,6 +14,7 @@ class Strings {
   static const String titleRoomList = 'Room List';
   static const String titleServiceList = 'Service List';
   static const String titlePatientList = 'Patient List';
+  static const String titleAppointmentList = 'Appointment List';
   static const String titleLogout = 'Log out';
   static const String titleEditProcedure = 'Edit Procedure';
   static const String titleEditService = 'Edit Service';
@@ -38,7 +39,11 @@ class Strings {
   static const String routeReceptionistList = '/ReceptionistList';
   static const String routeRoomList = '/RoomList';
   static const String routeServiceList = '/ServiceList';
+  static const String routeWalkInPatientList = '/WalkInList';
   static const String routePatientList = '/PatientList';
+  static const String routeAppointmentList = '/AppointmentList';
+  static const String routeOnlinePatientList = '/OnlineList';
+  static const String routeAdmittedPatientList = '/AdmittedList';
   static const String routeEditProcedure = '/EditProcedure';
   static const String routeEditService = '/EditService';
   static const String routeEditRoom = '/EditRoom';
@@ -58,46 +63,56 @@ class Strings {
   static const String apiAuthenticationRefresh = 'api/authentication/refresh';
 
   static const String apiServiceGet = 'api/service/get';
+  static const String apiServiceGetId = 'api/service/get/id';
   static const String apiServiceInsert = 'api/service/insert';
   static const String apiServiceUpdate = 'api/service/update';
   static const String apiServiceDelete = 'api/service/delete';
 
   static const String apiDoctorGet = 'api/doctor/get';
+  static const String apiDoctorGetId = 'api/doctor/get/id';
   static const String apiDoctorInsert = 'api/doctor/insert';
   static const String apiDoctorUpdate = 'api/doctor/update';
   static const String apiDoctorDelete = 'api/doctor/delete';
 
   static const String apiNurseGet = 'api/nurse/get';
+  static const String apiNurseGetId = 'api/nurse/get/id';
   static const String apiNurseInsert = 'api/nurse/insert';
   static const String apiNurseUpdate = 'api/nurse/update';
   static const String apiNurseDelete = 'api/nurse/delete';
 
   static const String apiPatientGet = 'api/patient/get';
+  static const String apiPatientGetCategory = 'api/appointment/get/category';
+  static const String apiPatientGetId = 'api/patient/get/id';
   static const String apiPatientInsert = 'api/patient/insert';
   static const String apiPatientUpdate = 'api/patient/update';
   static const String apiPatientDelete = 'api/patient/delete';
 
   static const String apiProcedureGet = 'api/procedure/get';
+  static const String apiProcedureGetId = 'api/procedure/get/id';
   static const String apiProcedureInsert = 'api/procedure/insert';
   static const String apiProcedureUpdate = 'api/procedure/update';
   static const String apiProcedureDelete = 'api/procedure/delete';
 
   static const String apiReceptionistGet = 'api/receptionist/get';
+  static const String apiReceptionistGetId = 'api/receptionist/get/id';
   static const String apiReceptionistInsert = 'api/receptionist/insert';
   static const String apiReceptionistUpdate = 'api/receptionist/update';
   static const String apiReceptionistDelete = 'api/receptionist/delete';
 
   static const String apiExpenseGet = 'api/expense/get';
+  static const String apiExpenseGetId = 'api/expense/get/id';
   static const String apiExpenseInsert = 'api/expense/insert';
   static const String apiExpenseUpdate = 'api/expense/update';
   static const String apiExpenseDelete = 'api/expense/delete';
 
   static const String apiInvoiceGet = 'api/invoice/get';
+  static const String apiInvoiceGetId = 'api/invoice/get/id';
   static const String apiInvoiceInsert = 'api/invoice/insert';
   static const String apiInvoiceUpdate = 'api/invoice/update';
   static const String apiInvoiceDelete = 'api/invoice/delete';
 
   static const String apiLoginGet = 'api/invoice/get';
+  static const String apiLoginGetId = 'api/invoice/get/id';
   static const String apiLoginInsert = 'api/invoice/insert';
   static const String apiLoginUpdate = 'api/invoice/update';
   static const String apiLoginDelete = 'api/invoice/delete';

@@ -22,7 +22,7 @@ class ReceptionistService {
 
   Future<ReceptionistResponse> getReceptionistById(int id, String token) async {
     final response = await http.get(
-      Uri.https(Strings.pathAPI, '${Strings.apiReceptionistGet}/$id'),
+      Uri.https(Strings.pathAPI, '${Strings.apiReceptionistGetId}/$id'),
       headers: <String, String>{
         Strings.apiContentType: Strings.apiApplicationJson,
         Strings.apiAuthorization: '${Strings.apiBearer} $token',

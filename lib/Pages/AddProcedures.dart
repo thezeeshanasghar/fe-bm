@@ -22,9 +22,12 @@ class _AddProceduresState extends State<AddProcedures> {
   String procedureName;
   String executant;
   int charges;
+  bool consent;
   int executantShare;
   bool hasChangeDependencies = false;
   GlobalProgressDialog globalProgressDialog;
+
+  String ConsentType = 'Choose Mandatory Consent';
 
   @override
   void initState() {
@@ -65,13 +68,17 @@ class _AddProceduresState extends State<AddProcedures> {
                   minHeight: viewportConstraints.minHeight,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                      Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                  padding: EdgeInsets.fromLTRB(
+                      Dimens.globalPaddingLeft,
+                      Dimens.globalPaddingTop,
+                      Dimens.globalPaddingRight,
+                      Dimens.globalPaddingBottom),
                   child: Form(
                     key: formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
+                        widgetConsentType(),
                         widgetProcedureName(),
                         widgetPerformedBy(),
                         widgetCharges(),
@@ -93,13 +100,18 @@ class _AddProceduresState extends State<AddProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 30,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.fact_check), border: OutlineInputBorder(), labelText: 'Procedure Name'),
+                prefixIcon: Icon(Icons.fact_check),
+                border: OutlineInputBorder(),
+                labelText: 'Procedure Name'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -119,13 +131,18 @@ class _AddProceduresState extends State<AddProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 15,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.person), border: OutlineInputBorder(), labelText: 'Performed By'),
+                prefixIcon: Icon(Icons.person),
+                border: OutlineInputBorder(),
+                labelText: 'Performed By'),
             validator: (String value) {
               if (value == null || value.isEmpty) {
                 return 'This field cannot be empty';
@@ -141,18 +158,86 @@ class _AddProceduresState extends State<AddProcedures> {
     );
   }
 
+  Widget widgetConsentType() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+             Dimens.globalInputFieldBottomWithoutMaxLength),
+          child: Container(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.grey)),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: ListTile(
+                          title: const Text(
+                            'Consent: ',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile(
+                          title: const Text('Yes'),
+                          value: "Yes",
+                          groupValue: ConsentType,
+                          onChanged: (String value) {
+                            setState(() {
+                              ConsentType = value;
+                              consent = true;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile(
+                          title: const Text('No'),
+                          value: "No",
+                          groupValue: ConsentType,
+                          onChanged: (String value) {
+                            setState(() {
+                              ConsentType = value;
+                              consent = false;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget widgetCharges() {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 5,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-                prefixIcon: Icon(Icons.monetization_on), border: OutlineInputBorder(), labelText: 'charges'),
+                prefixIcon: Icon(Icons.monetization_on),
+                border: OutlineInputBorder(),
+                labelText: 'charges'),
             validator: (String value) {
               if (value.isEmpty) {
                 return 'This field cannot be empty';
@@ -179,8 +264,11 @@ class _AddProceduresState extends State<AddProcedures> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-              Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+          padding: const EdgeInsets.fromLTRB(
+              Dimens.globalInputFieldleft,
+              Dimens.globalInputFieldTop,
+              Dimens.globalInputFieldRight,
+              Dimens.globalInputFieldBottom),
           child: TextFormField(
             autofocus: false,
             maxLength: 3,
@@ -220,8 +308,11 @@ class _AddProceduresState extends State<AddProcedures> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -240,22 +331,27 @@ class _AddProceduresState extends State<AddProcedures> {
 
   Future<void> onPressedSubmitButton() async {
     if (!formKey.currentState.validate()) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorInputValidation, context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, Strings.errorInputValidation, context);
       return;
     }
     formKey.currentState.save();
     try {
       globalProgressDialog.showSimpleFontellicoProgressDialog(
-          false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+          false,
+          Strings.dialogSubmitting,
+          SimpleFontelicoProgressDialogType.multilines);
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
         onCallingInsertProcedure();
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
@@ -263,24 +359,35 @@ class _AddProceduresState extends State<AddProcedures> {
   Future<void> onCallingInsertProcedure() async {
     try {
       ProcedureService procedureService = ProcedureService();
-      ProcedureResponse procedureResponse = await procedureService.insertProcedure(
-          ProcedureRequest(name: procedureName, charges: charges, executant: executant, executantShare: executantShare),
-          context.read<TokenProvider>().tokenSample.jwtToken);
+      ProcedureResponse procedureResponse =
+          await procedureService.insertProcedure(
+              ProcedureRequest(
+                  name: procedureName,
+                  charges: charges,
+                  executant: executant,
+                  executantShare: executantShare,
+                  consent: consent
+              ),
+              context.read<TokenProvider>().tokenSample.jwtToken);
       if (procedureResponse != null) {
         if (procedureResponse.isSuccess) {
           resetValues();
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, procedureResponse.message, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalSuccess, procedureResponse.message, context);
           globalProgressDialog.hideSimpleFontellicoProgressDialog();
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureResponse.message, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, procedureResponse.message, context);
           globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorNull, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
