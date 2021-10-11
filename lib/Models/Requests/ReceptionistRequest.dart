@@ -28,10 +28,10 @@ class ReceptionistRequest {
   ReceptionistRequest({
     this.id = -1,
     this.userId = -1,
-    this.userType,
+    this.userType = "Receptionist",
     this.dateOfBirth = '1900-01-01',
-    this.maritalStatus,
-    this.religion,
+    this.maritalStatus = "Other",
+    this.religion = "Islam",
     this.firstName,
     this.lastName,
     this.fatherHusbandName,
@@ -43,9 +43,9 @@ class ReceptionistRequest {
     this.address,
     this.joiningDate = '1900-01-01',
     this.floorNo = -1,
-    this.experience,
-    this.jobType,
-    this.shiftTime,
+    this.experience = '-1',
+    this.jobType = "Part-Time",
+    this.shiftTime = '8-12',
     this.qualificationList,
   });
 
@@ -72,7 +72,8 @@ class ReceptionistRequest {
     data['JobType'] = this.jobType;
     data['ShiftTime'] = this.shiftTime;
     if (this.qualificationList != null) {
-      data['QualificationList'] = this.qualificationList.map((v) => v.toJson()).toList();
+      data['QualificationList'] =
+          this.qualificationList.map((v) => v.toJson()).toList();
     }
     return data;
   }

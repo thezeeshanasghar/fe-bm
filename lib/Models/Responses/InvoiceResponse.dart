@@ -15,7 +15,8 @@ class InvoiceResponse {
     return InvoiceResponse(
         isSuccess: json['isSuccess'],
         message: json['message'],
-        data: json['data'] != null ? InvoiceSample.fromJson(json['data']) : null);
+        data:
+        json['data'] != null ? InvoiceSample.fromJson(json['data']) : null);
   }
 }
 
@@ -36,6 +37,7 @@ class InvoiceResponseList {
       var list = json['data'] as List;
       dataList = list.map((i) => InvoiceSample.fromJson(i)).toList();
     }
-    return InvoiceResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+    return InvoiceResponseList(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

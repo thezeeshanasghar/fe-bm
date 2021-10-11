@@ -1,11 +1,15 @@
+
 import 'package:baby_doctor/Models/Sample/AppointmentSample.dart';
 import 'package:baby_doctor/Models/Sample/DoctorSample.dart';
+import 'package:baby_doctor/Models/Sample/PatientSample.dart';
+import 'package:baby_doctor/Models/Sample/ReceiptSample.dart';
 
 class InvoiceSample {
   final int id;
   final int appointmentId;
   final int doctorId;
   final int patientId;
+  final int receptionistId;
 
   final String date;
   final String checkupType;
@@ -14,8 +18,10 @@ class InvoiceSample {
   final double disposibles;
   final double grossAmount;
 
-  final AppointmentSample appointment;
-  final DoctorSample doctor;
+  final AppointmentSample appointmentSample;
+  final DoctorSample doctorSample;
+  final ReceiptSample receiptSample;
+  final PatientSample patientSample;
 
   InvoiceSample({
     this.id,
@@ -28,8 +34,11 @@ class InvoiceSample {
     this.paymentType,
     this.disposibles,
     this.grossAmount,
-    this.appointment,
-    this.doctor,
+    this.appointmentSample,
+    this.doctorSample,
+    this.receiptSample,
+    this.patientSample,
+    this.receptionistId,
   });
 
   factory InvoiceSample.fromJson(Map<String, dynamic> json) {
@@ -38,14 +47,24 @@ class InvoiceSample {
       appointmentId: json['appointmentId'],
       doctorId: json['doctorId'],
       patientId: json['patientId'],
+      receptionistId: json['receptionistId'],
       date: json['date'],
       checkupType: json['checkupType'],
       checkupFee: json['checkupFee'],
       paymentType: json['paymentType'],
       disposibles: json['disposibles'],
       grossAmount: json['grossAmount'],
-      appointment: json['appointment'] != null ? AppointmentSample.fromJson(json['appointment']) : null,
-      doctor: json['doctor'] != null ? DoctorSample.fromJson(json['doctor']) : null,
+      appointmentSample: json['appointment'] != null
+          ? AppointmentSample.fromJson(json['appointment'])
+          : null,
+      doctorSample:
+      json['doctor'] != null ? DoctorSample.fromJson(json['doctor']) : null,
+      patientSample: json['patient'] != null
+          ? new PatientSample.fromJson(json['patient'])
+          : null,
+      receiptSample: json['receipt'] != null
+          ? new ReceiptSample.fromJson(json['receipt'])
+          : null,
     );
   }
 }

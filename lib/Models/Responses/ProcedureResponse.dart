@@ -15,7 +15,9 @@ class ProcedureResponse {
     return ProcedureResponse(
         isSuccess: json['isSuccess'],
         message: json['message'],
-        data: json['data'] != null ? ProcedureSample.fromJson(json['data']) : null);
+        data: json['data'] != null
+            ? ProcedureSample.fromJson(json['data'])
+            : null);
   }
 }
 
@@ -36,6 +38,7 @@ class ProcedureResponseList {
       var list = json['data'] as List;
       dataList = list.map((i) => ProcedureSample.fromJson(i)).toList();
     }
-    return ProcedureResponseList(isSuccess: json['isSuccess'], message: json['message'], data: dataList);
+    return ProcedureResponseList(
+        isSuccess: json['isSuccess'], message: json['message'], data: dataList);
   }
 }

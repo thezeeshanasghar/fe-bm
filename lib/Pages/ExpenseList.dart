@@ -1,65 +1,60 @@
 import 'dart:async';
-
 import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
 import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
 import 'package:baby_doctor/Common/GlobalSnakbar.dart';
 import 'package:baby_doctor/Design/Dimens.dart';
 import 'package:baby_doctor/Design/Shade.dart';
 import 'package:baby_doctor/Design/Strings.dart';
-import 'package:baby_doctor/Models/Requests/ServiceRequest.dart';
-import 'package:baby_doctor/Models/Responses/ServiceResponse.dart';
-import 'package:baby_doctor/Models/Sample/ServiceSample.dart';
+import 'package:baby_doctor/Models/Responses/ExpenseResponse.dart';
+import 'package:baby_doctor/Models/Sample/ExpenseSample.dart';
 import 'package:baby_doctor/Providers/TokenProvider.dart';
-import 'package:baby_doctor/Service/Service.dart';
-import 'package:baby_doctor/ShareArguments/ServiceArguments.dart';
+import 'package:baby_doctor/Service/ExpenseService.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
-import 'package:provider/provider.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-class ServiceList extends StatefulWidget {
+class ExpenseList extends StatefulWidget {
   @override
-  _ServiceListState createState() => _ServiceListState();
+  _ExpenseListState createState() => _ExpenseListState();
 }
 
-class _ServiceListState extends State<ServiceList> {
+class _ExpenseListState extends State<ExpenseList> {
   final formKey = GlobalKey<FormState>();
 
-  int serviceTotal;
-  int serviceCurrentPerPage;
-  int serviceCurrentPage;
-  bool serviceIsSearch;
-  String serviceSelectableKey;
-  String serviceSortColumn;
-  bool serviceSortAscending;
-  bool serviceIsLoading;
-  bool serviceShowSelect;
+  int expenseTotal;
+  int expenseCurrentPerPage;
+  int expenseCurrentPage;
+  bool expenseIsSearch;
+  String expenseSelectableKey;
+  String expenseSortColumn;
+  bool expenseSortAscending;
+  bool expenseIsLoading;
+  bool expenseShowSelect;
   bool showSearchedList;
-  List<DatatableHeader> serviceHeaders;
-  List<int> servicePerPage;
-  List<Map<String, dynamic>> serviceIsSource;
-  List<Map<String, dynamic>> serviceIsSearched;
-  List<Map<String, dynamic>> serviceSelected;
-
-  List<ServiceSample> listService;
-  Service service;
-
-  GlobalProgressDialog globalProgressDialog;
+  List<DatatableHeader> expenseHeaders;
+  List<int> expensePerPage;
+  List<Map<String, dynamic>> expenseIsSource;
+  List<Map<String, dynamic>> expenseIsSearched;
+  List<Map<String, dynamic>> expenseSelecteds;
+  List<ExpenseSample> listExpenses;
+  ExpenseService expenseService;
   bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
 
   @override
   void initState() {
     super.initState();
     initVariablesAndClasses();
-    initHeadersOfServiceTable();
+    initHeadersOfExpenseTable();
   }
 
   @override
   void didChangeDependencies() {
     if (!hasChangeDependencies) {
       globalProgressDialog = GlobalProgressDialog(context);
-      checkTokenValidityAndGetService();
+      checkTokenValidityAndGetExpense();
       hasChangeDependencies = true;
     }
     super.didChangeDependencies();
@@ -75,7 +70,7 @@ class _ServiceListState extends State<ServiceList> {
     return Scaffold(
         backgroundColor: Shade.globalBackgroundColor,
         appBar: AppBar(
-          title: Text(Strings.titleServiceList),
+          title: Text(Strings.titleExpenseList),
           centerTitle: false,
           backgroundColor: Shade.globalAppBarColor,
           elevation: 0.0,
@@ -100,7 +95,7 @@ class _ServiceListState extends State<ServiceList> {
                         key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[widgetServicePatients()],
+                          children: <Widget>[widgetExpensePatients()],
                         ),
                       )),
                 ),
@@ -111,7 +106,7 @@ class _ServiceListState extends State<ServiceList> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, Strings.routeAddService);
+            Navigator.pushNamed(context, Strings.routeAddDoctor);
           },
           child: const Icon(Icons.add),
           backgroundColor: Shade.fabGlobalButtonColor,
@@ -119,32 +114,29 @@ class _ServiceListState extends State<ServiceList> {
   }
 
   void initVariablesAndClasses() {
-    serviceHeaders = [];
-    servicePerPage = [5, 10, 15, 100];
-    serviceTotal = 100;
-    serviceCurrentPage = 1;
-    serviceIsSearch = false;
-    serviceIsSource = [];
-    serviceIsSearched = [];
-    serviceSelected = [];
-    serviceSelectableKey = "Invoice";
-    serviceSortAscending = true;
-    serviceIsLoading = true;
-    serviceShowSelect = false;
-    listService = [];
+    expenseHeaders = [];
+    expensePerPage = [5, 10, 15, 100];
+    expenseTotal = 100;
+    expenseCurrentPage = 1;
+    expenseIsSearch = false;
+    expenseIsSource = [];
+    expenseIsSearched = [];
+    expenseSelecteds = [];
+    expenseSelectableKey = "Invoice";
+    expenseSortAscending = true;
+    expenseIsLoading = true;
+    expenseShowSelect = false;
+    listExpenses = [];
     showSearchedList = false;
-    service = Service();
+
+    expenseService = ExpenseService();
   }
 
-  FutureOr onGoBack(dynamic value) {
-    checkTokenValidityAndGetService();
-  }
-
-  Future<void> checkTokenValidityAndGetService() async {
+  Future<void> checkTokenValidityAndGetExpense() async {
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
-        getServicesFromApiAndLinkToTable();
+        getExpensesFromApiAndLinkToTable();
       } else {
         GlobalSnackbar.showMessageUsingSnackBar(
             Shade.snackGlobalFailed, Strings.errorToken, context);
@@ -155,63 +147,54 @@ class _ServiceListState extends State<ServiceList> {
     }
   }
 
-  Future<void> getServicesFromApiAndLinkToTable() async {
-    setState(() => serviceIsLoading = true);
-    listService = [];
-    serviceIsSource = [];
+  Future<void> getExpensesFromApiAndLinkToTable() async {
+    setState(() => expenseIsLoading = true);
+    listExpenses = [];
+    expenseIsSource = [];
     try {
-      ServiceResponseList serviceResponseList = await service
-          .getServices(context.read<TokenProvider>().tokenSample.jwtToken);
-      if (serviceResponseList != null) {
-        if (serviceResponseList.isSuccess) {
-          listService = serviceResponseList.data;
-          serviceIsSource.addAll(generateServiceDataFromApi(listService));
+      ExpenseResponseList ExpenseList = await expenseService
+          .getExpenses(context.read<TokenProvider>().tokenSample.jwtToken);
+      if (ExpenseList != null) {
+        if (ExpenseList.isSuccess) {
+          listExpenses = ExpenseList.data;
+          expenseIsSource.addAll(generateExpenseDataFromApi(listExpenses));
         } else {
           GlobalSnackbar.showMessageUsingSnackBar(
-              Shade.snackGlobalFailed, serviceResponseList.message, context);
+              Shade.snackGlobalFailed, ExpenseList.message, context);
         }
       } else {
         GlobalSnackbar.showMessageUsingSnackBar(
             Shade.snackGlobalFailed, Strings.errorNull, context);
       }
-      setState(() => serviceIsLoading = false);
+      setState(() => expenseIsLoading = false);
     } catch (exception) {
-      setState(() => serviceIsLoading = false);
+      setState(() => expenseIsLoading = false);
       GlobalSnackbar.showMessageUsingSnackBar(
           Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  List<Map<String, dynamic>> generateServiceDataFromApi(
-      List<ServiceSample> listOfServices) {
-    List<Map<String, dynamic>> tempsService = [];
-    for (ServiceSample services in listOfServices) {
-      tempsService.add({
-        "id": services.id,
-        "name": services.name,
-        "description": services.description,
-        "Action": services.id,
+  List<Map<String, dynamic>> generateExpenseDataFromApi(
+      List<ExpenseSample> listOfExpense) {
+    List<Map<String, dynamic>> tempsExpense = [];
+    for (ExpenseSample expenseSample in listOfExpense) {
+      tempsExpense.add({
+        "id": expenseSample.id,
+        "Name": expenseSample.employeeName,
+        "BillType": expenseSample.billType,
+        "PaymentType": expenseSample.paymentType,
+        "EmployeeOrVender": expenseSample.employeeOrVender,
+        "VoucherNo": expenseSample.voucherNo,
+        "TotalBill": expenseSample.totalBill,
+        "TransactionDetail": expenseSample.transactionDetail,
+        "Action": expenseSample.id,
       });
     }
-    return tempsService;
+    return tempsExpense;
   }
 
-  List<Map<String, dynamic>> generateServiceSearchData(
-      Iterable<Map<String, dynamic>> iterableList) {
-    List<Map<String, dynamic>> tempsService = [];
-    for (var iterable in iterableList) {
-      tempsService.add({
-        "id": iterable["id"],
-        "name": iterable["name"],
-        "description": iterable["description"],
-        "Action": iterable["Action"],
-      });
-    }
-    return tempsService;
-  }
-
-  void initHeadersOfServiceTable() {
-    serviceHeaders = [
+  void initHeadersOfExpenseTable() {
+    expenseHeaders = [
       DatatableHeader(
           value: "id",
           show: true,
@@ -230,7 +213,7 @@ class _ServiceListState extends State<ServiceList> {
             );
           }),
       DatatableHeader(
-          value: "name",
+          value: "BillType",
           show: true,
           flex: 1,
           sortable: false,
@@ -240,16 +223,15 @@ class _ServiceListState extends State<ServiceList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Service Name",
+                  "Bill Type",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             );
           }),
       DatatableHeader(
-          value: "description",
+          value: "PaymentType",
           show: true,
-          flex: 3,
           sortable: false,
           textAlign: TextAlign.center,
           headerBuilder: (value) {
@@ -257,7 +239,71 @@ class _ServiceListState extends State<ServiceList> {
               padding: const EdgeInsets.all(10),
               child: Center(
                 child: Text(
-                  "Service Description",
+                  "Payment Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "EmployeeOrVender",
+          show: true,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Employee Name",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "VoucherNo",
+          show: false,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Voucher No",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "TotalBill",
+          show: true,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Total Bill",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "TransactionDetail",
+          show: false,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Transaction Detail",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -286,7 +332,7 @@ class _ServiceListState extends State<ServiceList> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: () => onPressedEditFromTable(id, row),
+                  // onPressed: () => onPressedEditFromTable(id, row),
                   child: Text('Edit',
                       style: TextStyle(
                         color: Shade.actionButtonTextEdit,
@@ -308,47 +354,30 @@ class _ServiceListState extends State<ServiceList> {
           }),
     ];
   }
-  Widget widgetSearch() {
-    return Expanded(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.grey[50],
-              border: Border.all(color: Colors.grey[300]),
-            ),
-            child: TextField(
-              textAlignVertical: TextAlignVertical.center,
-              cursorColor: Colors.grey[600],
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.search_outlined,
-                    color: Colors.grey[600],
-                  ),
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey[600],
-                  ),
-                  focusColor: Colors.grey[600],
-                  hintText: 'Search'),
-              onChanged: (value) => onChangedSearchedValue(value),
-            ),
-          ),
-        ));
+
+  FutureOr onGoBack(dynamic value) {
+    checkTokenValidityAndGetExpense();
   }
 
-  void onPressedEditFromTable(id, row) {
-    Navigator.pushNamed(context, Strings.routeEditService,
-            arguments: ServiceArguments(
-                id: row['id'],
-                name: row['name'],
-                description: row['description']))
-        .then((value) => onGoBack(value));
-  }
+  // void onPressedEditFromTable(id, row) {
+  //   ExpenseRequest expenseRequest = ExpenseRequest(
+  //     id: row['id'],
+  //     name: row['name'],
+  //     executantShare: row['executantShare'],
+  //     executant: row['executant'],
+  //     consent: row['consent'],
+  //     charges: row['charges'],
+  //   );
+  //
+  //   Navigator.pushNamed(
+  //     context,
+  //     Strings.routeEditExpense,
+  //     arguments: ExpenseRequest,
+  //   ).then((value) => onGoBack(value));
+  // }
 
   void onPressedDeleteFromTable(id, row) {
+    print(id);
     Widget cancelButton = TextButton(
       onPressed: () => Navigator.of(context).pop(),
       child: Text(Strings.alertDialogButtonCancel,
@@ -362,7 +391,7 @@ class _ServiceListState extends State<ServiceList> {
           style: TextStyle(
               color: Shade.alertBoxButtonTextDelete,
               fontWeight: FontWeight.w900)),
-      onPressed: () => onCallingDeleteService(id),
+      onPressed: () => onCallingDeleteExpense(id),
     );
 
     AlertDialog alert = AlertDialog(
@@ -375,7 +404,7 @@ class _ServiceListState extends State<ServiceList> {
         children: [
           Text(Strings.alertDialogTitleDeleteNote),
           Text(
-            row['name'] + ' ?',
+            row['BillType'] + ' ?',
             style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
           )
         ],
@@ -400,7 +429,7 @@ class _ServiceListState extends State<ServiceList> {
     );
   }
 
-  Future<void> onCallingDeleteService(int id) async {
+  Future<void> onCallingDeleteExpense(int id) async {
     Navigator.pop(context);
     globalProgressDialog.showSimpleFontellicoProgressDialog(false,
         Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
@@ -408,11 +437,11 @@ class _ServiceListState extends State<ServiceList> {
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
-        ServiceResponse serviceResponse = await service.deleteService(
+        ExpenseResponse serviceResponse = await expenseService.deleteExpense(
             id, context.read<TokenProvider>().tokenSample.jwtToken);
         if (serviceResponse != null) {
           if (serviceResponse.isSuccess) {
-            checkTokenValidityAndGetService();
+            checkTokenValidityAndGetExpense();
             GlobalSnackbar.showMessageUsingSnackBar(
                 Shade.snackGlobalSuccess, serviceResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
@@ -439,28 +468,28 @@ class _ServiceListState extends State<ServiceList> {
   }
 
   Future<void> onChangedSearchedValue(String search) async {
-    if (!serviceIsLoading) {
+    if (!expenseIsLoading) {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
         if (search.isEmpty) {
-          getServicesFromApiAndLinkToTable();
+          getExpensesFromApiAndLinkToTable();
           return;
         }
-        ServiceResponseList serviceResponse = await service.getServiceBySearch(
-            context.read<TokenProvider>().tokenSample.jwtToken, search);
-        if (serviceResponse != null) {
-          if (serviceResponse.isSuccess) {
-            serviceIsSource = [];
-            listService = [];
-            listService = serviceResponse.data;
-            serviceIsSource.addAll(generateServiceDataFromApi(listService));
+        ExpenseResponseList expenseResponse =
+            await expenseService.getExpenseBySearch(
+                context.read<TokenProvider>().tokenSample.jwtToken, search);
+        if (expenseResponse != null) {
+          if (expenseResponse.isSuccess) {
+            expenseIsSource = [];
+            listExpenses = [];
+            listExpenses = expenseResponse.data;
+            expenseIsSource.addAll(generateExpenseDataFromApi(listExpenses));
             setState(() {
               showSearchedList = false;
             });
           } else {
             GlobalSnackbar.showMessageUsingSnackBar(
-                Shade.snackGlobalFailed, serviceResponse.message, context);
-            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+                Shade.snackGlobalFailed, expenseResponse.message, context);
           }
         } else {
           GlobalSnackbar.showMessageUsingSnackBar(
@@ -478,7 +507,7 @@ class _ServiceListState extends State<ServiceList> {
     }
   }
 
-  Widget widgetServicePatients() {
+  Widget widgetExpensePatients() {
     return Card(
       elevation: 1,
       shadowColor: Colors.black,
@@ -499,48 +528,48 @@ class _ServiceListState extends State<ServiceList> {
                   actions: [
                     widgetSearch(),
                   ],
-                  headers: serviceHeaders,
+                  headers: expenseHeaders,
                   source:
-                      !showSearchedList ? serviceIsSource : serviceIsSearched,
-                  selecteds: serviceSelected,
-                  showSelect: serviceShowSelect,
+                      !showSearchedList ? expenseIsSource : expenseIsSearched,
+                  selecteds: expenseSelecteds,
+                  showSelect: expenseShowSelect,
                   autoHeight: false,
                   onTabRow: (data) {
                     print(data);
                   },
                   onSort: (value) {
                     setState(() {
-                      serviceSortColumn = value;
-                      serviceSortAscending = !serviceSortAscending;
-                      if (serviceSortAscending) {
-                        serviceIsSource.sort((a, b) => b["$serviceSortColumn"]
-                            .compareTo(a["$serviceSortColumn"]));
+                      expenseSortColumn = value;
+                      expenseSortAscending = !expenseSortAscending;
+                      if (expenseSortAscending) {
+                        expenseIsSource.sort((a, b) => b["$expenseSortColumn"]
+                            .compareTo(a["$expenseSortColumn"]));
                       } else {
-                        serviceIsSource.sort((a, b) => a["$serviceSortColumn"]
-                            .compareTo(b["$serviceSortColumn"]));
+                        expenseIsSource.sort((a, b) => a["$expenseSortColumn"]
+                            .compareTo(b["$expenseSortColumn"]));
                       }
                     });
                   },
-                  sortAscending: serviceSortAscending,
-                  sortColumn: serviceSortColumn,
-                  isLoading: serviceIsLoading,
+                  sortAscending: expenseSortAscending,
+                  sortColumn: expenseSortColumn,
+                  isLoading: expenseIsLoading,
                   onSelect: (value, item) {
                     print("$value  $item ");
                     if (value) {
-                      setState(() => serviceSelected.add(item));
+                      setState(() => expenseSelecteds.add(item));
                     } else {
-                      setState(() => serviceSelected
-                          .removeAt(serviceSelected.indexOf(item)));
+                      setState(() => expenseSelecteds
+                          .removeAt(expenseSelecteds.indexOf(item)));
                     }
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => serviceSelected = serviceIsSource
+                      setState(() => expenseSelecteds = expenseIsSource
                           .map((entry) => entry)
                           .toList()
                           .cast());
                     } else {
-                      setState(() => serviceSelected.clear());
+                      setState(() => expenseSelecteds.clear());
                     }
                   },
                 ),
@@ -548,5 +577,36 @@ class _ServiceListState extends State<ServiceList> {
             ),
           ]),
     );
+  }
+
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+      padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[300]),
+        ),
+        child: TextField(
+          textAlignVertical: TextAlignVertical.center,
+          cursorColor: Colors.grey[600],
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              prefixIcon: Icon(
+                Icons.search_outlined,
+                color: Colors.grey[600],
+              ),
+              labelStyle: TextStyle(
+                fontWeight: FontWeight.normal,
+                color: Colors.grey[600],
+              ),
+              focusColor: Colors.grey[600],
+              hintText: 'Search'),
+          onChanged: (value) => onChangedSearchedValue(value),
+        ),
+      ),
+    ));
   }
 }

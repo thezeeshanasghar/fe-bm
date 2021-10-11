@@ -76,4 +76,20 @@ class ReceptionistService {
     }
     return null;
   }
+
+  Future<ReceptionistResponseList> getReceptionistBySearch(
+      String token, String search) async {
+    final response = await http.get(
+      Uri.https(Strings.pathAPI, '${Strings.apiReceptionistGetSearch}/$search'),
+      headers: <String, String>{
+        Strings.apiContentType: Strings.apiApplicationJson,
+        Strings.apiAuthorization: '${Strings.apiBearer} $token',
+      },
+    );
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return ReceptionistResponseList.fromJson(jsonResponse);
+    }
+    return null;
+  }
 }

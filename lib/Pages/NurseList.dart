@@ -85,15 +85,19 @@ class _NurseListState extends State<NurseList> {
         body: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyText2,
           child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.minHeight,
                   ),
                   child: Padding(
-                      padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                          Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                      padding: EdgeInsets.fromLTRB(
+                          Dimens.globalPaddingLeft,
+                          Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight,
+                          Dimens.globalPaddingBottom),
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -142,39 +146,46 @@ class _NurseListState extends State<NurseList> {
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
-        getDoctorsFromApiAndLinkToTable();
+        getNursesFromApiAndLinkToTable();
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  Future<void> getDoctorsFromApiAndLinkToTable() async {
+  Future<void> getNursesFromApiAndLinkToTable() async {
     setState(() => nurseIsLoading = true);
     listNurse = [];
     nurseIsSource = [];
     try {
-      NurseResponseList nurseList = await nurseService.getNurses(context.read<TokenProvider>().tokenSample.jwtToken);
+      NurseResponseList nurseList = await nurseService
+          .getNurses(context.read<TokenProvider>().tokenSample.jwtToken);
       if (nurseList != null) {
         if (nurseList.isSuccess) {
           listNurse = nurseList.data;
-          nurseIsSource.addAll(generateDoctorDataFromApi(listNurse));
+          nurseIsSource.addAll(generateNurseDataFromApi(listNurse));
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, nurseList.message, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, nurseList.message, context);
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorNull, context);
       }
       setState(() => nurseIsLoading = false);
     } catch (exception) {
       setState(() => nurseIsLoading = false);
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  List<Map<String, dynamic>> generateDoctorDataFromApi(List<NurseSample> listOfNurse) {
+  List<Map<String, dynamic>> generateNurseDataFromApi(
+      List<NurseSample> listOfNurse) {
     List<Map<String, dynamic>> tempNurse = [];
     for (NurseSample nurse in listOfNurse) {
       tempNurse.add({
@@ -206,7 +217,8 @@ class _NurseListState extends State<NurseList> {
     return tempNurse;
   }
 
-  List<Map<String, dynamic>> generateNurseSearchData(Iterable<Map<String, dynamic>> iterableList) {
+  List<Map<String, dynamic>> generateNurseSearchData(
+      Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsnurse = [];
     for (var iterable in iterableList) {
       tempsnurse.add({
@@ -609,7 +621,8 @@ class _NurseListState extends State<NurseList> {
     List<QualificationSample> qualificationSampleList = row['qualifications'];
     if (qualificationSampleList != null) {
       if (qualificationSampleList.length > 0) {
-        for (QualificationSample qualificationSample in qualificationSampleList) {
+        for (QualificationSample qualificationSample
+            in qualificationSampleList) {
           qualificationRequestList.add(QualificationRequest(
             Id: qualificationSample.id,
             UserId: qualificationSample.userId,
@@ -656,11 +669,17 @@ class _NurseListState extends State<NurseList> {
   void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
       onPressed: () => Navigator.of(context).pop(),
-      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
-      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
       onPressed: () => onCallingDeleteNurse(id),
     );
 
@@ -683,8 +702,11 @@ class _NurseListState extends State<NurseList> {
         cancelButton,
         deleteButton,
       ],
-      actionsPadding: EdgeInsets.fromLTRB(Dimens.actionsGlobalButtonLeft, Dimens.actionsGlobalButtonTop,
-          Dimens.actionsGlobalButtonRight, Dimens.actionsGlobalButtonBottom),
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
     );
 
     showDialog(
@@ -698,68 +720,73 @@ class _NurseListState extends State<NurseList> {
 
   Future<void> onCallingDeleteNurse(int id) async {
     Navigator.pop(context);
-    globalProgressDialog.showSimpleFontellicoProgressDialog(
-        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(false,
+        Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
-        NurseResponse doctorResponse =
-            await nurseService.deleteNurse(id, context.read<TokenProvider>().tokenSample.jwtToken);
+        NurseResponse doctorResponse = await nurseService.deleteNurse(
+            id, context.read<TokenProvider>().tokenSample.jwtToken);
         if (doctorResponse != null) {
           if (doctorResponse.isSuccess) {
             checkTokenValidityAndGetNurse();
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, doctorResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalSuccess, doctorResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           } else {
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, doctorResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           }
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
           globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
 
-  void onChangedSearchedValue(value) {
+  Future<void> onChangedSearchedValue(String search) async {
     if (!nurseIsLoading) {
-      if (value.isNotEmpty) {
-        if (value.length >= 1) {
-          var searchList = nurseIsSource.where((element) {
-            String searchById = element["id"].toString().toLowerCase();
-            String searchByFirstName = element["firstName"].toString().toLowerCase();
-            String searchByLastName = element["lastName"].toString().toLowerCase();
-            String searchByEmail = element["email"].toString().toLowerCase();
-            if (searchById.contains(value.toLowerCase()) ||
-                searchByFirstName.contains(value.toLowerCase()) ||
-                searchByLastName.contains(value.toLowerCase()) ||
-                searchByEmail.contains(value.toLowerCase())) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          nurseIsSearched = [];
-          nurseIsSearched.addAll(generateNurseSearchData(searchList));
-          setState(() {
-            showSearchedList = true;
-          });
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        if (search.isEmpty) {
+          getNursesFromApiAndLinkToTable();
+          return;
+        }
+        NurseResponseList patientResponse = await nurseService.getNurseBySearch(
+            context.read<TokenProvider>().tokenSample.jwtToken, search);
+        if (patientResponse != null) {
+          if (patientResponse.isSuccess) {
+            nurseIsSource = [];
+            listNurse = [];
+            listNurse = patientResponse.data;
+            nurseIsSource.addAll(generateNurseDataFromApi(listNurse));
+            setState(() {
+              showSearchedList = false;
+            });
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, patientResponse.message, context);
+          }
         } else {
-          setState(() {
-            showSearchedList = false;
-          });
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        setState(() {
-          showSearchedList = false;
-        });
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     }
   }
@@ -769,65 +796,98 @@ class _NurseListState extends State<NurseList> {
       elevation: 1,
       shadowColor: Colors.black,
       clipBehavior: Clip.none,
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
-        Container(
-          margin: EdgeInsets.all(10),
-          padding: EdgeInsets.all(0),
-          constraints: BoxConstraints(
-            maxHeight: 500,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ResponsiveDatatable(
-              actions: [
-                Expanded(
-                    child: TextField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none, prefixIcon: Icon(Icons.search_outlined), hintText: 'Search nurse'),
-                  onChanged: (value) => onChangedSearchedValue(value),
-                )),
-              ],
-              headers: nurseHeaders,
-              source: !showSearchedList ? nurseIsSource : nurseIsSearched,
-              selecteds: nurseSelecteds,
-              showSelect: nurseShowSelect,
-              autoHeight: false,
-              onTabRow: (data) {
-                print(data);
-              },
-              onSort: (value) {
-                setState(() {
-                  nurseSortColumn = value;
-                  nurseSortAscending = !nurseSortAscending;
-                  if (nurseSortAscending) {
-                    nurseIsSource.sort((a, b) => b["$nurseSortColumn"].compareTo(a["$nurseSortColumn"]));
-                  } else {
-                    nurseIsSource.sort((a, b) => a["$nurseSortColumn"].compareTo(b["$nurseSortColumn"]));
-                  }
-                });
-              },
-              sortAscending: nurseSortAscending,
-              sortColumn: nurseSortColumn,
-              isLoading: nurseIsLoading,
-              onSelect: (value, item) {
-                print("$value  $item ");
-                if (value) {
-                  setState(() => nurseSelecteds.add(item));
-                } else {
-                  setState(() => nurseSelecteds.removeAt(nurseSelecteds.indexOf(item)));
-                }
-              },
-              onSelectAll: (value) {
-                if (value) {
-                  setState(() => nurseSelecteds = nurseIsSource.map((entry) => entry).toList().cast());
-                } else {
-                  setState(() => nurseSelecteds.clear());
-                }
-              },
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(0),
+              constraints: BoxConstraints(
+                maxHeight: 500,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ResponsiveDatatable(
+                  actions: [
+                    widgetSearch(),
+                  ],
+                  headers: nurseHeaders,
+                  source: !showSearchedList ? nurseIsSource : nurseIsSearched,
+                  selecteds: nurseSelecteds,
+                  showSelect: nurseShowSelect,
+                  autoHeight: false,
+                  onTabRow: (data) {
+                    print(data);
+                  },
+                  onSort: (value) {
+                    setState(() {
+                      nurseSortColumn = value;
+                      nurseSortAscending = !nurseSortAscending;
+                      if (nurseSortAscending) {
+                        nurseIsSource.sort((a, b) => b["$nurseSortColumn"]
+                            .compareTo(a["$nurseSortColumn"]));
+                      } else {
+                        nurseIsSource.sort((a, b) => a["$nurseSortColumn"]
+                            .compareTo(b["$nurseSortColumn"]));
+                      }
+                    });
+                  },
+                  sortAscending: nurseSortAscending,
+                  sortColumn: nurseSortColumn,
+                  isLoading: nurseIsLoading,
+                  onSelect: (value, item) {
+                    print("$value  $item ");
+                    if (value) {
+                      setState(() => nurseSelecteds.add(item));
+                    } else {
+                      setState(() => nurseSelecteds
+                          .removeAt(nurseSelecteds.indexOf(item)));
+                    }
+                  },
+                  onSelectAll: (value) {
+                    if (value) {
+                      setState(() => nurseSelecteds =
+                          nurseIsSource.map((entry) => entry).toList().cast());
+                    } else {
+                      setState(() => nurseSelecteds.clear());
+                    }
+                  },
+                ),
+              ),
             ),
-          ),
-        ),
-      ]),
+          ]),
     );
+  }
+
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+      padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[300]),
+        ),
+        child: TextField(
+          textAlignVertical: TextAlignVertical.center,
+          cursorColor: Colors.grey[600],
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              prefixIcon: Icon(
+                Icons.search_outlined,
+                color: Colors.grey[600],
+              ),
+              labelStyle: TextStyle(
+                fontWeight: FontWeight.normal,
+                color: Colors.grey[600],
+              ),
+              focusColor: Colors.grey[600],
+              hintText: 'Search'),
+          onChanged: (value) => onChangedSearchedValue(value),
+        ),
+      ),
+    ));
   }
 }

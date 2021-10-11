@@ -410,7 +410,7 @@ class _PatientListState extends State<PatientList> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
-                  onPressed: (){},
+                  onPressed: () {},
                   child: Text('Edit',
                       style: TextStyle(
                         color: Shade.actionButtonTextEdit,
@@ -420,13 +420,13 @@ class _PatientListState extends State<PatientList> {
                   width: 10,
                 ),
                 TextButton(
-                    onPressed: () {  },
+                    onPressed: () {},
                     child: Text(
-                  'Delete',
-                  style: TextStyle(
-                    color: Shade.actionButtonTextDelete,
-                  ),
-                )),
+                      'Delete',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
+                    )),
               ],
             ));
           }),
@@ -452,14 +452,7 @@ class _PatientListState extends State<PatientList> {
                 padding: const EdgeInsets.all(8.0),
                 child: ResponsiveDatatable(
                   actions: [
-                    Expanded(
-                        child: TextField(
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.search_outlined),
-                          hintText: 'Search Patient'),
-                      onChanged: (value) => onChangedSearchedValue(value),
-                    )),
+                    widgetSearch(),
                   ],
                   headers: patientHeaders,
                   source:
@@ -487,7 +480,7 @@ class _PatientListState extends State<PatientList> {
                   sortColumn: patientSortColumn,
                   isLoading: patientIsLoading,
                   onSelect: (value, item) {
-                    print("$value  $item ");
+                    // print("$value  $item ");
                     if (value) {
                       setState(() => patientSelected.add(item));
                     } else {
@@ -534,11 +527,9 @@ class _PatientListState extends State<PatientList> {
     try {
       PatientResponseList walkInList = await patientService
           .getPatients(context.read<TokenProvider>().tokenSample.jwtToken);
-      print(listPatient);
       if (walkInList != null) {
         if (walkInList.isSuccess) {
           listPatient = walkInList.data;
-          print(listPatient);
           patientIsSource.addAll(generatePatientDataFromApi(listPatient));
         } else {
           GlobalSnackbar.showMessageUsingSnackBar(
@@ -588,69 +579,71 @@ class _PatientListState extends State<PatientList> {
     return tempspatient;
   }
 
-  void onChangedSearchedValue(value) {
+  Future<void> onChangedSearchedValue(String search) async {
     if (!patientIsLoading) {
-      if (value.isNotEmpty) {
-        if (value.length >= 1) {
-          var searchList = patientIsSource.where((element) {
-            String searchById = element["id"].toString().toLowerCase();
-            String searchByFirstName =
-                element["firstName"].toString().toLowerCase();
-            String searchByLastName =
-                element["lastName"].toString().toLowerCase();
-            String searchByEmail = element["email"].toString().toLowerCase();
-            String searchByFatherName =
-                element["fatherName"].toString().toLowerCase();
-            String searchByDOB =
-                element["dateOfBirth"].toString().toLowerCase();
-            String searchByCategory =
-                element["category"].toString().toLowerCase();
-
-            if (searchById.contains(value.toLowerCase()) ||
-                searchByFirstName.contains(value.toLowerCase()) ||
-                searchByLastName.contains(value.toLowerCase()) ||
-                searchByEmail.contains(value.toLowerCase()) ||
-                searchByDOB.contains(value.toLowerCase()) ||
-                searchByCategory.contains(value.toLowerCase()) ||
-                searchByFatherName.contains(value.toLowerCase())) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          patientIsSearched = [];
-          patientIsSearched.addAll(generatePatientSearchData(searchList));
-          setState(() {
-            showSearchedList = true;
-          });
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        if (search.isEmpty) {
+          getPatientFromApiAndLinkToTable();
+          return;
+        }
+        PatientResponseList patientResponse =
+            await patientService.getPatientBySearch(
+                context.read<TokenProvider>().tokenSample.jwtToken, search);
+        if (patientResponse != null) {
+          if (patientResponse.isSuccess) {
+            patientIsSource = [];
+            listPatient = [];
+            listPatient = patientResponse.data;
+            patientIsSource.addAll(generatePatientDataFromApi(listPatient));
+            setState(() {
+              showSearchedList = false;
+            });
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, patientResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
         } else {
-          setState(() {
-            showSearchedList = false;
-          });
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        setState(() {
-          showSearchedList = false;
-        });
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     }
   }
-
-  List<Map<String, dynamic>> generatePatientSearchData(
-      Iterable<Map<String, dynamic>> iterableList) {
-    List<Map<String, dynamic>> tempsPatient = [];
-    for (var iterable in iterableList) {
-      tempsPatient.add({
-        "id": iterable["id"],
-        "firstName": iterable["firstName"],
-        "lastName": iterable["lastName"],
-        "email": iterable["email"],
-        "category": iterable["category"],
-        "dateOfBirth": iterable["dateOfBirth"],
-        "fatherName": iterable["fatherName"],
-        "Action": iterable["Action"],
-      });
-    }
-    return tempsPatient;
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.grey[50],
+              border: Border.all(color: Colors.grey[300]),
+            ),
+            child: TextField(
+              textAlignVertical: TextAlignVertical.center,
+              cursorColor: Colors.grey[600],
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.search_outlined,
+                    color: Colors.grey[600],
+                  ),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey[600],
+                  ),
+                  focusColor: Colors.grey[600],
+                  hintText: 'Search'),
+              onChanged: (value) => onChangedSearchedValue(value),
+            ),
+          ),
+        ));
   }
 }

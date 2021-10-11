@@ -627,6 +627,7 @@ class _AddReceptionistState extends State<AddReceptionist> {
       ReceptionistService receptionistService = ReceptionistService();
       ReceptionistResponse receptionistResponse = await receptionistService.insertReceptionist(
           ReceptionistRequest(
+
             firstName: FirstName,
             lastName: LastName,
             fatherHusbandName: FatherHusbandName,

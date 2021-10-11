@@ -82,15 +82,19 @@ class _ReceptionistListState extends State<ReceptionistList> {
         body: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyText2,
           child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.minHeight,
                   ),
                   child: Padding(
-                      padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                          Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                      padding: EdgeInsets.fromLTRB(
+                          Dimens.globalPaddingLeft,
+                          Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight,
+                          Dimens.globalPaddingBottom),
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -141,10 +145,12 @@ class _ReceptionistListState extends State<ReceptionistList> {
       if (hasToken) {
         getReceptionistFromApiAndLinkToTable();
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
@@ -153,28 +159,33 @@ class _ReceptionistListState extends State<ReceptionistList> {
     listReceptionist = [];
     receptionistIsSource = [];
     try {
-      ReceptionistResponseList receptionistList =
-          await receptionistService.getReceptionists(context.read<TokenProvider>().tokenSample.jwtToken);
+      ReceptionistResponseList receptionistList = await receptionistService
+          .getReceptionists(context.read<TokenProvider>().tokenSample.jwtToken);
       if (receptionistList != null) {
         if (receptionistList.isSuccess) {
           listReceptionist = receptionistList.data;
-          receptionistIsSource.addAll(generateReceptionistDataFromApi(listReceptionist));
+          receptionistIsSource
+              .addAll(generateReceptionistDataFromApi(listReceptionist));
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, receptionistList.message, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, receptionistList.message, context);
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorNull, context);
       }
       setState(() => receptionistIsLoading = false);
     } catch (exception) {
       setState(() => receptionistIsLoading = false);
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  List<Map<String, dynamic>> generateReceptionistDataFromApi(List<ReceptionistSample> listOfReceptionist) {
+  List<Map<String, dynamic>> generateReceptionistDataFromApi(
+      List<ReceptionistSample> listReceptionist) {
     List<Map<String, dynamic>> tempsReceptionist = [];
-    for (ReceptionistSample receptionist in listOfReceptionist) {
+    for (ReceptionistSample receptionist in listReceptionist) {
       tempsReceptionist.add({
         "id": receptionist.id,
         "userId": receptionist.userId,
@@ -203,15 +214,32 @@ class _ReceptionistListState extends State<ReceptionistList> {
     return tempsReceptionist;
   }
 
-  List<Map<String, dynamic>> generateReceptionistSearchData(Iterable<Map<String, dynamic>> iterableList) {
+  List<Map<String, dynamic>> generateReceptionistSearchData(
+      Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsreceptionist = [];
     for (var iterable in iterableList) {
       tempsreceptionist.add({
         "id": iterable["id"],
+        "userId": iterable["userId"],
+        "jobType": iterable["jobType"],
+        "shiftTime": iterable["shiftTime"],
+        "userType": iterable["userType"],
+        "dateOfBirth": iterable["dateOfBirth"],
+        "maritalStatus": iterable["maritalStatus"],
+        "religion": iterable["religion"],
         "firstName": iterable["firstName"],
         "lastName": iterable["lastName"],
-        "email": iterable["email"],
+        "fatherHusbandName": iterable["fatherHusbandName"],
+        "gender": iterable["gender"],
+        "cnic": iterable["cnic"],
         "contact": iterable["contact"],
+        "emergencyContact": iterable["emergencyContact"],
+        "email": iterable["email"],
+        "address": iterable["address"],
+        "joiningDate": iterable["joiningDate"],
+        "floorNo": iterable["floorNo"],
+        "experience": iterable["experience"],
+        "qualifications": iterable["qualifications"],
         "Action": iterable["Action"],
       });
     }
@@ -591,7 +619,8 @@ class _ReceptionistListState extends State<ReceptionistList> {
     List<QualificationSample> qualificationSampleList = row['qualifications'];
     if (qualificationSampleList != null) {
       if (qualificationSampleList.length > 0) {
-        for (QualificationSample qualificationSample in qualificationSampleList) {
+        for (QualificationSample qualificationSample
+            in qualificationSampleList) {
           qualificationRequestList.add(QualificationRequest(
             Id: qualificationSample.id,
             UserId: qualificationSample.userId,
@@ -602,7 +631,6 @@ class _ReceptionistListState extends State<ReceptionistList> {
         }
       }
     }
-
     ReceptionistRequest receptionistRequest = ReceptionistRequest(
       id: row['id'],
       jobType: row['jobType'],
@@ -637,11 +665,17 @@ class _ReceptionistListState extends State<ReceptionistList> {
   void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
       onPressed: () => Navigator.of(context).pop(),
-      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
-      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
       onPressed: () => onCallingDeleteReceptionist(id),
     );
 
@@ -664,8 +698,11 @@ class _ReceptionistListState extends State<ReceptionistList> {
         cancelButton,
         deleteButton,
       ],
-      actionsPadding: EdgeInsets.fromLTRB(Dimens.actionsGlobalButtonLeft, Dimens.actionsGlobalButtonTop,
-          Dimens.actionsGlobalButtonRight, Dimens.actionsGlobalButtonBottom),
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
     );
 
     showDialog(
@@ -679,70 +716,77 @@ class _ReceptionistListState extends State<ReceptionistList> {
 
   Future<void> onCallingDeleteReceptionist(int id) async {
     Navigator.pop(context);
-    globalProgressDialog.showSimpleFontellicoProgressDialog(
-        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(false,
+        Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
         ReceptionistResponse receptionistResponse =
-            await receptionistService.deleteReceptionist(id, context.read<TokenProvider>().tokenSample.jwtToken);
+            await receptionistService.deleteReceptionist(
+                id, context.read<TokenProvider>().tokenSample.jwtToken);
         if (receptionistResponse != null) {
           if (receptionistResponse.isSuccess) {
             checkTokenValidityAndGetReceptionist();
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, receptionistResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess,
+                receptionistResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           } else {
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, receptionistResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, receptionistResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           }
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
           globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
 
-  void onChangedSearchedValue(value) {
+  Future<void> onChangedSearchedValue(String search) async {
     if (!receptionistIsLoading) {
-      if (value.isNotEmpty) {
-        if (value.length >= 1) {
-          var searchList = receptionistIsSource.where((element) {
-            String searchById = element["id"].toString().toLowerCase();
-            String searchByFirstName = element["firstName"].toString().toLowerCase();
-            String searchByLastName = element["lastName"].toString().toLowerCase();
-            String searchByEmail = element["email"].toString().toLowerCase();
-            String searchByContactNumber = element["contactNumber"].toString().toLowerCase();
-            if (searchById.contains(value.toLowerCase()) ||
-                searchByFirstName.contains(value.toLowerCase()) ||
-                searchByLastName.contains(value.toLowerCase()) ||
-                searchByEmail.contains(value.toLowerCase()) ||
-                searchByContactNumber.contains(value.toLowerCase())) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          receptionistIsSearched = [];
-          receptionistIsSearched.addAll(generateReceptionistSearchData(searchList));
-          setState(() {
-            showSearchedList = true;
-          });
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        if (search.isEmpty) {
+          getReceptionistFromApiAndLinkToTable();
+          return;
+        }
+        ReceptionistResponseList serviceResponse =
+            await receptionistService.getReceptionistBySearch(
+                context.read<TokenProvider>().tokenSample.jwtToken, search);
+        if (serviceResponse != null) {
+          if (serviceResponse.isSuccess) {
+            receptionistIsSource = [];
+            listReceptionist = [];
+            listReceptionist = serviceResponse.data;
+            receptionistIsSource
+                .addAll(generateReceptionistDataFromApi(listReceptionist));
+            setState(() {
+              showSearchedList = false;
+            });
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, serviceResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
         } else {
-          setState(() {
-            showSearchedList = false;
-          });
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        setState(() {
-          showSearchedList = false;
-        });
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     }
   }
@@ -752,69 +796,103 @@ class _ReceptionistListState extends State<ReceptionistList> {
       elevation: 1,
       shadowColor: Colors.black,
       clipBehavior: Clip.none,
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
-        Container(
-          margin: EdgeInsets.all(10),
-          padding: EdgeInsets.all(0),
-          constraints: BoxConstraints(
-            maxHeight: 500,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ResponsiveDatatable(
-              actions: [
-                Expanded(
-                    child: TextField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      prefixIcon: Icon(Icons.search_outlined),
-                      hintText: 'Search receptionist'),
-                  onChanged: (value) => onChangedSearchedValue(value),
-                )),
-              ],
-              headers: receptionistHeaders,
-              source: !showSearchedList ? receptionistIsSource : receptionistIsSearched,
-              selecteds: receptionistSelected,
-              showSelect: receptionistShowSelect,
-              autoHeight: false,
-              onTabRow: (data) {
-                print(data);
-              },
-              onSort: (value) {
-                setState(() {
-                  receptionistSortColumn = value;
-                  receptionistSortAscending = !receptionistSortAscending;
-                  if (receptionistSortAscending) {
-                    receptionistIsSource
-                        .sort((a, b) => b["$receptionistSortColumn"].compareTo(a["$receptionistSortColumn"]));
-                  } else {
-                    receptionistIsSource
-                        .sort((a, b) => a["$receptionistSortColumn"].compareTo(b["$receptionistSortColumn"]));
-                  }
-                });
-              },
-              sortAscending: receptionistSortAscending,
-              sortColumn: receptionistSortColumn,
-              isLoading: receptionistIsLoading,
-              onSelect: (value, item) {
-                print("$value  $item ");
-                if (value) {
-                  setState(() => receptionistSelected.add(item));
-                } else {
-                  setState(() => receptionistSelected.removeAt(receptionistSelected.indexOf(item)));
-                }
-              },
-              onSelectAll: (value) {
-                if (value) {
-                  setState(() => receptionistSelected = receptionistIsSource.map((entry) => entry).toList().cast());
-                } else {
-                  setState(() => receptionistSelected.clear());
-                }
-              },
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(0),
+              constraints: BoxConstraints(
+                maxHeight: 500,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ResponsiveDatatable(
+                  actions: [
+                    widgetSearch(),
+                  ],
+                  headers: receptionistHeaders,
+                  source: !showSearchedList
+                      ? receptionistIsSource
+                      : receptionistIsSearched,
+                  selecteds: receptionistSelected,
+                  showSelect: receptionistShowSelect,
+                  autoHeight: false,
+                  onTabRow: (data) {
+                    print(data);
+                  },
+                  onSort: (value) {
+                    setState(() {
+                      receptionistSortColumn = value;
+                      receptionistSortAscending = !receptionistSortAscending;
+                      if (receptionistSortAscending) {
+                        receptionistIsSource.sort((a, b) =>
+                            b["$receptionistSortColumn"]
+                                .compareTo(a["$receptionistSortColumn"]));
+                      } else {
+                        receptionistIsSource.sort((a, b) =>
+                            a["$receptionistSortColumn"]
+                                .compareTo(b["$receptionistSortColumn"]));
+                      }
+                    });
+                  },
+                  sortAscending: receptionistSortAscending,
+                  sortColumn: receptionistSortColumn,
+                  isLoading: receptionistIsLoading,
+                  onSelect: (value, item) {
+                    print("$value  $item ");
+                    if (value) {
+                      setState(() => receptionistSelected.add(item));
+                    } else {
+                      setState(() => receptionistSelected
+                          .removeAt(receptionistSelected.indexOf(item)));
+                    }
+                  },
+                  onSelectAll: (value) {
+                    if (value) {
+                      setState(() => receptionistSelected = receptionistIsSource
+                          .map((entry) => entry)
+                          .toList()
+                          .cast());
+                    } else {
+                      setState(() => receptionistSelected.clear());
+                    }
+                  },
+                ),
+              ),
+            ),
+          ]),
+    );
+  }
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.grey[50],
+              border: Border.all(color: Colors.grey[300]),
+            ),
+            child: TextField(
+              textAlignVertical: TextAlignVertical.center,
+              cursorColor: Colors.grey[600],
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.search_outlined,
+                    color: Colors.grey[600],
+                  ),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey[600],
+                  ),
+                  focusColor: Colors.grey[600],
+                  hintText: 'Search'),
+              onChanged: (value) => onChangedSearchedValue(value),
             ),
           ),
-        ),
-      ]),
-    );
+        ));
   }
 }

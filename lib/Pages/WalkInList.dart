@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:baby_doctor/Common/GlobalProgressDialog.dart';
 import 'package:baby_doctor/Common/GlobalRefreshToken.dart';
 import 'package:baby_doctor/Common/GlobalSnakbar.dart';
@@ -11,71 +13,75 @@ import 'package:baby_doctor/Models/Responses/PatientResponse.dart';
 import 'package:baby_doctor/Models/Responses/ReceptionistResponse.dart';
 import 'package:baby_doctor/Models/Sample/AppointmentSample.dart';
 import 'package:baby_doctor/Models/Sample/DoctorSample.dart';
-import 'package:baby_doctor/Models/Sample/PatientSample.dart';
 import 'package:baby_doctor/Models/Sample/ReceptionistSample.dart';
 import 'package:baby_doctor/Models/Sample/UserSample.dart';
 import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:baby_doctor/Service/AppointmentService.dart';
 import 'package:baby_doctor/Service/DoctorService.dart';
+import 'package:baby_doctor/Service/PatientService.dart';
 import 'package:baby_doctor/Service/ReceptionistService.dart';
 import 'package:baby_doctor/constants/QEnum.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:baby_doctor/Service/PatientService.dart';
 import 'package:responsive_table/DatatableHeader.dart';
 import 'package:responsive_table/ResponsiveDatatable.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
-class AdmittedList extends StatefulWidget {
+class WalkInList extends StatefulWidget {
   @override
-  _AdmittedListState createState() => _AdmittedListState();
+  _WalkInListState createState() => _WalkInListState();
 }
 
-class _AdmittedListState extends State<AdmittedList> {
+class _WalkInListState extends State<WalkInList> {
   final formKey = GlobalKey<FormState>();
-  AppointmentService appointmentService;
-  bool room = true;
-  bool er = false;
-
-  // admitted Data
-  List<DatatableHeader> admittedHeaders = [];
-  List<int> admittedPerPage = [5, 10, 15, 100];
-  int admittedTotal = 100;
-  int admittedCurrentPerPage;
-  int admittedCurrentPage = 1;
-  bool admittedIsSearch = false;
-  List<Map<String, dynamic>> admittedIsSource = [];
-  List<Map<String, dynamic>> admittedSelected = [];
-  String admittedSelectableKey = "Invoice";
-  String admittedSortColumn;
-  String admittedId;
-  List<AppointmentSample> listAdmitted;
+  bool walkIn = true;
+  List<DatatableHeader> walkInHeaders = [];
+  List<int> walkInPerPage = [5, 10, 15, 100];
+  int walkInTotal = 100;
+  int walkInCurrentPerPage;
+  int walkInCurrentPage = 1;
+  bool walkInIsSearch;
+  List<Map<String, dynamic>> walkInIsSource = [];
+  List<Map<String, dynamic>> walkInSelected = [];
+  String walkInSelectableKey = "Invoice";
+  String walkInSortColumn;
+  bool walkInSortAscending = true;
+  bool walkInIsLoading = true;
+  bool walkInShowSelect = false;
+  List<AppointmentSample> listWalkIn;
   List<DoctorSample> listDoctor;
   List<ReceptionistSample> listReceptionist;
-  bool admittedSortAscending = true;
-  bool admittedIsLoading = true;
-  bool admittedShowSelect = false;
-  bool showSearchedList;
-  bool admittedShowpatientIsSearchedSelect;
-  List<Map<String, dynamic>> admittedIsSearched;
-  bool hasChangeDependencies = false;
-  GlobalProgressDialog globalProgressDialog;
-  DoctorSample doctorSampleDropDown = DoctorSample(id: -1);
-  ReceptionistSample receptionistSampleDropDown = ReceptionistSample(id: -1);
-  bool hasDoctors = false;
-  bool hasReceptionist = false;
-  final _tecFromDate = TextEditingController();
-  final _tecToDate = TextEditingController();
+  AppointmentService appointmentService;
   DoctorService doctorService;
   ReceptionistService receptionistService;
+  List<Map<String, dynamic>> walkInIsSearched;
+  final _tecFromDate = TextEditingController();
+  final _tecToDate = TextEditingController();
+  String fromDate;
+  String toDate;
+
+  PatientService patientService;
+  bool showSearchedList;
+  String dropdownDoctor = "Select Doctor";
+  DoctorSample doctorSampleDropDown = DoctorSample(id: -1);
+  ReceptionistSample receptionistSampleDropDown = ReceptionistSample(id: -1);
+  String dropdownDate = "Select Date";
+  String dropdownBookedBy = "Select Booked By";
+
+  bool hasChangeDependencies = false;
+  GlobalProgressDialog globalProgressDialog;
+  bool hasDoctors = false;
+  bool hasReceptionist = false;
 
   @override
   void initState() {
     super.initState();
     appointmentService = AppointmentService();
+    patientService = PatientService();
     doctorService = DoctorService();
     receptionistService = ReceptionistService();
-    initAdmittedPatientVariablesAndClasses();
-    initializeAdmittedPatientHeaders();
+    initWalkInVariablesAndClasses();
+    initializeWalkInHeaders();
   }
 
   @override
@@ -84,7 +90,7 @@ class _AdmittedListState extends State<AdmittedList> {
       globalProgressDialog = GlobalProgressDialog(context);
       onSelectDoctorValue();
       onSelectReceptionistValue();
-      checkTokenValidityAndGetAdmittedPatients();
+      checkTokenValidityAndGetPatients();
       hasChangeDependencies = true;
     }
     super.didChangeDependencies();
@@ -99,405 +105,32 @@ class _AdmittedListState extends State<AdmittedList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Shade.globalBackgroundColor,
-      appBar: AppBar(
-        title: Text(Strings.titleAdmittedList),
-        centerTitle: false,
-        backgroundColor: Shade.globalAppBarColor,
-        elevation: 0.0,
-      ),
-      body: DefaultTextStyle(
-        style: Theme.of(context).textTheme.bodyText2,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.minHeight,
-                ),
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        Dimens.globalPaddingLeft,
-                        Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight,
-                        Dimens.globalPaddingBottom),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          widgetTableType(),
-                          widgetAdmittedPatients(),
-                        ],
-                      ),
-                    )),
-              ),
-            );
-          },
-        ),
-      ),
-    );
+    return widgetWalkInPatients();
   }
 
-  void initAdmittedPatientVariablesAndClasses() {
-    admittedHeaders = [];
-    admittedPerPage = [5, 10, 15, 100];
-    admittedTotal = 100;
-    admittedCurrentPerPage;
-    admittedCurrentPage = 1;
-    admittedIsSearch = false;
-    admittedIsSource = [];
-    admittedSelected = [];
-    admittedSelectableKey = "Invoice";
-    admittedSortColumn;
-    admittedSortAscending = true;
-    admittedIsLoading = true;
-    admittedShowSelect = false;
+  void initWalkInVariablesAndClasses() {
+    walkInHeaders = [];
+    walkInPerPage = [5, 10, 15, 100];
+    walkInTotal = 100;
+    walkInCurrentPerPage;
+    walkInCurrentPage = 1;
+    walkInIsSearch = false;
+    walkInIsSource = [];
+    walkInSelected = [];
+    walkInSelectableKey = "Invoice";
+    walkInSortColumn;
+    listWalkIn = [];
+    listDoctor = [];
+    walkInSortAscending = true;
+    walkInIsLoading = true;
+    walkInShowSelect = false;
     showSearchedList = false;
     appointmentService = AppointmentService();
+    patientService = PatientService();
+    doctorService = DoctorService();
   }
 
-  void initializeAdmittedPatientHeaders() {
-    admittedHeaders = [
-      DatatableHeader(
-          value: "id",
-          show: true,
-          flex: 1,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Id",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "patientId",
-          show: false,
-          flex: 2,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Patient Id",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "doctorId",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Doctor Id",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "receptionistId",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Receptionist Id",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "code",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Code",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "date",
-          show: true,
-          sortable: true,
-          flex: 2,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Date",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "consultationDate",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Consultation Date",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "type",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Type",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "patientCategory",
-          show: true,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Patient Category",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "birthPlace",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Birth Place",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "patientType",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Patient Type",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "externalId",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "externalId",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "bloodGroup",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "bloodGroup",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "clinicSite",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "clinicSite",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "referredBy",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "referredBy",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "referredDate",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "referredDate",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "guardian",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "guardian",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "description",
-          show: false,
-          sortable: true,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "description",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          }),
-      DatatableHeader(
-          value: "Action",
-          show: true,
-          flex: 2,
-          sortable: false,
-          textAlign: TextAlign.center,
-          headerBuilder: (value) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: Text(
-                  "Action",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            );
-          },
-          sourceBuilder: (id, row) {
-            return Container(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {},
-                  child: Text('Edit',
-                      style: TextStyle(
-                        color: Shade.actionButtonTextEdit,
-                      )),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(
-                        color: Shade.actionButtonTextDelete,
-                      ),
-                    )),
-              ],
-            ));
-          }),
-    ];
-  }
-
-  Widget widgetAdmittedPatients() {
+  Widget widgetWalkInPatients() {
     return Card(
       elevation: 1,
       shadowColor: Colors.black,
@@ -782,47 +415,44 @@ class _AdmittedListState extends State<AdmittedList> {
                   actions: [
                     widgetSearch(),
                   ],
-                  headers: admittedHeaders,
-                  source:
-                      !showSearchedList ? admittedIsSource : admittedIsSearched,
-                  selecteds: admittedSelected,
-                  showSelect: admittedShowSelect,
+                  headers: walkInHeaders,
+                  source: !showSearchedList ? walkInIsSource : walkInIsSearched,
+                  selecteds: walkInSelected,
+                  showSelect: walkInShowSelect,
                   autoHeight: false,
                   onTabRow: (data) {
                     // print(data);
                   },
                   onSort: (value) {
                     setState(() {
-                      admittedSortColumn = value;
-                      admittedSortAscending = !admittedSortAscending;
-                      if (admittedSortAscending) {
-                        admittedIsSource.sort((a, b) => b["$admittedSortColumn"]
-                            .compareTo(a["$admittedSortColumn"]));
+                      walkInSortColumn = value;
+                      walkInSortAscending = !walkInSortAscending;
+                      if (walkInSortAscending) {
+                        walkInIsSource.sort((a, b) => b["$walkInSortColumn"]
+                            .compareTo(a["$walkInSortColumn"]));
                       } else {
-                        admittedIsSource.sort((a, b) => a["$admittedSortColumn"]
-                            .compareTo(b["$admittedSortColumn"]));
+                        walkInIsSource.sort((a, b) => a["$walkInSortColumn"]
+                            .compareTo(b["$walkInSortColumn"]));
                       }
                     });
                   },
-                  sortAscending: admittedSortAscending,
-                  sortColumn: admittedSortColumn,
-                  isLoading: admittedIsLoading,
+                  sortAscending: walkInSortAscending,
+                  sortColumn: walkInSortColumn,
+                  isLoading: walkInIsLoading,
                   onSelect: (value, item) {
                     if (value) {
-                      setState(() => admittedSelected.add(item));
+                      setState(() => walkInSelected.add(item));
                     } else {
-                      setState(() => admittedSelected
-                          .removeAt(admittedSelected.indexOf(item)));
+                      setState(() => walkInSelected
+                          .removeAt(walkInSelected.indexOf(item)));
                     }
                   },
                   onSelectAll: (value) {
                     if (value) {
-                      setState(() => admittedSelected = admittedIsSource
-                          .map((entry) => entry)
-                          .toList()
-                          .cast());
+                      setState(() => walkInSelected =
+                          walkInIsSource.map((entry) => entry).toList().cast());
                     } else {
-                      setState(() => admittedSelected.clear());
+                      setState(() => walkInSelected.clear());
                     }
                   },
                 ),
@@ -832,11 +462,366 @@ class _AdmittedListState extends State<AdmittedList> {
     );
   }
 
-  Future<void> checkTokenValidityAndGetAdmittedPatients() async {
+  initializeWalkInHeaders() {
+    walkInHeaders = [
+      DatatableHeader(
+          value: "id",
+          show: true,
+          flex: 1,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "patientId",
+          show: false,
+          flex: 2,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Patient Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "doctorId",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Doctor Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "receptionistId",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Receptionist Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "code",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Code",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "date",
+          show: true,
+          sortable: true,
+          flex: 2,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Date",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "consultationDate",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Consultation Date",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "type",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "patientCategory",
+          show: true,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Patient Category",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "userId",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "User Id",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "birthPlace",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Birth Place",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "patientType",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Patient Type",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "externalId",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "externalId",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "bloodGroup",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "bloodGroup",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "clinicSite",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "clinicSite",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "referredBy",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "referredBy",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "referredDate",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "referredDate",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "guardian",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "guardian",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "description",
+          show: false,
+          sortable: true,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "description",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          }),
+      DatatableHeader(
+          value: "Action",
+          show: true,
+          flex: 2,
+          sortable: false,
+          textAlign: TextAlign.center,
+          headerBuilder: (value) {
+            return Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Text(
+                  "Action",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            );
+          },
+          sourceBuilder: (id, row) {
+            return Container(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  // onPressed: () => onPressedEditFromTable(id, row),
+                  child: Text('Edit',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextEdit,
+                      )),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                TextButton(
+                    onPressed: () => onPressedDeleteFromTable(id, row),
+                    child: Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Shade.actionButtonTextDelete,
+                      ),
+                    )),
+              ],
+            ));
+          }),
+    ];
+  }
+
+  Future<void> checkTokenValidityAndGetPatients() async {
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
-        getAdmittedPatientFromApiAndLinkToTable();
+        getWalkInFromApiAndLinkToTable();
       } else {
         GlobalSnackbar.showMessageUsingSnackBar(
             Shade.snackGlobalFailed, Strings.errorToken, context);
@@ -847,40 +832,43 @@ class _AdmittedListState extends State<AdmittedList> {
     }
   }
 
-  void getAdmittedPatientFromApiAndLinkToTable() async {
-    setState(() => admittedIsLoading = true);
-    listAdmitted = [];
-    admittedIsSource = [];
+  void getWalkInFromApiAndLinkToTable() async {
     try {
-      AppointmentResponseList roomList =
-          await appointmentService.getPatientAppointmentsByCategory(
-              context.read<TokenProvider>().tokenSample.jwtToken, 'Admitted');
-      if (roomList != null) {
-        if (roomList.isSuccess) {
-          listAdmitted = roomList.data;
-          admittedIsSource
-              .addAll(generateAdmittedPatientDataFromApi(listAdmitted));
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        AppointmentResponseList walkInList =
+            await appointmentService.getPatientAppointmentsByCategory(
+                context.read<TokenProvider>().tokenSample.jwtToken, 'WalkIn');
+        if (walkInList != null) {
+          if (walkInList.isSuccess) {
+            listWalkIn = walkInList.data;
+            walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIn));
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, walkInList.message, context);
+          }
         } else {
           GlobalSnackbar.showMessageUsingSnackBar(
-              Shade.snackGlobalFailed, roomList.message, context);
+              Shade.snackGlobalFailed, Strings.errorNull, context);
         }
       } else {
         GlobalSnackbar.showMessageUsingSnackBar(
-            Shade.snackGlobalFailed, Strings.errorNull, context);
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
-      setState(() => admittedIsLoading = false);
+      setState(() => walkInIsLoading = false);
     } catch (exception) {
-      setState(() => admittedIsLoading = false);
+      setState(() => walkInIsLoading = false);
       GlobalSnackbar.showMessageUsingSnackBar(
           Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  List<Map<String, dynamic>> generateAdmittedPatientDataFromApi(
-      List<AppointmentSample> listAdmittedPatient) {
-    List<Map<String, dynamic>> tempspatient = [];
-    for (AppointmentSample appointmentSample in listAdmittedPatient) {
-      tempspatient.add({
+  List<Map<String, dynamic>> generatewalkInDataFromApi(
+      List<AppointmentSample> listWalkIns) {
+    List<Map<String, dynamic>> tempswalkIn = [];
+    for (AppointmentSample appointmentSample in listWalkIns) {
+      tempswalkIn.add({
         "id": appointmentSample.id,
         "patientId": appointmentSample.patientId,
         "doctorId": appointmentSample.doctorId,
@@ -890,6 +878,7 @@ class _AdmittedListState extends State<AdmittedList> {
         "consultationDate": appointmentSample.consultationDate,
         "type": appointmentSample.type,
         "patientCategory": appointmentSample.patientCategory,
+        "userId": appointmentSample.patient.userId,
         "birthPlace": appointmentSample.patient.birthPlace,
         "externalId": appointmentSample.patient.externalId,
         "bloodGroup": appointmentSample.patient.bloodGroup,
@@ -902,11 +891,131 @@ class _AdmittedListState extends State<AdmittedList> {
         "Action": appointmentSample.id,
       });
     }
-    return tempspatient;
+    return tempswalkIn;
+  }
+
+  void onPressedDeleteFromTable(id, row) {
+    Widget cancelButton = TextButton(
+      onPressed: () => Navigator.of(context).pop(),
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
+    );
+
+    Widget deleteButton = TextButton(
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
+      onPressed: () => onCallingDeletePatient(id),
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Row(
+        children: [
+          Text(Strings.alertDialogTitleDelete),
+        ],
+      ),
+      content: Row(
+        children: [
+          Text(Strings.alertDialogTitleDeleteNote),
+          Text(
+            row['firstName'],
+            style: TextStyle(fontWeight: FontWeight.w100, color: Colors.red),
+          )
+        ],
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
+    );
+
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future<void> onCallingDeletePatient(int id) async {
+    Navigator.pop(context);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(false,
+        Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    try {
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        PatientResponse patientResponse = await patientService.deletePatient(
+            id, context.read<TokenProvider>().tokenSample.jwtToken);
+        if (patientResponse != null) {
+          if (patientResponse.isSuccess) {
+            checkTokenValidityAndGetPatients();
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalSuccess, patientResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, patientResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+      }
+    } catch (exception) {
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
+      globalProgressDialog.hideSimpleFontellicoProgressDialog();
+    }
+  }
+
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+      padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[300]),
+        ),
+        child: TextField(
+          textAlignVertical: TextAlignVertical.center,
+          cursorColor: Colors.grey[600],
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              prefixIcon: Icon(
+                Icons.search_outlined,
+                color: Colors.grey[600],
+              ),
+              labelStyle: TextStyle(
+                fontWeight: FontWeight.normal,
+                color: Colors.grey[600],
+              ),
+              focusColor: Colors.grey[600],
+              hintText: 'Search'),
+          onChanged: (value) => onChangedSearchedValue(value),
+        ),
+      ),
+    ));
   }
 
   Future<void> onChangedSearchedValue(String search) async {
-    if (!admittedIsLoading) {
+    if (!walkInIsLoading) {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
         String x = 'Category';
@@ -958,7 +1067,7 @@ class _AdmittedListState extends State<AdmittedList> {
             await service.getPatientAppointmentsBySearch(
                 AppointmentSearchRequest(
                   search: search,
-                  category: "admitted",
+                  category: "walkin",
                   doctor: doctorSampleDropDown.id.toString(),
                   dateFrom: '2021-09-07',
                   dateTo: '2021-09-30',
@@ -968,11 +1077,10 @@ class _AdmittedListState extends State<AdmittedList> {
                 context.read<TokenProvider>().tokenSample.jwtToken);
         if (serviceResponse != null) {
           if (serviceResponse.isSuccess) {
-            admittedIsSource = [];
-            listAdmitted = [];
-            listAdmitted = serviceResponse.data;
-            admittedIsSource
-                .addAll(generateAdmittedPatientDataFromApi(listAdmitted));
+            walkInIsSource = [];
+            listWalkIn = [];
+            listWalkIn = serviceResponse.data;
+            walkInIsSource.addAll(generatewalkInDataFromApi(listWalkIn));
             setState(() {
               showSearchedList = false;
             });
@@ -984,37 +1092,6 @@ class _AdmittedListState extends State<AdmittedList> {
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     }
-  }
-
-  Widget widgetSearch() {
-    return Expanded(
-        child: Padding(
-      padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.grey[50],
-          border: Border.all(color: Colors.grey[300]),
-        ),
-        child: TextField(
-          textAlignVertical: TextAlignVertical.center,
-          cursorColor: Colors.grey[600],
-          decoration: InputDecoration(
-              border: InputBorder.none,
-              prefixIcon: Icon(
-                Icons.search_outlined,
-                color: Colors.grey[600],
-              ),
-              labelStyle: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.grey[600],
-              ),
-              focusColor: Colors.grey[600],
-              hintText: 'Search'),
-          onChanged: (value) => onChangedSearchedValue(value),
-        ),
-      ),
-    ));
   }
 
   Future<void> _pickDate({
@@ -1067,7 +1144,9 @@ class _AdmittedListState extends State<AdmittedList> {
             Shade.snackGlobalFailed, Strings.errorToken, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
+      setState(() => walkInIsLoading = false);
     } catch (exception) {
+      setState(() => walkInIsLoading = false);
       GlobalSnackbar.showMessageUsingSnackBar(
           Shade.snackGlobalFailed, exception.toString(), context);
     }
@@ -1104,65 +1183,5 @@ class _AdmittedListState extends State<AdmittedList> {
       GlobalSnackbar.showMessageUsingSnackBar(
           Shade.snackGlobalFailed, exception.toString(), context);
     }
-  }
-
-  String TableType = 'room';
-
-  Widget widgetTableType() {
-    return Card(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(5, 0, 5, 10),
-            child: Column(
-              children: <Widget>[
-                Column(
-                  children: [
-                    ListTile(
-                      title: const Text(
-                        'Choose Type',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: RadioListTile(
-                        title: const Text('Room'),
-                        value: "room",
-                        groupValue: TableType,
-                        onChanged: (String value) {
-                          setState(() {
-                            TableType = value;
-                            room = true;
-                            er = false;
-                          });
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RadioListTile(
-                        title: const Text('ER'),
-                        value: "er",
-                        groupValue: TableType,
-                        onChanged: (String value) {
-                          setState(() {
-                            TableType = value;
-                            room = false;
-                            er = true;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

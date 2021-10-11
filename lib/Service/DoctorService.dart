@@ -35,13 +35,15 @@ class DoctorService {
     return null;
   }
 
-  Future<DoctorResponse> insertDoctor(DoctorRequest doctorRequest, String token) async {
-    final response = await http.post(Uri.https(Strings.pathAPI, Strings.apiDoctorInsert),
-        headers: <String, String>{
-          Strings.apiContentType: Strings.apiApplicationJson,
-          Strings.apiAuthorization: '${Strings.apiBearer} $token',
-        },
-        body: jsonEncode(doctorRequest.toJson()));
+  Future<DoctorResponse> insertDoctor(
+      DoctorRequest doctorRequest, String token) async {
+    final response =
+        await http.post(Uri.https(Strings.pathAPI, Strings.apiDoctorInsert),
+            headers: <String, String>{
+              Strings.apiContentType: Strings.apiApplicationJson,
+              Strings.apiAuthorization: '${Strings.apiBearer} $token',
+            },
+            body: jsonEncode(doctorRequest.toJson()));
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
       return DoctorResponse.fromJson(jsonResponse);
@@ -49,8 +51,11 @@ class DoctorService {
     return null;
   }
 
-  Future<DoctorResponse> updateDoctor(DoctorRequest serviceRequest, String token) async {
-    final response = await http.put(Uri.https(Strings.pathAPI, '${Strings.apiDoctorUpdate}/${serviceRequest.id}'),
+  Future<DoctorResponse> updateDoctor(
+      DoctorRequest serviceRequest, String token) async {
+    final response = await http.put(
+        Uri.https(
+            Strings.pathAPI, '${Strings.apiDoctorUpdate}/${serviceRequest.id}'),
         headers: <String, String>{
           Strings.apiContentType: Strings.apiApplicationJson,
           Strings.apiAuthorization: '${Strings.apiBearer} $token',
@@ -64,14 +69,31 @@ class DoctorService {
   }
 
   Future<DoctorResponse> deleteDoctor(int id, String token) async {
-    final response =
-        await http.delete(Uri.https(Strings.pathAPI, '${Strings.apiDoctorDelete}/$id'), headers: <String, String>{
-      Strings.apiContentType: Strings.apiApplicationJson,
-      Strings.apiAuthorization: '${Strings.apiBearer} $token',
-    });
+    final response = await http.delete(
+        Uri.https(Strings.pathAPI, '${Strings.apiDoctorDelete}/$id'),
+        headers: <String, String>{
+          Strings.apiContentType: Strings.apiApplicationJson,
+          Strings.apiAuthorization: '${Strings.apiBearer} $token',
+        });
     if (response.statusCode >= 200 && response.statusCode < 227) {
       final jsonResponse = jsonDecode(response.body);
       return DoctorResponse.fromJson(jsonResponse);
+    }
+    return null;
+  }
+
+  Future<DoctorResponseList> getDoctorBySearch(
+      String token, String search) async {
+    final response = await http.get(
+      Uri.https(Strings.pathAPI, '${Strings.apiDoctorGetSearch}/$search'),
+      headers: <String, String>{
+        Strings.apiContentType: Strings.apiApplicationJson,
+        Strings.apiAuthorization: '${Strings.apiBearer} $token',
+      },
+    );
+    if (response.statusCode >= 200 && response.statusCode < 227) {
+      final jsonResponse = jsonDecode(response.body);
+      return DoctorResponseList.fromJson(jsonResponse);
     }
     return null;
   }

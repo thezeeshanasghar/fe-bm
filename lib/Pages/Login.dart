@@ -65,11 +65,15 @@ class _LoginState extends State<Login> {
           builder: (BuildContext context, BoxConstraints viewportConstraints) {
             return SingleChildScrollView(
               child: ConstrainedBox(
-                constraints:
-                    BoxConstraints(minHeight: viewportConstraints.minHeight, minWidth: viewportConstraints.minWidth),
+                constraints: BoxConstraints(
+                    minHeight: viewportConstraints.minHeight,
+                    minWidth: viewportConstraints.minWidth),
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                        Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                    padding: EdgeInsets.fromLTRB(
+                        Dimens.globalPaddingLeft,
+                        Dimens.globalPaddingTop,
+                        Dimens.globalPaddingRight,
+                        Dimens.globalPaddingBottom),
                     child: Form(
                       key: formKey,
                       child: Column(
@@ -97,12 +101,17 @@ class _LoginState extends State<Login> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottomWithoutMaxLength),
             child: TextFormField(
               autofocus: false,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.supervised_user_circle), border: OutlineInputBorder(), labelText: 'User Name'),
+                  prefixIcon: Icon(Icons.supervised_user_circle),
+                  border: OutlineInputBorder(),
+                  labelText: 'User Name'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -121,13 +130,18 @@ class _LoginState extends State<Login> {
     return Column(
       children: [
         Padding(
-            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottomWithoutMaxLength),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottomWithoutMaxLength),
             child: TextFormField(
               autofocus: false,
               obscureText: true,
               decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline_rounded), border: OutlineInputBorder(), labelText: 'Password'),
+                  prefixIcon: Icon(Icons.lock_outline_rounded),
+                  border: OutlineInputBorder(),
+                  labelText: 'Password'),
               validator: (String value) {
                 if (value == null || value.isEmpty) {
                   return 'This field cannot be empty';
@@ -148,8 +162,11 @@ class _LoginState extends State<Login> {
         Align(
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(Dimens.globalInputFieldleft, Dimens.globalInputFieldTop,
-                Dimens.globalInputFieldRight, Dimens.globalInputFieldBottom),
+            padding: const EdgeInsets.fromLTRB(
+                Dimens.globalInputFieldleft,
+                Dimens.globalInputFieldTop,
+                Dimens.globalInputFieldRight,
+                Dimens.globalInputFieldBottom),
             child: ElevatedButton(
               autofocus: false,
               style: ElevatedButton.styleFrom(
@@ -171,27 +188,30 @@ class _LoginState extends State<Login> {
     //   return;
     // }
     formKey.currentState.save();
-    globalProgressDialog.showSimpleFontellicoProgressDialog(
-        false, Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(false,
+        Strings.dialogSubmitting, SimpleFontelicoProgressDialogType.multilines);
     AuthenticationService authenticationService = AuthenticationService();
     AuthenticateResponse authenticateResponse =
-        await authenticationService.authenticateLogin(AuthenticateLoginRequest(UserName: 'admin@gmail.com', Password: 'admin'));
+        await authenticationService.authenticateLogin(AuthenticateLoginRequest(
+            UserName: 'admin@gmail.com', Password: 'admin'));
     if (authenticateResponse != null) {
       if (authenticateResponse.isSuccess) {
         context.read<TokenProvider>().setToken(authenticateResponse.token);
-        context
-            .read<LoginCredentialsProvider>()
-            .setLoginCredentials(AuthenticateLoginRequest(UserName: UserName, Password: Password));
+        context.read<LoginCredentialsProvider>().setLoginCredentials(
+            AuthenticateLoginRequest(
+                UserName: 'admin@gmail.com', Password: 'admin'));
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
         Navigator.pop(context);
         Navigator.pushNamed(context, Strings.routeHomePage);
       } else {
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, authenticateResponse.message, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, authenticateResponse.message, context);
       }
     } else {
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Error: failed to call server', context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, 'Error: failed to call server', context);
     }
   }
 

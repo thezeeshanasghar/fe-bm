@@ -1,5 +1,4 @@
 import 'package:baby_doctor/Models/Sample/UserSample.dart';
-
 class DoctorSample {
   final int id;
   final int userId;

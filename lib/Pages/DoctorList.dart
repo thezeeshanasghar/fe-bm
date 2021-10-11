@@ -84,15 +84,19 @@ class _DoctorListState extends State<DoctorList> {
         body: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyText2,
           child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.minHeight,
                   ),
                   child: Padding(
-                      padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                          Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                      padding: EdgeInsets.fromLTRB(
+                          Dimens.globalPaddingLeft,
+                          Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight,
+                          Dimens.globalPaddingBottom),
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -143,10 +147,12 @@ class _DoctorListState extends State<DoctorList> {
       if (hasToken) {
         getDoctorsFromApiAndLinkToTable();
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
@@ -155,26 +161,30 @@ class _DoctorListState extends State<DoctorList> {
     listDoctor = [];
     doctorIsSource = [];
     try {
-      DoctorResponseList doctorList =
-          await doctorService.getDoctors(context.read<TokenProvider>().tokenSample.jwtToken);
+      DoctorResponseList doctorList = await doctorService
+          .getDoctors(context.read<TokenProvider>().tokenSample.jwtToken);
       if (doctorList != null) {
         if (doctorList.isSuccess) {
           listDoctor = doctorList.data;
           doctorIsSource.addAll(generateDoctorDataFromApi(listDoctor));
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorList.message, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, doctorList.message, context);
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorNull, context);
       }
       setState(() => doctorIsLoading = false);
     } catch (exception) {
       setState(() => doctorIsLoading = false);
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  List<Map<String, dynamic>> generateDoctorDataFromApi(List<DoctorSample> listOfDoctors) {
+  List<Map<String, dynamic>> generateDoctorDataFromApi(
+      List<DoctorSample> listOfDoctors) {
     List<Map<String, dynamic>> tempsdoctor = [];
     for (DoctorSample doctors in listOfDoctors) {
       tempsdoctor.add({
@@ -207,7 +217,8 @@ class _DoctorListState extends State<DoctorList> {
     return tempsdoctor;
   }
 
-  List<Map<String, dynamic>> generateDoctorSearchData(Iterable<Map<String, dynamic>> iterableList) {
+  List<Map<String, dynamic>> generateDoctorSearchData(
+      Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsdoctor = [];
     for (var iterable in iterableList) {
       tempsdoctor.add({
@@ -626,7 +637,8 @@ class _DoctorListState extends State<DoctorList> {
     List<QualificationSample> qualificationSampleList = row['qualifications'];
     if (qualificationSampleList != null) {
       if (qualificationSampleList.length > 0) {
-        for (QualificationSample qualificationSample in qualificationSampleList) {
+        for (QualificationSample qualificationSample
+            in qualificationSampleList) {
           qualificationRequestList.add(QualificationRequest(
             Id: qualificationSample.id,
             UserId: qualificationSample.userId,
@@ -674,11 +686,17 @@ class _DoctorListState extends State<DoctorList> {
   void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
       onPressed: () => Navigator.of(context).pop(),
-      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
-      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
       onPressed: () => onCallingDeleteDoctor(id),
     );
 
@@ -701,8 +719,11 @@ class _DoctorListState extends State<DoctorList> {
         cancelButton,
         deleteButton,
       ],
-      actionsPadding: EdgeInsets.fromLTRB(Dimens.actionsGlobalButtonLeft, Dimens.actionsGlobalButtonTop,
-          Dimens.actionsGlobalButtonRight, Dimens.actionsGlobalButtonBottom),
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
     );
 
     showDialog(
@@ -716,68 +737,75 @@ class _DoctorListState extends State<DoctorList> {
 
   Future<void> onCallingDeleteDoctor(int id) async {
     Navigator.pop(context);
-    globalProgressDialog.showSimpleFontellicoProgressDialog(
-        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(false,
+        Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
-        DoctorResponse doctorResponse =
-            await doctorService.deleteDoctor(id, context.read<TokenProvider>().tokenSample.jwtToken);
+        DoctorResponse doctorResponse = await doctorService.deleteDoctor(
+            id, context.read<TokenProvider>().tokenSample.jwtToken);
         if (doctorResponse != null) {
           if (doctorResponse.isSuccess) {
             checkTokenValidityAndGetDoctor();
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, doctorResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalSuccess, doctorResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           } else {
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, doctorResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, doctorResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           }
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
           globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
 
-  void onChangedSearchedValue(value) {
+  Future<void> onChangedSearchedValue(String search) async {
     if (!doctorIsLoading) {
-      if (value.isNotEmpty) {
-        if (value.length >= 1) {
-          var searchList = doctorIsSource.where((element) {
-            String searchById = element["id"].toString().toLowerCase();
-            String searchByName = element["firstName"].toString().toLowerCase();
-            String searchByPerformedBy = element["lastName"].toString().toLowerCase();
-            String searchByCharges = element["specialityType"].toString().toLowerCase();
-            if (searchById.contains(value.toLowerCase()) ||
-                searchByName.contains(value.toLowerCase()) ||
-                searchByPerformedBy.contains(value.toLowerCase()) ||
-                searchByCharges.contains(value.toLowerCase())) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          doctorIsSearched = [];
-          doctorIsSearched.addAll(generateDoctorSearchData(searchList));
-          setState(() {
-            showSearchedList = true;
-          });
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        if (search.isEmpty) {
+          getDoctorsFromApiAndLinkToTable();
+          return;
+        }
+        DoctorResponseList patientResponse =
+            await doctorService.getDoctorBySearch(
+                context.read<TokenProvider>().tokenSample.jwtToken, search);
+        if (patientResponse != null) {
+          if (patientResponse.isSuccess) {
+            doctorIsSource = [];
+            listDoctor = [];
+            listDoctor = patientResponse.data;
+            doctorIsSource.addAll(generateDoctorDataFromApi(listDoctor));
+            setState(() {
+              showSearchedList = false;
+            });
+          }
+          else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, patientResponse.message, context);
+          }
         } else {
-          setState(() {
-            showSearchedList = false;
-          });
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        setState(() {
-          showSearchedList = false;
-        });
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     }
   }
@@ -787,65 +815,97 @@ class _DoctorListState extends State<DoctorList> {
       elevation: 1,
       shadowColor: Colors.black,
       clipBehavior: Clip.none,
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
-        Container(
-          margin: EdgeInsets.all(10),
-          padding: EdgeInsets.all(0),
-          constraints: BoxConstraints(
-            maxHeight: 500,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ResponsiveDatatable(
-              actions: [
-                Expanded(
-                    child: TextField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none, prefixIcon: Icon(Icons.search_outlined), hintText: 'Search doctor'),
-                  onChanged: (value) => onChangedSearchedValue(value),
-                )),
-              ],
-              headers: doctorHeaders,
-              source: !showSearchedList ? doctorIsSource : doctorIsSearched,
-              selecteds: doctorSelected,
-              showSelect: doctorShowSelect,
-              autoHeight: false,
-              onTabRow: (data) {
-                print(data);
-              },
-              onSort: (value) {
-                setState(() {
-                  doctorSortColumn = value;
-                  doctorSortAscending = !doctorSortAscending;
-                  if (doctorSortAscending) {
-                    doctorIsSource.sort((a, b) => b["$doctorSortColumn"].compareTo(a["$doctorSortColumn"]));
-                  } else {
-                    doctorIsSource.sort((a, b) => a["$doctorSortColumn"].compareTo(b["$doctorSortColumn"]));
-                  }
-                });
-              },
-              sortAscending: doctorSortAscending,
-              sortColumn: doctorSortColumn,
-              isLoading: doctorIsLoading,
-              onSelect: (value, item) {
-                print("$value  $item ");
-                if (value) {
-                  setState(() => doctorSelected.add(item));
-                } else {
-                  setState(() => doctorSelected.removeAt(doctorSelected.indexOf(item)));
-                }
-              },
-              onSelectAll: (value) {
-                if (value) {
-                  setState(() => doctorSelected = doctorIsSource.map((entry) => entry).toList().cast());
-                } else {
-                  setState(() => doctorSelected.clear());
-                }
-              },
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(0),
+              constraints: BoxConstraints(
+                maxHeight: 500,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ResponsiveDatatable(
+                  actions: [
+                    widgetSearch(),
+                  ],
+                  headers: doctorHeaders,
+                  source: !showSearchedList ? doctorIsSource : doctorIsSearched,
+                  selecteds: doctorSelected,
+                  showSelect: doctorShowSelect,
+                  autoHeight: false,
+                  onTabRow: (data) {
+                    print(data);
+                  },
+                  onSort: (value) {
+                    setState(() {
+                      doctorSortColumn = value;
+                      doctorSortAscending = !doctorSortAscending;
+                      if (doctorSortAscending) {
+                        doctorIsSource.sort((a, b) => b["$doctorSortColumn"]
+                            .compareTo(a["$doctorSortColumn"]));
+                      } else {
+                        doctorIsSource.sort((a, b) => a["$doctorSortColumn"]
+                            .compareTo(b["$doctorSortColumn"]));
+                      }
+                    });
+                  },
+                  sortAscending: doctorSortAscending,
+                  sortColumn: doctorSortColumn,
+                  isLoading: doctorIsLoading,
+                  onSelect: (value, item) {
+                    print("$value  $item ");
+                    if (value) {
+                      setState(() => doctorSelected.add(item));
+                    } else {
+                      setState(() => doctorSelected
+                          .removeAt(doctorSelected.indexOf(item)));
+                    }
+                  },
+                  onSelectAll: (value) {
+                    if (value) {
+                      setState(() => doctorSelected =
+                          doctorIsSource.map((entry) => entry).toList().cast());
+                    } else {
+                      setState(() => doctorSelected.clear());
+                    }
+                  },
+                ),
+              ),
+            ),
+          ]),
+    );
+  }
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.grey[50],
+              border: Border.all(color: Colors.grey[300]),
+            ),
+            child: TextField(
+              textAlignVertical: TextAlignVertical.center,
+              cursorColor: Colors.grey[600],
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.search_outlined,
+                    color: Colors.grey[600],
+                  ),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey[600],
+                  ),
+                  focusColor: Colors.grey[600],
+                  hintText: 'Search'),
+              onChanged: (value) => onChangedSearchedValue(value),
             ),
           ),
-        ),
-      ]),
-    );
+        ));
   }
 }

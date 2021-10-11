@@ -81,15 +81,19 @@ class _ProcedureListState extends State<ProcedureList> {
         body: DefaultTextStyle(
           style: Theme.of(context).textTheme.bodyText2,
           child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints viewportConstraints) {
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.minHeight,
                   ),
                   child: Padding(
-                      padding: EdgeInsets.fromLTRB(Dimens.globalPaddingLeft, Dimens.globalPaddingTop,
-                          Dimens.globalPaddingRight, Dimens.globalPaddingBottom),
+                      padding: EdgeInsets.fromLTRB(
+                          Dimens.globalPaddingLeft,
+                          Dimens.globalPaddingTop,
+                          Dimens.globalPaddingRight,
+                          Dimens.globalPaddingBottom),
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -137,10 +141,12 @@ class _ProcedureListState extends State<ProcedureList> {
       if (hasToken) {
         getProceduresFromApiAndLinkToTable();
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
@@ -149,26 +155,31 @@ class _ProcedureListState extends State<ProcedureList> {
     listProcedures = [];
     procedureIsSource = [];
     try {
-      ProcedureResponseList procedureList =
-          await procedureService.getProcedures(context.read<TokenProvider>().tokenSample.jwtToken);
+      ProcedureResponseList procedureList = await procedureService
+          .getProcedures(context.read<TokenProvider>().tokenSample.jwtToken);
       if (procedureList != null) {
         if (procedureList.isSuccess) {
           listProcedures = procedureList.data;
-          procedureIsSource.addAll(generateProcedureDataFromApi(listProcedures));
+          procedureIsSource
+              .addAll(generateProcedureDataFromApi(listProcedures));
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureList.message, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, procedureList.message, context);
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorNull, context);
       }
       setState(() => procedureIsLoading = false);
     } catch (exception) {
       setState(() => procedureIsLoading = false);
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
     }
   }
 
-  List<Map<String, dynamic>> generateProcedureDataFromApi(List<ProcedureSample> listOfProcedure) {
+  List<Map<String, dynamic>> generateProcedureDataFromApi(
+      List<ProcedureSample> listOfProcedure) {
     List<Map<String, dynamic>> tempsProcedure = [];
     for (ProcedureSample procedureSample in listOfProcedure) {
       tempsProcedure.add({
@@ -184,7 +195,8 @@ class _ProcedureListState extends State<ProcedureList> {
     return tempsProcedure;
   }
 
-  List<Map<String, dynamic>> generateProcedureSearchData(Iterable<Map<String, dynamic>> iterableList) {
+  List<Map<String, dynamic>> generateProcedureSearchData(
+      Iterable<Map<String, dynamic>> iterableList) {
     List<Map<String, dynamic>> tempsprocedure = [];
     for (var iterable in iterableList) {
       tempsprocedure.add({
@@ -367,11 +379,17 @@ class _ProcedureListState extends State<ProcedureList> {
   void onPressedDeleteFromTable(id, row) {
     Widget cancelButton = TextButton(
       onPressed: () => Navigator.of(context).pop(),
-      child: Text("Cancel", style: TextStyle(color: Shade.alertBoxButtonTextCancel, fontWeight: FontWeight.w900)),
+      child: Text("Cancel",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextCancel,
+              fontWeight: FontWeight.w900)),
     );
 
     Widget deleteButton = TextButton(
-      child: Text("Delete", style: TextStyle(color: Shade.alertBoxButtonTextDelete, fontWeight: FontWeight.w900)),
+      child: Text("Delete",
+          style: TextStyle(
+              color: Shade.alertBoxButtonTextDelete,
+              fontWeight: FontWeight.w900)),
       onPressed: () => onCallingDeleteProcedure(id),
     );
 
@@ -394,8 +412,11 @@ class _ProcedureListState extends State<ProcedureList> {
         cancelButton,
         deleteButton,
       ],
-      actionsPadding: EdgeInsets.fromLTRB(Dimens.actionsGlobalButtonLeft, Dimens.actionsGlobalButtonTop,
-          Dimens.actionsGlobalButtonRight, Dimens.actionsGlobalButtonBottom),
+      actionsPadding: EdgeInsets.fromLTRB(
+          Dimens.actionsGlobalButtonLeft,
+          Dimens.actionsGlobalButtonTop,
+          Dimens.actionsGlobalButtonRight,
+          Dimens.actionsGlobalButtonBottom),
     );
 
     showDialog(
@@ -409,61 +430,80 @@ class _ProcedureListState extends State<ProcedureList> {
 
   Future<void> onCallingDeleteProcedure(int id) async {
     Navigator.pop(context);
-    globalProgressDialog.showSimpleFontellicoProgressDialog(
-        false, Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
+    globalProgressDialog.showSimpleFontellicoProgressDialog(false,
+        Strings.dialogDeleting, SimpleFontelicoProgressDialogType.multilines);
     try {
       bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
       if (hasToken) {
         ProcedureResponse procedureResponse =
-            await procedureService.deleteProcedure(id, context.read<TokenProvider>().tokenSample.jwtToken);
+            await procedureService.deleteProcedure(
+                id, context.read<TokenProvider>().tokenSample.jwtToken);
         if (procedureResponse != null) {
           if (procedureResponse.isSuccess) {
             checkTokenValidityAndGetProcedure();
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalSuccess, procedureResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalSuccess, procedureResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           } else {
-            GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, procedureResponse.message, context);
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, procedureResponse.message, context);
             globalProgressDialog.hideSimpleFontellicoProgressDialog();
           }
         } else {
-          GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorNull, context);
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
           globalProgressDialog.hideSimpleFontellicoProgressDialog();
         }
       } else {
-        GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, Strings.errorToken, context);
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
         globalProgressDialog.hideSimpleFontellicoProgressDialog();
       }
     } catch (exception) {
-      GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, exception.toString(), context);
+      GlobalSnackbar.showMessageUsingSnackBar(
+          Shade.snackGlobalFailed, exception.toString(), context);
       globalProgressDialog.hideSimpleFontellicoProgressDialog();
     }
   }
 
-  void onChangedSearchedValue(value) {
+  Future<void> onChangedSearchedValue(String search) async {
     if (!procedureIsLoading) {
-      if (value.isNotEmpty) {
-        if (value.length >= 2) {
-          var searchList = procedureIsSource.where((element) {
-            String searchById = element["id"].toString().toLowerCase();
-            String searchByName = element["name"].toString().toLowerCase();
-
-            if (searchById.contains(value.toLowerCase()) ||
-                searchByName.contains(value.toLowerCase())) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          procedureIsSearched = [];
-          procedureIsSearched.addAll(generateProcedureSearchData(searchList));
-          setState(() {
-            showSearchedList = true;
-          });
-        } else {
-          setState(() {
-            showSearchedList = false;
-          });
+      bool hasToken = await GlobalRefreshToken.hasValidTokenToSend(context);
+      if (hasToken) {
+        if (search.isEmpty) {
+          getProceduresFromApiAndLinkToTable();
+          return;
         }
+        ProcedureResponseList procedureResponse =
+            await procedureService.getProcedureBySearch(
+                context.read<TokenProvider>().tokenSample.jwtToken, search);
+        if (procedureResponse != null) {
+          if (procedureResponse.isSuccess) {
+            procedureIsSource = [];
+            listProcedures = [];
+            listProcedures = procedureResponse.data;
+            procedureIsSource
+                .addAll(generateProcedureDataFromApi(listProcedures));
+            setState(() {
+              showSearchedList = false;
+            });
+          } else {
+            GlobalSnackbar.showMessageUsingSnackBar(
+                Shade.snackGlobalFailed, procedureResponse.message, context);
+            globalProgressDialog.hideSimpleFontellicoProgressDialog();
+          }
+        } else {
+          GlobalSnackbar.showMessageUsingSnackBar(
+              Shade.snackGlobalFailed, Strings.errorNull, context);
+          globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        }
+      } else {
+        GlobalSnackbar.showMessageUsingSnackBar(
+            Shade.snackGlobalFailed, Strings.errorToken, context);
+        globalProgressDialog.hideSimpleFontellicoProgressDialog();
+        setState(() {
+          showSearchedList = false;
+        });
       }
     }
   }
@@ -473,65 +513,103 @@ class _ProcedureListState extends State<ProcedureList> {
       elevation: 1,
       shadowColor: Colors.black,
       clipBehavior: Clip.none,
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
-        Container(
-          margin: EdgeInsets.all(10),
-          padding: EdgeInsets.all(0),
-          constraints: BoxConstraints(
-            maxHeight: 500,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ResponsiveDatatable(
-              actions: [
-                Expanded(
-                    child: TextField(
-                  decoration: InputDecoration(
-                      border: InputBorder.none, prefixIcon: Icon(Icons.search_outlined), hintText: 'Search procedure'),
-                  onChanged: (value) => onChangedSearchedValue(value),
-                )),
-              ],
-              headers: procedureHeaders,
-              source: !showSearchedList ? procedureIsSource : procedureIsSearched,
-              selecteds: procedureSelecteds,
-              showSelect: procedureShowSelect,
-              autoHeight: false,
-              onTabRow: (data) {
-                print(data);
-              },
-              onSort: (value) {
-                setState(() {
-                  procedureSortColumn = value;
-                  procedureSortAscending = !procedureSortAscending;
-                  if (procedureSortAscending) {
-                    procedureIsSource.sort((a, b) => b["$procedureSortColumn"].compareTo(a["$procedureSortColumn"]));
-                  } else {
-                    procedureIsSource.sort((a, b) => a["$procedureSortColumn"].compareTo(b["$procedureSortColumn"]));
-                  }
-                });
-              },
-              sortAscending: procedureSortAscending,
-              sortColumn: procedureSortColumn,
-              isLoading: procedureIsLoading,
-              onSelect: (value, item) {
-                print("$value  $item ");
-                if (value) {
-                  setState(() => procedureSelecteds.add(item));
-                } else {
-                  setState(() => procedureSelecteds.removeAt(procedureSelecteds.indexOf(item)));
-                }
-              },
-              onSelectAll: (value) {
-                if (value) {
-                  setState(() => procedureSelecteds = procedureIsSource.map((entry) => entry).toList().cast());
-                } else {
-                  setState(() => procedureSelecteds.clear());
-                }
-              },
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(0),
+              constraints: BoxConstraints(
+                maxHeight: 500,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ResponsiveDatatable(
+                  actions: [
+                    widgetSearch(),
+                  ],
+                  headers: procedureHeaders,
+                  source: !showSearchedList
+                      ? procedureIsSource
+                      : procedureIsSearched,
+                  selecteds: procedureSelecteds,
+                  showSelect: procedureShowSelect,
+                  autoHeight: false,
+                  onTabRow: (data) {
+                    print(data);
+                  },
+                  onSort: (value) {
+                    setState(() {
+                      procedureSortColumn = value;
+                      procedureSortAscending = !procedureSortAscending;
+                      if (procedureSortAscending) {
+                        procedureIsSource.sort((a, b) =>
+                            b["$procedureSortColumn"]
+                                .compareTo(a["$procedureSortColumn"]));
+                      } else {
+                        procedureIsSource.sort((a, b) =>
+                            a["$procedureSortColumn"]
+                                .compareTo(b["$procedureSortColumn"]));
+                      }
+                    });
+                  },
+                  sortAscending: procedureSortAscending,
+                  sortColumn: procedureSortColumn,
+                  isLoading: procedureIsLoading,
+                  onSelect: (value, item) {
+                    print("$value  $item ");
+                    if (value) {
+                      setState(() => procedureSelecteds.add(item));
+                    } else {
+                      setState(() => procedureSelecteds
+                          .removeAt(procedureSelecteds.indexOf(item)));
+                    }
+                  },
+                  onSelectAll: (value) {
+                    if (value) {
+                      setState(() => procedureSelecteds = procedureIsSource
+                          .map((entry) => entry)
+                          .toList()
+                          .cast());
+                    } else {
+                      setState(() => procedureSelecteds.clear());
+                    }
+                  },
+                ),
+              ),
+            ),
+          ]),
+    );
+  }
+  Widget widgetSearch() {
+    return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(5, 0, 5, 10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.grey[50],
+              border: Border.all(color: Colors.grey[300]),
+            ),
+            child: TextField(
+              textAlignVertical: TextAlignVertical.center,
+              cursorColor: Colors.grey[600],
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.search_outlined,
+                    color: Colors.grey[600],
+                  ),
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey[600],
+                  ),
+                  focusColor: Colors.grey[600],
+                  hintText: 'Search'),
+              onChanged: (value) => onChangedSearchedValue(value),
             ),
           ),
-        ),
-      ]),
-    );
+        ));
   }
 }

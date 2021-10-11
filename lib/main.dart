@@ -11,8 +11,10 @@ import 'package:baby_doctor/Pages/EditDoctor.dart';
 import 'package:baby_doctor/Pages/EditNurse.dart';
 import 'package:baby_doctor/Pages/EditReceptionist.dart';
 import 'package:baby_doctor/Pages/EditService.dart';
+import 'package:baby_doctor/Pages/ExpenseList.dart';
 import 'package:baby_doctor/Pages/Home.dart';
 import 'package:baby_doctor/Pages/AddReceptionist.dart';
+import 'package:baby_doctor/Pages/AppointmentList.dart';
 import 'package:baby_doctor/Pages/InvoiceList.dart';
 import 'package:baby_doctor/Pages/Login.dart';
 import 'package:baby_doctor/Pages/Nurse%20Share.dart';
@@ -24,7 +26,7 @@ import 'package:baby_doctor/Pages/NurseAppointment.dart';
 import 'package:baby_doctor/Pages/ProcedureList.dart';
 import 'package:baby_doctor/Pages/ReceptionistList.dart';
 import 'package:baby_doctor/Pages/ServiceList.dart';
-import 'package:baby_doctor/Pages/AppointmentList.dart';
+import 'package:baby_doctor/Pages/WalkInList.dart';
 import 'package:baby_doctor/Providers/LoginCredentialsProvider.dart';
 import 'package:baby_doctor/Providers/TokenProvider.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +70,8 @@ class MyApp extends StatelessWidget {
         Strings.routeReceptionistList: (context) => ReceptionistList(),
         Strings.routeProcedureList: (context) => ProcedureList(),
         Strings.routeServiceList: (context) => ServiceList(),
+        Strings.routeExpenseList: (context) => ExpenseList(),
+        Strings.routeInvoiceList: (context) => InvoiceList(),
         Strings.routeHomePage: (context) => Home(),
         '/NurseMedication': (context) => NurseMedication(),
         '/BedTime': (context) => BedTime(),

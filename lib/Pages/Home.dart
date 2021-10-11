@@ -152,7 +152,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, Strings.routePatientList);
-                  }), ListTile(
+                  }),
+              ListTile(
                   leading: Icon(Icons.list_alt),
                   title: Text(Strings.titleAppointmentList),
                   onTap: () {
@@ -199,6 +200,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               widgetRowThree(),
                               widgetRowFour(),
                               widgetRowSix(),
+                              widgetRowSeven(),
                               widgetRowFive(),
                             ],
                           ),
@@ -318,7 +320,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        widgetInvoiceListCard(),
+        widgetAppintmentListCard(),
         widgetDoctorListCard(),
         widgetNurseListCard(),
       ],
@@ -343,6 +345,18 @@ class _HomeDrawerState extends State<HomeDrawer> {
       textDirection: TextDirection.ltr,
       children: [
         widgetPatientListCard(),
+        widgetExpenseListCard(),
+        widgetInvoiceListCard(),
+      ],
+    );
+  }
+
+  Widget widgetRowSeven() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      textDirection: TextDirection.ltr,
+      children: [
+        widgetAdmittedPatientListCard(),
         widgetDummySpaceCard(),
         widgetDummySpaceCard(),
       ],
@@ -1066,7 +1080,130 @@ class _HomeDrawerState extends State<HomeDrawer> {
     );
   }
 
+  Widget widgetExpenseListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeExpenseList);
+          //GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleExpenseList,
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget widgetInvoiceListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeInvoiceList);
+          //GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleInvoiceList,
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetAdmittedPatientListCard() {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, Strings.routeAdmittedPatientList);
+          //GlobalSnackbar.showMessageUsingSnackBar(Shade.snackGlobalFailed, 'Working On It', context);
+        },
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                    child: FittedBox(
+                        child: Icon(Icons.list_alt_outlined),
+                        fit: BoxFit.fill)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Strings.titleAdmittedList,
+                      style: TextStyle(fontWeight: Shade.fwHomeRowItems),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetAppintmentListCard() {
     return Expanded(
       child: InkWell(
         onTap: () {
